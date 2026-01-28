@@ -1,0 +1,42 @@
+# Ignore model cache (will be downloaded at runtime)
+*.gguf
+*.bin
+*.safetensors
+models/
+
+# Ignore Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Ignore virtual environments
+venv/
+env/
+ENV/
+.venv
+
+# Ignore IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Ignore OS files
+.DS_Store
+Thumbs.db
+
+# Ignore logs
+*.log
+logs/
+
+# Ignore test files
+tests/
+.pytest_cache/
+.coverage
+
+# Ignore documentation
+docs/
+*.md

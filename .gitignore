@@ -1,0 +1,43 @@
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Dependencies
+node_modules/
+dist/
+build/
+target/
+
+# DBT
+dbt/target/
+dbt/dbt_packages/
+dbt/logs/
+
+# Docker
+*.gguf
+*.bin
+*.safetensors
+docker/models/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Convex
+convex/_generated/
+
+# Temporary files
+*.tmp
+.cache/

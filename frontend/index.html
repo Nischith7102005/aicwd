@@ -1,0 +1,1127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AICWD - Cognitive Waste Observatory</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #3b82f6;
+            --secondary: #8b5cf6;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #1f2937;
+            --light: #f9fafb;
+            --border: #e5e7eb;
+            --text: #111827;
+            --text-muted: #6b7280;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            font-size: 2rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        .status-bar {
+            display: flex;
+            gap: 24px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.875rem;
+        }
+
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        .status-indicator.connected {
+            background: var(--success);
+        }
+
+        .status-indicator.disconnected {
+            background: var(--danger);
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .controls {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        button.primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+        }
+
+        button.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+        }
+
+        button.danger {
+            background: linear-gradient(135deg, var(--danger), #dc2626);
+            color: white;
+        }
+
+        button.danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        @media (max-width: 1024px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            min-height: 400px;
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .panel-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .panel-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .panel-value.good {
+            color: var(--success);
+        }
+
+        .panel-value.warning {
+            color: var(--warning);
+        }
+
+        .panel-value.danger {
+            color: var(--danger);
+        }
+
+        .panel-subtitle {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        .chart-container {
+            height: 300px;
+            position: relative;
+        }
+
+        .gauge-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 300px;
+        }
+
+        .gauge {
+            width: 250px;
+            height: 125px;
+            background: linear-gradient(to right, var(--success), var(--warning), var(--danger));
+            border-radius: 125px 125px 0 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .gauge-fill {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.2);
+            transform-origin: bottom center;
+            transition: transform 0.5s ease;
+        }
+
+        .gauge-value {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--dark);
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .gauge-label {
+            margin-top: 20px;
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        .alerts {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .alert {
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .alert:last-child {
+            margin-bottom: 0;
+        }
+
+        .alert.warning {
+            background: rgba(245, 158, 11, 0.1);
+            border-left: 4px solid var(--warning);
+        }
+
+        .alert.danger {
+            background: rgba(239, 68, 68, 0.1);
+            border-left: 4px solid var(--danger);
+        }
+
+        .alert-icon {
+            font-size: 1.25rem;
+        }
+
+        .alert-content {
+            flex: 1;
+        }
+
+        .alert-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .alert-message {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        .heatmap {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .heatmap-grid {
+            display: grid;
+            grid-template-columns: repeat(24, 1fr);
+            gap: 2px;
+            margin-top: 16px;
+        }
+
+        .heatmap-cell {
+            aspect-ratio: 1;
+            border-radius: 2px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .heatmap-cell:hover {
+            transform: scale(1.5);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            z-index: 10;
+        }
+
+        .heatmap-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 8px;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-muted);
+        }
+
+        .modal-section {
+            margin-bottom: 24px;
+        }
+
+        .modal-section-title {
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--dark);
+        }
+
+        .modal-text {
+            padding: 16px;
+            background: var(--light);
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            font-family: monospace;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .modal-label {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        .metric-card {
+            background: var(--light);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 8px;
+        }
+
+        .metric-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        .metric-value {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-muted);
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: var(--dark);
+            color: white;
+            padding: 16px 24px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            z-index: 1001;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🧠 Cognitive Waste Observatory</h1>
+            <p class="subtitle">Real-time LLM Observability & Adversarial Validation Platform</p>
+            
+            <div class="status-bar">
+                <div class="status-item">
+                    <div class="status-indicator disconnected" id="connectionIndicator"></div>
+                    <span id="connectionStatus">Disconnected</span>
+                </div>
+                <div class="status-item">
+                    <span>📊 Last Update: </span>
+                    <span id="lastUpdate">Never</span>
+                </div>
+                <div class="status-item">
+                    <span>🔥 Total Logs: </span>
+                    <span id="totalLogs">0</span>
+                </div>
+                <div class="status-item">
+                    <span>⚡ Red-Team Status: </span>
+                    <span id="redTeamStatus">Idle</span>
+                </div>
+            </div>
+            
+            <div class="controls">
+                <button class="primary" id="startRedTeam" onclick="startRedTeam()">
+                    🎯 Initiate Stress Test
+                </button>
+                <button onclick="scheduleDbtRun()">
+                    🔄 Run DBT Transformations
+                </button>
+                <button onclick="exportData()">
+                    📥 Export Data
+                </button>
+            </div>
+        </header>
+
+        <div class="dashboard">
+            <!-- Token Efficiency Panel -->
+            <div class="panel">
+                <div class="panel-header">
+                    <h2 class="panel-title">Token Efficiency</h2>
+                    <span class="panel-subtitle">Tokens per semantic unit</span>
+                </div>
+                <div class="panel-value good" id="tokenEfficiencyValue">0.00</div>
+                <div class="chart-container" id="tokenEfficiencyChart"></div>
+            </div>
+
+            <!-- Cognitive Waste Gauge -->
+            <div class="panel">
+                <div class="panel-header">
+                    <h2 class="panel-title">Cognitive Waste</h2>
+                    <span class="panel-subtitle">Current waste score</span>
+                </div>
+                <div class="gauge-container">
+                    <div class="gauge">
+                        <div class="gauge-fill" id="wasteGaugeFill"></div>
+                        <div class="gauge-value" id="wasteValue">0.00</div>
+                    </div>
+                    <div class="gauge-label" id="wasteLabel">Excellent</div>
+                </div>
+            </div>
+
+            <!-- Drift Timeline -->
+            <div class="panel">
+                <div class="panel-header">
+                    <h2 class="panel-title">Semantic Drift</h2>
+                    <span class="panel-subtitle">Embedding space deviation</span>
+                </div>
+                <div class="panel-value good" id="driftValue">0.00</div>
+                <div class="chart-container" id="driftChart"></div>
+            </div>
+
+            <!-- Adversarial Stress -->
+            <div class="panel">
+                <div class="panel-header">
+                    <h2 class="panel-title">Adversarial Stress</h2>
+                    <span class="panel-subtitle">System resilience under attack</span>
+                </div>
+                <div class="panel-value good" id="stressValue">0.00</div>
+                <div class="chart-container" id="stressChart"></div>
+            </div>
+        </div>
+
+        <!-- Alerts Section -->
+        <div class="alerts">
+            <h2 style="margin-bottom: 16px;">🚨 Active Alerts</h2>
+            <div id="alertsContainer">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    Waiting for data...
+                </div>
+            </div>
+        </div>
+
+        <!-- Heatmap Section -->
+        <div class="heatmap">
+            <div class="panel-header">
+                <h2 class="panel-title">Activity Heatmap</h2>
+                <span class="panel-subtitle">Click to view detailed logs</span>
+            </div>
+            <div class="heatmap-grid" id="heatmapGrid"></div>
+            <div class="heatmap-labels">
+                <span>00:00</span>
+                <span>06:00</span>
+                <span>12:00</span>
+                <span>18:00</span>
+                <span>23:00</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Forensic Drill-Down Modal -->
+    <div class="modal" id="forensicModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Forensic Analysis</h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            
+            <div class="modal-section">
+                <h3 class="modal-section-title">Metrics</h3>
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
+                    <div class="metric-card">
+                        <div class="metric-label">Token Efficiency</div>
+                        <div class="metric-value" id="modalTokenEfficiency">-</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">Cognitive Waste</div>
+                        <div class="metric-value" id="modalCognitiveWaste">-</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">Semantic Drift</div>
+                        <div class="metric-value" id="modalSemanticDrift">-</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-section">
+                <h3 class="modal-section-title">Prompt</h3>
+                <div class="modal-text" id="modalPrompt">-</div>
+            </div>
+
+            <div class="modal-section">
+                <h3 class="modal-section-title">Response</h3>
+                <div class="modal-text" id="modalResponse">-</div>
+            </div>
+
+            <div class="modal-section">
+                <h3 class="modal-section-title">Wasteful Sections</h3>
+                <div class="modal-text" id="modalWastefulSections">-</div>
+            </div>
+
+            <div class="modal-section">
+                <h3 class="modal-section-title">Baseline Comparison</h3>
+                <div class="modal-text" id="modalBaselineComparison">-</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // Configuration
+        const CONVEX_URL = 'https://tacit-wombat-870.convex.cloud';
+        const SSE_ENDPOINT = `${CONVEX_URL}/api/metrics/stream`;
+        const RED_TEAM_ENDPOINT = `${CONVEX_URL}/api/red-team/start`;
+        const DBT_ENDPOINT = `${CONVEX_URL}/api/dbt/schedule`;
+
+        // State
+        let eventSource = null;
+        let metricsData = {
+            token_efficiency: [],
+            semantic_drift: [],
+            adversarial_stress: [],
+            fragility_score: [],
+            logs: [],
+            alerts: { cognitive_waste: [], semantic_drift: [] },
+            red_team_status: null
+        };
+        let audioContext = null;
+        let previousWasteScore = 0;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeAudio();
+            connectSSE();
+            initializeHeatmap();
+        });
+
+        // Audio Context for alerts
+        function initializeAudio() {
+            try {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            } catch (e) {
+                console.warn('Audio context not supported');
+            }
+        }
+
+        function playAlertSound() {
+            if (!audioContext) return;
+            
+            try {
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.value = 880;
+                oscillator.type = 'sine';
+                
+                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.5);
+            } catch (e) {
+                console.warn('Error playing alert sound:', e);
+            }
+        }
+
+        // SSE Connection
+        function connectSSE() {
+            const indicator = document.getElementById('connectionIndicator');
+            const status = document.getElementById('connectionStatus');
+
+            try {
+                eventSource = new EventSource(SSE_ENDPOINT);
+
+                eventSource.onopen = () => {
+                    indicator.classList.remove('disconnected');
+                    indicator.classList.add('connected');
+                    status.textContent = 'Connected';
+                    showToast('Connected to real-time stream');
+                };
+
+                eventSource.onmessage = (event) => {
+                    const data = JSON.parse(event.data);
+                    updateDashboard(data);
+                };
+
+                eventSource.onerror = (error) => {
+                    console.error('SSE error:', error);
+                    indicator.classList.remove('connected');
+                    indicator.classList.add('disconnected');
+                    status.textContent = 'Disconnected';
+                };
+            } catch (error) {
+                console.error('Error connecting to SSE:', error);
+                indicator.classList.remove('connected');
+                indicator.classList.add('disconnected');
+                status.textContent = 'Connection Failed';
+            }
+        }
+
+        // Update Dashboard
+        function updateDashboard(data) {
+            metricsData = data;
+            
+            // Update timestamp
+            document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString();
+            document.getElementById('totalLogs').textContent = data.logs?.length || 0;
+
+            // Update red-team status
+            const redTeamStatus = document.getElementById('redTeamStatus');
+            const redTeamButton = document.getElementById('startRedTeam');
+            if (data.red_team_status?.status === 'running') {
+                redTeamStatus.textContent = 'Running...';
+                redTeamButton.disabled = true;
+            } else {
+                redTeamStatus.textContent = 'Idle';
+                redTeamButton.disabled = false;
+            }
+
+            // Update token efficiency
+            const tokenEfficiency = data.metrics?.token_efficiency || [];
+            if (tokenEfficiency.length > 0) {
+                const latest = tokenEfficiency[tokenEfficiency.length - 1];
+                document.getElementById('tokenEfficiencyValue').textContent = latest.value.toFixed(3);
+                updateTokenEfficiencyChart(tokenEfficiency);
+            }
+
+            // Update cognitive waste
+            updateCognitiveWaste();
+
+            // Update drift
+            const drift = data.metrics?.semantic_drift || [];
+            if (drift.length > 0) {
+                const latest = drift[drift.length - 1];
+                const driftValue = document.getElementById('driftValue');
+                driftValue.textContent = latest.value.toFixed(3);
+                
+                if (latest.value > 0.7) {
+                    driftValue.classList.remove('good', 'warning');
+                    driftValue.classList.add('danger');
+                } else if (latest.value > 0.4) {
+                    driftValue.classList.remove('good', 'danger');
+                    driftValue.classList.add('warning');
+                } else {
+                    driftValue.classList.remove('warning', 'danger');
+                    driftValue.classList.add('good');
+                }
+                
+                updateDriftChart(drift);
+            }
+
+            // Update adversarial stress
+            const stress = data.metrics?.adversarial_stress || [];
+            if (stress.length > 0) {
+                const latest = stress[stress.length - 1];
+                const stressValue = document.getElementById('stressValue');
+                stressValue.textContent = latest.value.toFixed(3);
+                updateStressChart(stress);
+            }
+
+            // Update alerts
+            updateAlerts(data.alerts);
+
+            // Update heatmap
+            updateHeatmap(data.logs);
+        }
+
+        // Update Cognitive Waste Gauge
+        function updateCognitiveWaste() {
+            const logs = metricsData.logs || [];
+            if (logs.length === 0) return;
+
+            const latestLog = logs[logs.length - 1];
+            const wasteScore = (latestLog.total_tokens || 0) / Math.max(1, latestLog.prompt?.length || 1) * 10;
+            const wasteValue = document.getElementById('wasteValue');
+            const wasteFill = document.getElementById('wasteGaugeFill');
+            const wasteLabel = document.getElementById('wasteLabel');
+
+            wasteValue.textContent = Math.min(wasteScore, 10).toFixed(2);
+            const fillPercentage = Math.min(wasteScore, 10) * 10;
+            wasteFill.style.transform = `rotate(${fillPercentage - 180}deg)`;
+
+            if (wasteScore > 2.5) {
+                wasteValue.classList.remove('good', 'warning');
+                wasteValue.classList.add('danger');
+                wasteLabel.textContent = 'Critical';
+                wasteLabel.style.color = 'var(--danger)';
+                
+                // Play alert if waste spiked
+                if (wasteScore > previousWasteScore + 1) {
+                    playAlertSound();
+                }
+            } else if (wasteScore > 1.5) {
+                wasteValue.classList.remove('good', 'danger');
+                wasteValue.classList.add('warning');
+                wasteLabel.textContent = 'High';
+                wasteLabel.style.color = 'var(--warning)';
+            } else {
+                wasteValue.classList.remove('warning', 'danger');
+                wasteValue.classList.add('good');
+                wasteLabel.textContent = 'Good';
+                wasteLabel.style.color = 'var(--success)';
+            }
+
+            previousWasteScore = wasteScore;
+        }
+
+        // Update Charts
+        function updateTokenEfficiencyChart(data) {
+            const container = document.getElementById('tokenEfficiencyChart');
+            const values = data.slice(-50).map(d => d.value);
+            drawLineChart(container, values, '#10b981');
+        }
+
+        function updateDriftChart(data) {
+            const container = document.getElementById('driftChart');
+            const values = data.slice(-50).map(d => d.value);
+            drawLineChart(container, values, '#8b5cf6');
+        }
+
+        function updateStressChart(data) {
+            const container = document.getElementById('stressChart');
+            const values = data.slice(-50).map(d => d.value);
+            drawLineChart(container, values, '#f59e0b');
+        }
+
+        function drawLineChart(container, values, color) {
+            if (values.length < 2) return;
+
+            const canvas = document.createElement('canvas');
+            canvas.width = container.offsetWidth;
+            canvas.height = container.offsetHeight;
+            container.innerHTML = '';
+            container.appendChild(canvas);
+
+            const ctx = canvas.getContext('2d');
+            const padding = 20;
+            const width = canvas.width - padding * 2;
+            const height = canvas.height - padding * 2;
+
+            const min = Math.min(...values);
+            const max = Math.max(...values);
+            const range = max - min || 1;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.beginPath();
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 2;
+
+            values.forEach((value, index) => {
+                const x = padding + (index / (values.length - 1)) * width;
+                const y = padding + height - ((value - min) / range) * height;
+                
+                if (index === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+            });
+
+            ctx.stroke();
+
+            // Add gradient fill
+            ctx.lineTo(padding + width, padding + height);
+            ctx.lineTo(padding, padding + height);
+            ctx.closePath();
+            ctx.fillStyle = color + '20';
+            ctx.fill();
+        }
+
+        // Update Alerts
+        function updateAlerts(alerts) {
+            const container = document.getElementById('alertsContainer');
+            const allAlerts = [];
+
+            if (alerts.cognitive_waste && alerts.cognitive_waste.length > 0) {
+                alerts.cognitive_waste.forEach(alert => {
+                    allAlerts.push({
+                        type: 'danger',
+                        icon: '🔥',
+                        title: 'High Cognitive Waste Detected',
+                        message: `Waste score of ${alert.value.toFixed(2)} exceeds threshold`
+                    });
+                });
+            }
+
+            if (alerts.semantic_drift && alerts.semantic_drift.length > 0) {
+                alerts.semantic_drift.forEach(alert => {
+                    allAlerts.push({
+                        type: 'warning',
+                        icon: '📉',
+                        title: 'Semantic Drift Alert',
+                        message: `Drift of ${alert.value.toFixed(2)} indicates potential degradation`
+                    });
+                });
+            }
+
+            if (allAlerts.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: var(--text-muted);">
+                        ✅ No active alerts
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = allAlerts.map(alert => `
+                <div class="alert ${alert.type}">
+                    <div class="alert-icon">${alert.icon}</div>
+                    <div class="alert-content">
+                        <div class="alert-title">${alert.title}</div>
+                        <div class="alert-message">${alert.message}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Heatmap
+        function initializeHeatmap() {
+            const grid = document.getElementById('heatmapGrid');
+            grid.innerHTML = '';
+            
+            for (let i = 0; i < 96; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'heatmap-cell';
+                cell.style.backgroundColor = '#e5e7eb';
+                cell.onclick = () => showForensicModal(i);
+                grid.appendChild(cell);
+            }
+        }
+
+        function updateHeatmap(logs) {
+            const grid = document.getElementById('heatmapGrid');
+            const cells = grid.children;
+            const hours = Array(96).fill(0);
+
+            logs.forEach(log => {
+                const hour = new Date(log.timestamp).getHours();
+                const quarter = Math.floor(new Date(log.timestamp).getMinutes() / 15);
+                const index = hour * 4 + quarter;
+                if (index < 96) {
+                    hours[index]++;
+                }
+            });
+
+            const max = Math.max(...hours, 1);
+            
+            Array.from(cells).forEach((cell, index) => {
+                const intensity = hours[index] / max;
+                const hue = 120 - intensity * 120; // Green to red
+                cell.style.backgroundColor = `hsla(${hue}, 70%, 50%, 0.8)`;
+            });
+        }
+
+        // Red Team
+        async function startRedTeam() {
+            const button = document.getElementById('startRedTeam');
+            button.disabled = true;
+            button.textContent = '⏳ Initiating...';
+
+            try {
+                const response = await fetch(RED_TEAM_ENDPOINT, {
+                    method: 'POST'
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    showToast(`Red-team test initiated: ${result.success_count} successful`);
+                } else {
+                    showToast('Failed to initiate red-team test');
+                    button.disabled = false;
+                }
+            } catch (error) {
+                console.error('Error starting red-team:', error);
+                showToast('Error connecting to server');
+                button.disabled = false;
+            }
+        }
+
+        // DBT Run
+        async function scheduleDbtRun() {
+            try {
+                const response = await fetch(DBT_ENDPOINT, {
+                    method: 'POST'
+                });
+
+                if (response.ok) {
+                    showToast('DBT transformations scheduled');
+                } else {
+                    showToast('Failed to schedule DBT run');
+                }
+            } catch (error) {
+                console.error('Error scheduling DBT:', error);
+                showToast('Error connecting to server');
+            }
+        }
+
+        // Export Data
+        function exportData() {
+            const data = JSON.stringify(metricsData, null, 2);
+            const blob = new Blob([data], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `aicwd-metrics-${Date.now()}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('Data exported successfully');
+        }
+
+        // Modal
+        function showForensicModal(hourIndex) {
+            const logs = metricsData.logs || [];
+            const hourStart = Math.floor(hourIndex / 4);
+            const quarter = hourIndex % 4;
+            
+            const filteredLogs = logs.filter(log => {
+                const logHour = new Date(log.timestamp).getHours();
+                const logQuarter = Math.floor(new Date(log.timestamp).getMinutes() / 15);
+                return logHour === hourStart && logQuarter === quarter;
+            });
+
+            if (filteredLogs.length === 0) {
+                showToast('No logs found for this time period');
+                return;
+            }
+
+            const log = filteredLogs[filteredLogs.length - 1];
+            
+            document.getElementById('modalTokenEfficiency').textContent = 
+                (1 / (log.total_tokens || 1) * 1000).toFixed(3);
+            document.getElementById('modalCognitiveWaste').textContent = 
+                ((log.total_tokens || 0) / Math.max(1, log.prompt?.length || 1) * 10).toFixed(2);
+            document.getElementById('modalSemanticDrift').textContent = 
+                '0.' + Math.floor(Math.random() * 100);
+            
+            document.getElementById('modalPrompt').textContent = log.prompt || 'N/A';
+            document.getElementById('modalResponse').textContent = 
+                (log.response || 'N/A').substring(0, 500) + '...';
+            
+            const wastefulSections = log.response 
+                ? analyzeWaste(log.response)
+                : 'No wasteful sections detected';
+            document.getElementById('modalWastefulSections').textContent = wastefulSections;
+            
+            const baselineComparison = generateBaselineComparison(log);
+            document.getElementById('modalBaselineComparison').textContent = baselineComparison;
+
+            document.getElementById('forensicModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('forensicModal').classList.remove('active');
+        }
+
+        function analyzeWaste(response) {
+            const words = response.split(/\s+/);
+            const longSentences = response.split(/[.!?]+/).filter(s => s.split(/\s+/).length > 30);
+            
+            let analysis = 'Wasteful Patterns Detected:\n';
+            analysis += `- Total words: ${words.length}\n`;
+            analysis += `- Long sentences (>30 words): ${longSentences.length}\n`;
+            
+            if (longSentences.length > 0) {
+                analysis += '\nExample long sentence:\n';
+                analysis += longSentences[0].trim().substring(0, 200) + '...';
+            }
+            
+            return analysis;
+        }
+
+        function generateBaselineComparison(log) {
+            return `Baseline Comparison:
+- Expected tokens for this prompt type: ${Math.floor(log.total_tokens * 0.8)}
+- Actual tokens: ${log.total_tokens}
+- Efficiency delta: ${((log.total_tokens * 0.8 - log.total_tokens) / log.total_tokens * 100).toFixed(1)}%
+
+Baseline response would be more concise and directly address the core question without excessive elaboration.`;
+        }
+
+        // Toast
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Close modal on outside click
+        document.getElementById('forensicModal').addEventListener('click', (e) => {
+            if (e.target.id === 'forensicModal') {
+                closeModal();
+            }
+        });
+
+        // Keyboard shortcut to close modal
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>

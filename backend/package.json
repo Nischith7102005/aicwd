@@ -1,0 +1,33 @@
+{
+  "name": "aicwd-backend",
+  "version": "1.0.0",
+  "description": "AICWD Backend - Convex serverless functions with Groq LLM integration",
+  "type": "module",
+  "scripts": {
+    "dev": "convex dev",
+    "deploy": "convex deploy",
+    "typecheck": "convex typecheck",
+    "test": "convex dev"
+  },
+  "keywords": [
+    "llm",
+    "observability",
+    "cognitive-waste",
+    "adversarial",
+    "convex",
+    "groq"
+  ],
+  "author": "AICWD Team",
+  "license": "MIT",
+  "dependencies": {
+    "convex": "^1.15.0",
+    "groq-sdk": "^0.7.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "typescript": "^5.3.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

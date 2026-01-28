@@ -1,0 +1,45 @@
+{
+  "version": 1,
+  "functions": [
+    {
+      "name": "api",
+      "path": "convex/functions/api.ts",
+      "export": "api"
+    },
+    {
+      "name": "ingestLog",
+      "path": "convex/functions/api.ts",
+      "export": "ingestLog"
+    },
+    {
+      "name": "streamMetrics",
+      "path": "convex/functions/api.ts",
+      "export": "streamMetrics"
+    },
+    {
+      "name": "startRedTeam",
+      "path": "convex/functions/api.ts",
+      "export": "startRedTeam"
+    },
+    {
+      "name": "getRedTeamStatus",
+      "path": "convex/functions/api.ts",
+      "export": "getRedTeamStatus"
+    },
+    {
+      "name": "getRedTeamResults",
+      "path": "convex/functions/api.ts",
+      "export": "getRedTeamResults"
+    },
+    {
+      "name": "scheduleDbtRun",
+      "path": "convex/functions/api.ts",
+      "export": "scheduleDbtRun"
+    },
+    {
+      "name": "runDbtScheduled",
+      "path": "convex/functions/api.ts",
+      "export": "runDbtScheduled"
+    }
+  ]
+}
