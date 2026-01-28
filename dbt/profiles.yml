@@ -1,0 +1,21 @@
+aicwd:
+  outputs:
+    dev:
+      type: postgres
+      host: localhost
+      user: postgres
+      password: your_password
+      port: 5432
+      dbname: aicwd
+      schema: dbt_aicwd
+      threads: 4
+    prod:
+      type: postgres
+      host: your-production-host
+      user: your_user
+      password: your_production_password
+      port: 5432
+      dbname: aicwd_prod
+      schema: dbt_aicwd
+      threads: 8
+  target: dev

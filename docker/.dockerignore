@@ -1,0 +1,44 @@
+# Git files
+.git
+.gitignore
+
+# Python cache
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg-info/
+dist/
+build/
+
+# Virtual environments
+venv/
+env/
+ENV/
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# Large model files (download during build)
+*.gguf
+*.bin
+*.safetensors
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Test files
+tests/
+test_*.py
+*_test.py

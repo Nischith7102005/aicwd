@@ -1,0 +1,66 @@
+{
+  "version": 1,
+  "functions": [
+    {
+      "path": "convex/functions/api.ts",
+      "isMutation": false,
+      "isQuery": false,
+      "isHttp": true,
+      "http": {
+        "path": "/api/metrics/stream",
+        "method": "GET"
+      }
+    },
+    {
+      "path": "convex/functions/api.ts",
+      "isMutation": true,
+      "isQuery": false,
+      "isHttp": true,
+      "http": {
+        "path": "/api/metrics/ingest",
+        "method": "POST"
+      }
+    },
+    {
+      "path": "convex/functions/api.ts",
+      "isMutation": true,
+      "isQuery": false,
+      "isHttp": true,
+      "http": {
+        "path": "/api/red-team/start",
+        "method": "POST"
+      }
+    },
+    {
+      "path": "convex/functions/api.ts",
+      "isMutation": false,
+      "isQuery": true,
+      "isHttp": true,
+      "http": {
+        "path": "/api/red-team/status",
+        "method": "GET"
+      }
+    },
+    {
+      "path": "convex/functions/api.ts",
+      "isMutation": false,
+      "isQuery": true,
+      "isHttp": true,
+      "http": {
+        "path": "/api/red-team/results",
+        "method": "GET"
+      }
+    },
+    {
+      "path": "convex/functions/api.ts",
+      "isMutation": true,
+      "isQuery": false,
+      "isHttp": true,
+      "http": {
+        "path": "/api/dbt/schedule",
+        "method": "POST"
+      }
+    }
+  ],
+  "schema": "convex/schema.ts"
+}

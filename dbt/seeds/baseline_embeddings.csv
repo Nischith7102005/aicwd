@@ -1,0 +1,11 @@
+dimension_id,semantic_space,embedding_vector,label
+dim_001,helpfulness,0.9234,0.8456,0.7123,baseline_helpful
+dim_002,accuracy,0.8123,0.9345,0.6789,baseline_accurate
+dim_003,clarity,0.9567,0.8234,0.7890,baseline_clear
+dim_004,conciseness,0.8456,0.9123,0.7345,baseline_concise
+dim_005,safety,0.9678,0.9456,0.9234,baseline_safe
+dim_006,neutrality,0.8234,0.8567,0.8901,baseline_neutral
+dim_007,relevance,0.9345,0.8789,0.8123,baseline_relevant
+dim_008,completeness,0.8567,0.9012,0.7456,baseline_complete
+dim_009,coherence,0.9123,0.8456,0.7789,baseline_coherent
+dim_010,originality,0.7890,0.8678,0.8234,baseline_original

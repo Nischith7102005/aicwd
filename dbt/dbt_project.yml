@@ -1,0 +1,27 @@
+name: 'aicwd'
+version: '1.0.0'
+config-version: 2
+
+profile: 'aicwd'
+
+model-paths: ["models"]
+seed-paths: ["seeds"]
+test-paths: ["tests"]
+analysis-paths: ["analysis"]
+macro-paths: ["macros"]
+
+target-path: "target"
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+models:
+  aicwd:
+    staging:
+      +materialized: view
+    mart:
+      +materialized: table
+
+seeds:
+  aicwd:
+    +schema: seeds

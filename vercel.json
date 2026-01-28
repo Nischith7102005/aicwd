@@ -1,0 +1,19 @@
+{
+  "version": 2,
+  "name": "aicwd-dashboard",
+  "builds": [
+    {
+      "src": "frontend/index.html",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/frontend/index.html"
+    }
+  ],
+  "env": {
+    "CONVEX_URL": "https://your-convex-url.convex.cloud"
+  }
+}
