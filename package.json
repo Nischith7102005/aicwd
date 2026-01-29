@@ -1,0 +1,11 @@
+{
+  "name": "aicwd",
+  "version": "1.0.0",
+  "description": "LLM Observability Platform - Cognitive Waste Index",
+  "scripts": {
+    "build": "echo 'Static frontend - no build step required'"
+  },
+  "keywords": ["llm", "observability", "cognitive-waste"],
+  "author": "",
+  "license": "MIT"
+}
