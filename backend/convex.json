@@ -1,5 +1,0 @@
-{
-  "functions": "convex/",
-  "deploymentUrl": "https://your-deployment-name.convex.cloud",
-  "deploymentKey": "dev:your-deployment-name|your_deploy_key_here"
-}
