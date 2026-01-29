@@ -1,11 +1,5 @@
 {
   "buildCommand": "echo 'Static frontend ready'",
   "outputDirectory": "frontend",
-  "framework": "static",
-  "env": {
-    "CONVEX_URL": {
-      "description": "Convex deployment URL",
-      "default": "https://tacit-wombat-870.convex.cloud"
-    }
-  }
+  "framework": "static"
 }
