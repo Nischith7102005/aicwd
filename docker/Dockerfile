@@ -1,48 +1,37 @@
-FROM ubuntu:22.04
-
-ENV DEBIAN_FRONTEND=noninteractive
-
-RUN apt-get update && apt-get install -y \
-    python3 \
-    python3-pip \
-    curl \
-    git \
-    && rm -rf /var/lib/apt/lists/*
+FROM python:3.10-slim
 
 WORKDIR /app
 
-# Install dependencies
-COPY requirements.txt .
-RUN pip3 install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir fastapi uvicorn pydantic requests
 
-# Create a simple FastAPI app for prompt generation/augmentation
-RUN echo 'from fastapi import FastAPI, HTTPException\n\
-from pydantic import BaseModel\n\
-from typing import List\n\
-import uvicorn\n\
-\n\
-app = FastAPI()\n\
-\n\
-class PromptRequest(BaseModel):\n\
-    prompts: List[str]\n\
-\n\
-@app.get("/")\n\
-def read_root():\n\
-    return {"status": "AICWD Adversarial Model Runner Active"}\n\
-\n\
-@app.post("/generate")\n\
-async def generate_prompts(request: PromptRequest):\n\
-    # Simulating uncensored model augmentation\n\
-    augmented = [f"AUGMENTED: {p}" for p in request.prompts]\n\
-    return {"generated_prompts": augmented}\n\
-\n\
-if __name__ == "__main__":\n\
-    uvicorn.run(app, host="0.0.0.0", port=8000)\n\
-' > app.py
+RUN python - <<'PY'
+from pathlib import Path
+Path('app.py').write_text('''\
+from fastapi import FastAPI
+from pydantic import BaseModel
+from typing import List
 
-# Placeholder for actual model download logic
-# RUN python3 -c "from transformers import AutoModel; AutoModel.from_pretrained('DavidAU/OpenAi-GPT-oss-20b-abliterated-uncensored-NEO-Imatrix-gguf')"
+app = FastAPI(title="AICWD Model Runner", version="1.0")
+
+class GenerateRequest(BaseModel):
+    prompts: List[str]
+
+@app.get("/")
+def root():
+    return {"status": "ok", "service": "aicwd-model-runner"}
+
+@app.post("/generate")
+def generate(req: GenerateRequest):
+    generated = []
+    for p in req.prompts:
+        p = (p or "").strip()
+        if not p:
+            continue
+        generated.append(f"AUGMENTED: {p}")
+    return {"generated_prompts": generated}
+''')
+PY
 
 EXPOSE 8000
 
-CMD ["python3", "app.py"]
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]

@@ -1,23 +1,14 @@
--- Normalize raw logs from Convex DB
-WITH raw_logs AS (
-    SELECT
-        _id AS log_id,
-        prompt,
-        response,
-        tokens,
-        latency,
-        model,
-        created_at
-    FROM {{ source('convex', 'logs') }}
-)
+{{ config(materialized='table') }}
 
 SELECT
-    log_id,
-    prompt,
-    response,
-    CAST(tokens AS INT) AS tokens,
-    CAST(latency AS FLOAT) AS latency_ms,
-    model,
-    TO_TIMESTAMP(created_at / 1000) AS created_at_ts,
-    ROW_NUMBER() OVER (ORDER BY created_at) as row_num
-FROM raw_logs
+  id,
+  prompt,
+  response,
+  tokens,
+  latency,
+  model,
+  LENGTH(response) as response_length,
+  tokens / NULLIF(LENGTH(response), 0) as tokens_per_char,
+  CURRENT_TIMESTAMP as processed_at
+FROM {{ source('convex', 'logs') }}
+WHERE created_at >= NOW() - INTERVAL '24 hours'

@@ -1,23 +1,7 @@
 name: 'cognitive_waste'
 version: '1.0.0'
 config-version: 2
-
-profile: 'cognitive_waste'
-
-model-paths: ["models"]
-seed-paths: ["seeds"]
-test-paths: ["tests"]
-analysis-paths: ["analyses"]
-macro-paths: ["macros"]
-
-target-path: "target"
-clean-targets:
-  - "target"
-  - "dbt_packages"
-
-models:
-  cognitive_waste:
-    staging:
-      +materialized: view
-    mart:
-      +materialized: table
+profile: 'default'
+model-paths: ['models']
+seed-paths: ['seeds']
+target-path: 'target'
