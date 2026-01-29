@@ -1,0 +1,25 @@
+# Node
+node_modules/
+dist/
+.env
+.env.local
+.env.*.local
+
+# Convex
+.convex/
+
+# DBT
+target/
+dbt_packages/
+logs/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Docker
+model_weights/
+
+# OS
+.DS_Store

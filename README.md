@@ -1,20 +1,59 @@
-Project Title: Cognitive Waste Observatory: A Static-First Real-Time Monitoring Platform with Adversarial Validation via Uncensored AI
-Core Concept:
-a lightweight, real-time LLM observability platform that operates entirely through static HTML/CSS/JavaScript (no React/Next.js bloat), leveraging Firebase or WebSocket-enabled serverless functions for live data streaming. The system ingests interaction logs from commercial LLM APIs (OpenAI, Claude, etc.) and executes DBT (Data Build Tool) transformations to calculate a proprietary "Cognitive Waste Index"—a composite metric quantifying token inefficiency, semantic drift, and reasoning redundancy.
-The platform features a dual-model adversarial validation layer: uncensored local LLMs (Llama-3-uncensored, Dolphin-Mistral, or WizardLM-uncensored) act as automated red-team agents, continuously generating adversarial prompts, jailbreak attempts, and edge-case queries to stress-test the monitored production LLM. By comparing the target model's responses against ground-truth embeddings and the uncensored model's "chaos baseline," the system detects hallucination cascades, cognitive overload patterns, and efficiency degradation in real time.
-Live Visualization Architecture:
-The static HTML dashboard renders live statistics through Server-Sent Events (SSE) or lightweight WebSocket connections, displaying:
+# AICWD - Cognitive Waste Index Platform
 
-* Token Efficiency Ratios: Real-time scatter plots of input/output token counts versus semantic information density
-* Cognitive Waste Heatmaps: Color-coded temporal visualizations where brightness indicates Embedding CoherencePerplexity×Token Count​
-* Drift Timelines: Live-updating line charts tracking embedding space deviation from baseline responses
-* Adversarial Stress Indicators: Gauge charts showing the monitored LLM's performance degradation under uncensored model attacks (response latency spikes, coherence drops, refusal rate anomalies)
-* Hallucination Probability Meters: Bayesian confidence intervals updated per inference, derived from semantic consistency checks against vectorized knowledge bases
+A complete, production-ready LLM observability system for monitoring cognitive waste, semantic drift, and adversarial resilience.
 
-Technical Innovation:
-The novelty lies in three converging elements: 
-(1) Architectural inversion—using static-site generators (Eleventy/Hugo) with edge functions to achieve sub-100ms dashboard updates without heavy frontend frameworks, making ML observability accessible on low-cost hosting; 
-(2) Methodological uniqueness—employing unaligned, uncensored models specifically as diagnostic tools to quantify "cognitive fragility" (how quickly model reasoning degrades under adversarial pressure), a technique unexplored in traditional LLM monitoring; and
-(3) Educational ETL—using DBT to transform raw conversational logs into pedagogical datasets, teaching data engineering students how structured transformations apply to unstructured AI telemetry.
+## Features
 
-This creates the first open-source platform where real-time LLM monitoring, adversarial red-teaming, and data engineering pedagogy coexist in a serverless, static-first architecture. 
+- **Static-First Dashboard**: 4-pane responsive layout with real-time Chart.js visualizations.
+- **Real-Time Streaming**: SSE connection for live metric updates every 5s.
+- **Adversarial Red-Teaming**: Automated stress tests using uncensored local models via Docker.
+- **Cognitive Waste Index**: Proprietary metric computing token efficiency and semantic coherence using DBT.
+- **Forensic Drill-Down**: Detailed analysis of LLM interactions, including perplexity and drift scores.
+
+## Project Structure
+
+- `frontend/`: Static HTML/JS dashboard.
+- `backend/`: Convex functions for persistence, API, and orchestration.
+- `dbt/`: Data transformations for metric computation.
+- `docker/`: Uncensored model runner service.
+- `red_team_config.yaml`: Adversarial campaign configuration.
+
+## Setup & Deployment
+
+### 1. Prerequisites
+- Node.js & NPM
+- Convex Account
+- Groq API Key
+- Docker
+
+### 2. Backend (Convex)
+```bash
+cd backend
+npm install
+# Set your environment variables in .env.local
+npx convex dev
+```
+
+### 3. Docker (Model Runner)
+```bash
+cd docker
+docker build -t aicwd-model .
+docker run -p 8000:8000 aicwd-model
+```
+
+### 4. DBT (Data Warehouse)
+```bash
+cd dbt
+dbt seed
+dbt run
+```
+
+### 5. Frontend
+Open `frontend/index.html` in any browser. Ensure `VITE_CONVEX_URL` matches your Convex deployment.
+
+## Metrics Calculation
+
+1. **Token Efficiency**: `tokens / (semantic_payload_size)`
+2. **Semantic Drift**: `cosine_similarity(response_embedding, baseline_embedding)`
+3. **Adversarial Stress**: `response_latency_under_attack / baseline_latency`
+4. **Fragility Score**: `(adversarial_waste - baseline_waste) / baseline_waste`
