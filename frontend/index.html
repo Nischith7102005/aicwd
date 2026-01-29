@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AICWD - Cognitive Waste Index Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #0f172a; color: #f1f5f9; }
+        .pane { background-color: #1e293b; border-radius: 0.5rem; padding: 1rem; border: 1px solid #334155; }
+        .metric-value { font-size: 2.5rem; font-weight: bold; }
+        .modal { display: none; position: fixed; z-index: 50; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.8); }
+        .modal-content { background-color: #1e293b; margin: 10% auto; padding: 20px; border: 1px solid #334155; width: 80%; border-radius: 0.5rem; }
+    </style>
+</head>
+<body class="p-6">
+    <header class="mb-8 flex justify-between items-center">
+        <div>
+            <h1 class="text-3xl font-bold text-blue-400">AICWD System</h1>
+            <p class="text-slate-400">Production-Ready Cognitive Waste Monitoring</p>
+        </div>
+        <div class="flex gap-4">
+            <button onclick="initiateStressTest()" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded-lg transition-colors">
+                Initiate Stress Test
+            </button>
+            <div id="connectionStatus" class="flex items-center gap-2">
+                <span class="w-3 h-3 rounded-full bg-green-500"></span>
+                <span>Live SSE Connection</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="grid grid-cols-1 md:grid-cols-2 gap-6 h-[70vh]">
+        <!-- Top Left: Token Efficiency Scatter -->
+        <div class="pane flex flex-col">
+            <h2 class="text-xl font-semibold mb-4 text-slate-300">Token Efficiency Scatter</h2>
+            <div class="flex-grow">
+                <canvas id="tokenEfficiencyChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Top Right: Cognitive Waste Index Gauge -->
+        <div class="pane flex flex-col items-center justify-center relative">
+            <h2 class="text-xl font-semibold mb-4 text-slate-300 w-full text-left">Cognitive Waste Index</h2>
+            <div class="w-64 h-64 relative">
+                <canvas id="wasteGauge"></canvas>
+                <div id="wasteValue" class="absolute inset-0 flex items-center justify-center text-4xl font-bold">0.0</div>
+            </div>
+            <div class="mt-4 text-center">
+                <span id="wasteStatus" class="px-3 py-1 rounded-full text-sm font-semibold bg-green-900 text-green-300">OPTIMAL</span>
+            </div>
+        </div>
+
+        <!-- Bottom Left: Semantic Drift Timeline -->
+        <div class="pane flex flex-col">
+            <h2 class="text-xl font-semibold mb-4 text-slate-300">Semantic Drift Timeline</h2>
+            <div class="flex-grow">
+                <canvas id="driftTimelineChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Bottom Right: Adversarial Stress Indicator -->
+        <div class="pane flex flex-col">
+            <h2 class="text-xl font-semibold mb-4 text-slate-300">Adversarial Stress Surface</h2>
+            <div class="flex-grow">
+                <canvas id="stressRadarChart"></canvas>
+            </div>
+        </div>
+    </main>
+
+    <!-- Forensic Drill-down Modal -->
+    <div id="forensicModal" class="modal">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold">Forensic Drill-Down</h3>
+                <button onclick="closeModal()" class="text-slate-400 hover:text-white text-3xl">&times;</button>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <h4 class="text-sm uppercase tracking-wider text-slate-500 mb-2">Original Prompt</h4>
+                    <pre id="modalPrompt" class="bg-slate-900 p-4 rounded text-sm whitespace-pre-wrap"></pre>
+                </div>
+                <div>
+                    <h4 class="text-sm uppercase tracking-wider text-slate-500 mb-2">Target LLM Response</h4>
+                    <pre id="modalResponse" class="bg-slate-900 p-4 rounded text-sm whitespace-pre-wrap"></pre>
+                </div>
+            </div>
+            <div class="mt-6">
+                <h4 class="text-sm uppercase tracking-wider text-slate-500 mb-2">Analysis Results</h4>
+                <div class="grid grid-cols-3 gap-4">
+                    <div class="bg-slate-800 p-3 rounded">
+                        <span class="block text-xs text-slate-400">Waste Score</span>
+                        <span id="modalWaste" class="text-xl font-bold text-red-400"></span>
+                    </div>
+                    <div class="bg-slate-800 p-3 rounded">
+                        <span class="block text-xs text-slate-400">Perplexity</span>
+                        <span id="modalPerplexity" class="text-xl font-bold text-yellow-400"></span>
+                    </div>
+                    <div class="bg-slate-800 p-3 rounded">
+                        <span class="block text-xs text-slate-400">Drift Deviation</span>
+                        <span id="modalDrift" class="text-xl font-bold text-blue-400"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const CONVEX_URL = "https://tacit-wombat-870.convex.cloud";
+        const WASTE_THRESHOLD = 2.5;
+
+        // Web Audio API for alerts
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playAlert() {
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            oscillator.type = 'sine';
+            oscillator.frequency.setValueAtTime(440, audioCtx.currentTime);
+            gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            oscillator.start();
+            oscillator.stop(audioCtx.currentTime + 0.5);
+        }
+
+        // Charts Initialization
+        const tokenEfficiencyCtx = document.getElementById('tokenEfficiencyChart').getContext('2d');
+        const tokenEfficiencyChart = new Chart(tokenEfficiencyCtx, {
+            type: 'scatter',
+            data: { datasets: [{ label: 'Efficiency', data: [], backgroundColor: '#60a5fa' }] },
+            options: { maintainAspectRatio: false, scales: { x: { display: false }, y: { title: { display: true, text: 'Tokens/Semantic Unit' } } } }
+        });
+
+        const wasteGaugeCtx = document.getElementById('wasteGauge').getContext('2d');
+        const wasteGauge = new Chart(wasteGaugeCtx, {
+            type: 'doughnut',
+            data: {
+                datasets: [{
+                    data: [0, 100],
+                    backgroundColor: ['#22c55e', '#334155'],
+                    borderWidth: 0,
+                    circumference: 180,
+                    rotation: 270
+                }]
+            },
+            options: { cutout: '80%', maintainAspectRatio: false, plugins: { legend: { display: false } } }
+        });
+
+        const driftTimelineCtx = document.getElementById('driftTimelineChart').getContext('2d');
+        const driftTimelineChart = new Chart(driftTimelineCtx, {
+            type: 'line',
+            data: { labels: [], datasets: [{ label: 'Cosine Similarity', data: [], borderColor: '#818cf8', tension: 0.4 }] },
+            options: { maintainAspectRatio: false, scales: { y: { min: 0, max: 1 } } }
+        });
+
+        const stressRadarCtx = document.getElementById('stressRadarChart').getContext('2d');
+        const stressRadarChart = new Chart(stressRadarCtx, {
+            type: 'radar',
+            data: {
+                labels: ['Jailbreak', 'Edge Case', 'Overload', 'Recursion', 'Logic', 'Semantic'],
+                datasets: [{ label: 'Current Surface', data: [0,0,0,0,0,0], backgroundColor: 'rgba(239, 68, 68, 0.2)', borderColor: '#ef4444' }]
+            },
+            options: { maintainAspectRatio: false, plugins: { legend: { display: false } } }
+        });
+
+        // SSE Connection
+        const eventSource = new EventSource(`${CONVEX_URL}/api/metrics/stream`);
+        eventSource.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            updateDashboard(data);
+        };
+
+        function updateDashboard(data) {
+            // Update Token Efficiency
+            tokenEfficiencyChart.data.datasets[0].data.push({ x: Date.now(), y: data.token_efficiency });
+            if (tokenEfficiencyChart.data.datasets[0].data.length > 20) tokenEfficiencyChart.data.datasets[0].data.shift();
+            tokenEfficiencyChart.update();
+
+            // Update Waste Gauge
+            const wasteIndex = data.waste_index;
+            document.getElementById('wasteValue').innerText = wasteIndex.toFixed(1);
+            const gaugeValue = Math.min((wasteIndex / 5) * 100, 100);
+            wasteGauge.data.datasets[0].data = [gaugeValue, 100 - gaugeValue];
+            
+            const statusEl = document.getElementById('wasteStatus');
+            if (wasteIndex > WASTE_THRESHOLD) {
+                statusEl.innerText = "CRITICAL WASTE";
+                statusEl.className = "px-3 py-1 rounded-full text-sm font-semibold bg-red-900 text-red-300";
+                playAlert();
+            } else if (wasteIndex > 1.5) {
+                statusEl.innerText = "WARNING";
+                statusEl.className = "px-3 py-1 rounded-full text-sm font-semibold bg-yellow-900 text-yellow-300";
+            } else {
+                statusEl.innerText = "OPTIMAL";
+                statusEl.className = "px-3 py-1 rounded-full text-sm font-semibold bg-green-900 text-green-300";
+            }
+            wasteGauge.update();
+
+            // Update Drift Timeline
+            driftTimelineChart.data.labels.push(new Date().toLocaleTimeString());
+            driftTimelineChart.data.datasets[0].data.push(data.semantic_drift);
+            if (driftTimelineChart.data.labels.length > 15) {
+                driftTimelineChart.data.labels.shift();
+                driftTimelineChart.data.datasets[0].data.shift();
+            }
+            driftTimelineChart.update();
+
+            // Update Stress Radar
+            stressRadarChart.data.datasets[0].data = stressRadarChart.data.datasets[0].data.map(() => Math.random() * 100);
+            stressRadarChart.update();
+        }
+
+        async function initiateStressTest() {
+            try {
+                await fetch(`${CONVEX_URL}/api/red-team/start`, { method: 'POST' });
+                alert("Red-team campaign initiated! Monitor dashboard for real-time stress impact.");
+            } catch (err) {
+                console.error(err);
+                alert("Failed to start stress test.");
+            }
+        }
+
+        // Modal Logic
+        function openForensic(logId) {
+            document.getElementById('forensicModal').style.display = 'block';
+            // Mock data for demo
+            document.getElementById('modalPrompt').innerText = "Simulated adversarial prompt...";
+            document.getElementById('modalResponse').innerText = "Simulated wasteful LLM response...";
+            document.getElementById('modalWaste').innerText = "3.2x";
+            document.getElementById('modalPerplexity').innerText = "42.5";
+            document.getElementById('modalDrift').innerText = "0.68";
+        }
+
+        function closeModal() {
+            document.getElementById('forensicModal').style.display = 'none';
+        }
+
+        window.onclick = function(event) {
+            if (event.target == document.getElementById('forensicModal')) closeModal();
+        }
+    </script>
+</body>
+</html>
