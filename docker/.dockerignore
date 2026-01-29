@@ -1,9 +1,7 @@
-.git
 __pycache__
-.env
 *.pyc
-*.pyo
-*.pyd
-.db
-.sqlite
-model_weights/
+.git
+.env
+.env.local
+*.log
+node_modules
