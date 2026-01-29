@@ -1,7 +1,0 @@
-name: 'cognitive_waste'
-version: '1.0.0'
-config-version: 2
-profile: 'default'
-model-paths: ['models']
-seed-paths: ['seeds']
-target-path: 'target'
