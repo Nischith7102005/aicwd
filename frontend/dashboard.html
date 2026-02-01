@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Observability</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Convex Client -->
+    <script type="module">
+        import { ConvexClient } from "https://esm.sh/@convex-dev/client@1.8.2";
+        window.ConvexClient = ConvexClient;
+    </script>
+    <style>
+        body { background-color: #050508; color: #e5e7eb; font-family: 'Inter', sans-serif; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        .card { background: #111827; border: 1px solid #374151; border-radius: 0.5rem; padding: 1rem; }
+        .text-glow-green { text-shadow: 0 0 10px rgba(74, 222, 128, 0.5); }
+        .text-glow-red { text-shadow: 0 0 10px rgba(248, 113, 113, 0.5); }
+    </style>
+</head>
+<body class="p-4 h-screen flex flex-col overflow-hidden">
+
+    <!-- Header -->
+    <header class="flex justify-between items-center mb-4 pb-4 border-b border-white/10">
+        <div class="flex items-center gap-3">
+            <div class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+            <div>
+                <h1 class="text-xl font-bold tracking-wider mono text-white">LIVE_OBSERVATORY</h1>
+                <span id="targetDisplay" class="text-xs text-indigo-400 font-mono">CONNECTING...</span>
+            </div>
+        </div>
+        <div class="flex gap-4">
+            <button onclick="triggerRedTeam()" class="px-4 py-1.5 bg-rose-900/50 border border-rose-500 text-rose-400 text-xs font-bold mono hover:bg-rose-900 transition rounded">
+                INITIATE_STRESS_TEST
+            </button>
+            <button onclick="window.location.href='key.html'" class="px-4 py-1.5 border border-white/10 text-gray-400 text-xs font-bold mono hover:text-white rounded">
+                CHANGE KEY
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 flex-1 min-h-0">
+        
+        <!-- KPI: Token Efficiency -->
+        <div class="card flex flex-col">
+            <h3 class="text-xs text-gray-500 mono mb-2">TOKEN_EFFICIENCY_RATIO</h3>
+            <div class="flex-1 relative">
+                <canvas id="tokenChart"></canvas>
+            </div>
+            <div class="mt-2 text-2xl font-bold text-indigo-400 mono" id="tokenValue">0.00</div>
+            <div class="text-[10px] text-gray-600">OUTPUT_TOKENS / SEMANTIC_PAYLOAD</div>
+        </div>
+
+        <!-- KPI: Waste Index Gauge -->
+        <div class="card flex flex-col relative overflow-hidden">
+            <h3 class="text-xs text-gray-500 mono mb-2">COGNITIVE_WASTE_INDEX</h3>
+            <div class="flex-1 flex items-center justify-center relative">
+                <div class="w-32 h-32 rounded-full border-[12px] border-gray-800 relative flex items-center justify-center">
+                    <div id="wasteCircle" class="absolute w-full h-full rounded-full border-[12px] border-green-500 border-l-transparent border-b-transparent transition-all duration-1000 rotate-45"></div>
+                    <span id="wasteValue" class="text-3xl font-bold mono text-white">0%</span>
+                </div>
+            </div>
+            <div id="wasteStatus" class="text-center text-xs font-bold text-green-500 mono mt-2">OPTIMAL</div>
+        </div>
+
+        <!-- Chart: Drift Timeline -->
+        <div class="card md:col-span-2 flex flex-col">
+            <h3 class="text-xs text-gray-500 mono mb-2">SEMANTIC_DRIFT_TIMELINE (REAL-TIME)</h3>
+            <div class="flex-1 min-h-0 relative">
+                <canvas id="driftChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Log: Adversarial Stress -->
+        <div class="card lg:col-span-3 flex flex-col">
+            <h3 class="text-xs text-gray-500 mono mb-2">ADVERSARIAL_LOG_STREAM</h3>
+            <div class="flex-1 overflow-y-auto font-mono text-xs space-y-1 pr-2" id="logConsole">
+                <div class="text-gray-600">Connecting to telemetry stream...</div>
+            </div>
+        </div>
+
+        <!-- Metric: Hallucination Prob -->
+        <div class="card flex flex-col justify-between">
+            <h3 class="text-xs text-gray-500 mono mb-1">HALLUCINATION_PROB</h3>
+            <div class="text-4xl font-bold text-purple-400 mono" id="hallucinationVal">0.02</div>
+            <div class="w-full bg-gray-800 h-1 mt-2">
+                <div id="hallucinationBar" class="bg-purple-500 h-1" style="width: 2%"></div>
+            </div>
+            <div class="text-[10px] text-gray-500 mt-2">BAYESIAN_CONFIDENCE_INTERVAL</div>
+        </div>
+
+    </div>
+
+    <script type="module">
+        const address = "https://tacit-wombat-870.convex.cloud";
+        const token = localStorage.getItem('firebase_id_token') || "dev:tacit-wombat-870|eyJ2MiI6IjRmYjIzZDBjOTk1NjQwMjFhMjAyMGVkMDI0ZDEyZWZhIn0=";
+        
+        const configRaw = localStorage.getItem('target_config');
+        if (!configRaw) {
+            window.location.href = 'key.html';
+        }
+        const config = JSON.parse(configRaw);
+        const maskedKey = config.apiKey ? `${config.apiKey.substring(0, 4)}...${config.apiKey.slice(-4)}` : 'UNKNOWN';
+        document.getElementById('targetDisplay').innerText = `TARGET: ${config.modelName.toUpperCase()} [KEY: ${maskedKey}]`;
+
+        const convex = new window.ConvexClient(address, {
+            auth: { token: token }
+        });
+
+        const commonOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: { duration: 0 },
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { display: false },
+                y: { grid: { color: '#1f2937' }, ticks: { color: '#6b7280', font: {family: 'JetBrains Mono'} } }
+            }
+        };
+
+        const tokenChart = new Chart(document.getElementById('tokenChart'), {
+            type: 'scatter',
+            data: { datasets: [{ label: 'Efficiency', data: [], backgroundColor: '#a5b4fc' }] },
+            options: commonOptions
+        });
+
+        const driftChart = new Chart(document.getElementById('driftChart'), {
+            type: 'line',
+            data: { 
+                datasets: [
+                    { label: 'Semantic Drift', data: [], borderColor: '#f472b6', tension: 0.4, borderWidth: 2 },
+                    { label: 'Baseline', data: [], borderColor: '#374151', borderDash: [5, 5] }
+                ] 
+            },
+            options: commonOptions
+        });
+
+        convex.subscribe("metrics:getLive", {}, (update) => {
+            if (!update) return;
+            
+            const newPoint = { x: update.inputTokens, y: update.outputTokens };
+            if (tokenChart.data.datasets[0].data.length > 20) tokenChart.data.datasets[0].data.shift();
+            tokenChart.data.datasets[0].data.push(newPoint);
+            tokenChart.update();
+            document.getElementById('tokenValue').innerText = update.efficiencyRatio.toFixed(2);
+
+            const now = new Date().toLocaleTimeString();
+            if (driftChart.data.datasets[0].data.length > 30) driftChart.data.datasets.forEach(d => d.data.shift());
+            driftChart.data.datasets[0].data.push({ x: now, y: update.semanticDrift });
+            driftChart.data.datasets[1].data.push({ x: now, y: 0.1 }); 
+            driftChart.update();
+
+            const wastePct = Math.round(update.wasteIndex * 100);
+            document.getElementById('wasteValue').innerText = wastePct + '%';
+            const rotation = 45 + (wastePct * 3.6); 
+            document.getElementById('wasteCircle').style.transform = `rotate(${rotation}deg)`;
+            
+            const statusEl = document.getElementById('wasteStatus');
+            if(wastePct > 70) {
+                statusEl.innerText = "CRITICAL WASTE";
+                statusEl.className = "text-center text-xs font-bold text-red-500 text-glow-red mono mt-2";
+            } else if (wastePct > 40) {
+                statusEl.innerText = "SUB-OPTIMAL";
+                statusEl.className = "text-center text-xs font-bold text-yellow-500 mono mt-2";
+            } else {
+                statusEl.innerText = "OPTIMAL";
+                statusEl.className = "text-center text-xs font-bold text-green-500 text-glow-green mono mt-2";
+            }
+
+            const hallucPct = Math.round(update.hallucinationProb * 100);
+            document.getElementById('hallucinationVal').innerText = (update.hallucinationProb).toFixed(3);
+            document.getElementById('hallucinationBar').style.width = hallucPct + '%';
+        });
+
+        const logConsole = document.getElementById('logConsole');
+        convex.subscribe("logs:getRecent", {}, (logs) => {
+            if (!logs) return;
+            logConsole.innerHTML = '';
+            logs.slice().reverse().forEach(log => {
+                const div = document.createElement('div');
+                const colorClass = log.type === 'ALERT' ? 'text-rose-400' : (log.type === 'INFO' ? 'text-indigo-400' : 'text-gray-400');
+                div.className = `${colorClass} border-l-2 border-gray-800 pl-2`;
+                div.innerText = `[${log.timestamp}] ${log.message}`;
+                logConsole.appendChild(div);
+            });
+        });
+
+        window.triggerRedTeam = () => {
+            convex.mutation("actions:triggerStressTest", { 
+                targetModel: config.modelName,
+                targetUrl: config.apiUrl 
+            });
+            
+            const btn = document.querySelector('button[onclick="triggerRedTeam()"]');
+            const originalText = btn.innerText;
+            btn.innerText = "INJECTING CHAOS...";
+            setTimeout(() => btn.innerText = originalText, 3000);
+        };
+    </script>
+</body>
+</html>
