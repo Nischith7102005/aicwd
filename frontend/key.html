@@ -20,14 +20,9 @@
             --accent-white: #ffffff;
             --accent-red: #ff4466;
             --glow-purple: rgba(168, 85, 247, 0.4);
-            --glow-violet: rgba(139, 92, 246, 0.3);
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: 'Share Tech Mono', monospace;
@@ -40,39 +35,15 @@
             overflow: hidden;
         }
 
-        #dither-canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 0;
-        }
+        #dither-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; }
 
         .scanlines {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 1000;
-            background: repeating-linear-gradient(
-                0deg,
-                rgba(0, 0, 0, 0.1) 0px,
-                rgba(0, 0, 0, 0.1) 1px,
-                transparent 1px,
-                transparent 3px
-            );
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 1000;
+            background: repeating-linear-gradient(0deg, rgba(0,0,0,0.1) 0px, rgba(0,0,0,0.1) 1px, transparent 1px, transparent 3px);
         }
 
-        .container {
-            position: relative;
-            z-index: 10;
-            width: 100%;
-            max-width: 480px;
-            padding: 2rem;
-        }
+        .container { position: relative; z-index: 10; width: 100%; max-width: 480px; padding: 2rem; }
 
         .login-card {
             background: var(--bg-panel);
@@ -85,367 +56,159 @@
 
         .login-card::before {
             content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 2px;
+            position: absolute; top: 0; left: 0; right: 0; height: 2px;
             background: linear-gradient(90deg, var(--accent-purple), var(--accent-lavender), var(--accent-white), var(--accent-lavender), var(--accent-purple));
             background-size: 200% 100%;
             animation: shimmer 3s linear infinite;
         }
 
-        @keyframes shimmer {
-            0% { background-position: -200% 0; }
-            100% { background-position: 200% 0; }
-        }
+        @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
 
         .login-card::after {
             content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 1px;
+            position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
             background: linear-gradient(90deg, transparent, var(--border-color), transparent);
         }
 
-        .corner {
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            border-color: var(--accent-purple);
-            border-style: solid;
-            border-width: 0;
-        }
-
+        .corner { position: absolute; width: 20px; height: 20px; border-color: var(--accent-purple); border-style: solid; border-width: 0; }
         .corner-tl { top: 10px; left: 10px; border-top-width: 2px; border-left-width: 2px; }
         .corner-tr { top: 10px; right: 10px; border-top-width: 2px; border-right-width: 2px; }
         .corner-bl { bottom: 10px; left: 10px; border-bottom-width: 2px; border-left-width: 2px; }
         .corner-br { bottom: 10px; right: 10px; border-bottom-width: 2px; border-right-width: 2px; }
 
-        .logo {
-            text-align: center;
-            margin-bottom: 2.5rem;
-        }
+        .logo { text-align: center; margin-bottom: 2.5rem; }
 
         .logo h1 {
             font-family: 'VT323', monospace;
             font-size: 2rem;
             background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-lavender) 50%, var(--accent-white) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
             letter-spacing: 4px;
-            margin-bottom: 0.25rem;
             filter: drop-shadow(0 0 15px var(--glow-purple));
         }
 
         .logo span {
             font-size: 0.8rem;
             background: linear-gradient(90deg, var(--accent-lavender), var(--text-secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            text-transform: uppercase;
-            letter-spacing: 3px;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+            text-transform: uppercase; letter-spacing: 3px;
         }
 
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
+        .form-group { margin-bottom: 1.5rem; }
 
         .form-label {
-            display: block;
-            font-size: 0.75rem;
+            display: block; font-size: 0.75rem;
             background: linear-gradient(90deg, var(--accent-lavender), var(--text-secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 0.75rem;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+            text-transform: uppercase; letter-spacing: 2px; margin-bottom: 0.75rem;
         }
 
         .form-select {
-            width: 100%;
-            padding: 1rem 1.25rem;
+            width: 100%; padding: 1rem 1.25rem;
             background: var(--bg-card);
             border: 1px solid var(--border-color);
             color: var(--text-primary);
-            font-family: inherit;
-            font-size: 0.95rem;
-            cursor: pointer;
-            appearance: none;
+            font-family: inherit; font-size: 0.95rem;
+            cursor: pointer; appearance: none;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23a855f7' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E");
             background-repeat: no-repeat;
             background-position: right 1rem center;
             transition: all 0.2s;
         }
 
-        .form-select:hover,
-        .form-select:focus {
+        .form-select:hover, .form-select:focus {
             border-color: var(--accent-purple);
             outline: none;
             box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.15);
         }
 
-        .form-select:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
+        .form-select:disabled { opacity: 0.5; cursor: not-allowed; }
 
-        .input-wrapper {
-            position: relative;
-        }
+        .input-wrapper { position: relative; }
 
         .form-input {
-            width: 100%;
-            padding: 1rem 3rem 1rem 1.25rem;
+            width: 100%; padding: 1rem 3rem 1rem 1.25rem;
             background: var(--bg-card);
             border: 1px solid var(--border-color);
             color: var(--text-primary);
-            font-family: inherit;
-            font-size: 0.95rem;
-            letter-spacing: 1px;
-            transition: all 0.2s;
+            font-family: inherit; font-size: 0.95rem;
+            letter-spacing: 1px; transition: all 0.2s;
         }
 
-        .form-input::placeholder {
-            color: var(--text-secondary);
-            opacity: 0.6;
-        }
-
-        .form-input:hover,
-        .form-input:focus {
-            border-color: var(--accent-purple);
-            outline: none;
-            box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.15);
-        }
-
-        .form-input.error {
-            border-color: var(--accent-red);
-            box-shadow: 0 0 0 2px rgba(255, 68, 102, 0.1);
-        }
-
-        .form-input.success {
-            border-color: var(--accent-purple);
-            box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.2);
-        }
+        .form-input::placeholder { color: var(--text-secondary); opacity: 0.6; }
+        .form-input:hover, .form-input:focus { border-color: var(--accent-purple); outline: none; box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.15); }
+        .form-input.error { border-color: var(--accent-red); box-shadow: 0 0 0 2px rgba(255, 68, 102, 0.1); }
+        .form-input.success { border-color: var(--accent-purple); box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.2); }
 
         .toggle-visibility {
-            position: absolute;
-            right: 1rem;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            color: var(--text-secondary);
-            cursor: pointer;
-            padding: 0.25rem;
-            transition: color 0.2s;
+            position: absolute; right: 1rem; top: 50%; transform: translateY(-50%);
+            background: none; border: none; color: var(--text-secondary);
+            cursor: pointer; padding: 0.25rem; transition: color 0.2s;
         }
-
-        .toggle-visibility:hover {
-            color: var(--accent-purple);
-        }
+        .toggle-visibility:hover { color: var(--accent-purple); }
 
         .error-message {
-            display: none;
-            align-items: center;
-            gap: 0.5rem;
-            margin-top: 0.75rem;
-            padding: 0.75rem 1rem;
+            display: none; align-items: center; gap: 0.5rem;
+            margin-top: 0.75rem; padding: 0.75rem 1rem;
             background: rgba(255, 68, 102, 0.1);
             border: 1px solid rgba(255, 68, 102, 0.3);
-            color: var(--accent-red);
-            font-size: 0.85rem;
+            color: var(--accent-red); font-size: 0.85rem;
         }
-
-        .error-message.show {
-            display: flex;
-        }
+        .error-message.show { display: flex; }
 
         .key-indicator {
-            display: none;
-            align-items: center;
-            gap: 0.5rem;
-            margin-top: 0.75rem;
-            padding: 0.75rem 1rem;
+            display: none; align-items: center; gap: 0.5rem;
+            margin-top: 0.75rem; padding: 0.75rem 1rem;
             background: rgba(168, 85, 247, 0.1);
             border: 1px solid rgba(168, 85, 247, 0.3);
             font-size: 0.85rem;
         }
+        .key-indicator.show { display: flex; }
+        .key-indicator .indicator-icon { width: 8px; height: 8px; border-radius: 50%; background: var(--accent-purple); box-shadow: 0 0 8px var(--glow-purple); }
+        .key-indicator .indicator-text { background: linear-gradient(90deg, var(--accent-purple), var(--accent-lavender)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
 
-        .key-indicator.show {
-            display: flex;
-        }
+        .model-select-group { display: none; margin-top: 1.5rem; animation: fadeIn 0.3s ease; }
+        .model-select-group.show { display: block; }
 
-        .key-indicator .indicator-icon {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: var(--accent-purple);
-            box-shadow: 0 0 8px var(--glow-purple);
-        }
-
-        .key-indicator .indicator-text {
-            background: linear-gradient(90deg, var(--accent-purple), var(--accent-lavender));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .model-select-group {
-            display: none;
-            margin-top: 1.5rem;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .model-select-group.show {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 
         .submit-btn {
-            width: 100%;
-            padding: 1rem 2rem;
+            width: 100%; padding: 1rem 2rem;
             background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(196, 181, 253, 0.2));
             border: 1px solid var(--accent-purple);
-            color: transparent;
-            font-family: 'VT323', monospace;
-            font-size: 1.3rem;
-            letter-spacing: 3px;
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
-            transition: all 0.3s;
-            text-transform: uppercase;
+            font-family: 'VT323', monospace; font-size: 1.3rem;
+            letter-spacing: 3px; cursor: pointer;
+            position: relative; overflow: hidden;
+            transition: all 0.3s; text-transform: uppercase;
         }
+        .submit-btn .btn-text { background: linear-gradient(135deg, var(--accent-purple), var(--accent-lavender), var(--accent-white)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .submit-btn::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(168, 85, 247, 0.2), transparent); transition: left 0.5s; }
+        .submit-btn:hover::before { left: 100%; }
+        .submit-btn:hover { background: linear-gradient(135deg, rgba(168, 85, 247, 0.3), rgba(196, 181, 253, 0.3)); box-shadow: 0 0 30px var(--glow-purple); }
+        .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .submit-btn.loading { pointer-events: none; }
+        .submit-btn.loading .btn-text { opacity: 0; }
+        .submit-btn .spinner { display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 24px; height: 24px; border: 2px solid transparent; border-top-color: var(--accent-purple); border-radius: 50%; animation: spin 0.8s linear infinite; }
+        .submit-btn.loading .spinner { display: block; }
 
-        .submit-btn .btn-text {
-            background: linear-gradient(135deg, var(--accent-purple), var(--accent-lavender), var(--accent-white));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
+        @keyframes spin { to { transform: translate(-50%, -50%) rotate(360deg); } }
 
-        .submit-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(168, 85, 247, 0.2), transparent);
-            transition: left 0.5s;
-        }
-
-        .submit-btn:hover::before {
-            left: 100%;
-        }
-
-        .submit-btn:hover {
-            background: linear-gradient(135deg, rgba(168, 85, 247, 0.3), rgba(196, 181, 253, 0.3));
-            box-shadow: 0 0 30px var(--glow-purple);
-        }
-
-        .submit-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .submit-btn.loading {
-            pointer-events: none;
-        }
-
-        .submit-btn.loading .btn-text {
-            opacity: 0;
-        }
-
-        .submit-btn .spinner {
-            display: none;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 24px;
-            height: 24px;
-            border: 2px solid transparent;
-            border-top-color: var(--accent-purple);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
-
-        .submit-btn.loading .spinner {
-            display: block;
-        }
-
-        @keyframes spin {
-            to { transform: translate(-50%, -50%) rotate(360deg); }
-        }
-
-        .info-text {
-            text-align: center;
-            margin-top: 1.5rem;
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-            line-height: 1.6;
-        }
-
-        .info-text a {
-            background: linear-gradient(90deg, var(--accent-purple), var(--accent-lavender));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            text-decoration: none;
-            border-bottom: 1px solid transparent;
-            transition: border-color 0.2s;
-        }
-
-        .info-text a:hover {
-            border-bottom-color: var(--accent-purple);
-        }
+        .info-text { text-align: center; margin-top: 1.5rem; font-size: 0.8rem; color: var(--text-secondary); line-height: 1.6; }
+        .info-text a { background: linear-gradient(90deg, var(--accent-purple), var(--accent-lavender)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; text-decoration: none; }
 
         .status-bar {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
+            position: fixed; bottom: 0; left: 0; right: 0;
             padding: 0.5rem 2rem;
             background: var(--bg-panel);
             border-top: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-            z-index: 100;
-            backdrop-filter: blur(10px);
+            display: flex; justify-content: space-between;
+            font-size: 0.75rem; color: var(--text-secondary);
+            z-index: 100; backdrop-filter: blur(10px);
         }
+        .status-item { display: flex; align-items: center; gap: 0.5rem; }
+        .status-dot { width: 6px; height: 6px; background: linear-gradient(135deg, var(--accent-purple), var(--accent-lavender)); border-radius: 50%; box-shadow: 0 0 8px var(--glow-purple); }
 
-        .status-item {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .status-dot {
-            width: 6px;
-            height: 6px;
-            background: linear-gradient(135deg, var(--accent-purple), var(--accent-lavender));
-            border-radius: 50%;
-            box-shadow: 0 0 8px var(--glow-purple);
-        }
-
-        @media (max-width: 520px) {
-            .container { padding: 1rem; }
-            .login-card { padding: 2rem 1.5rem; }
-            .logo h1 { font-size: 1.5rem; }
-        }
+        @media (max-width: 520px) { .container { padding: 1rem; } .login-card { padding: 2rem 1.5rem; } .logo h1 { font-size: 1.5rem; } }
     </style>
 </head>
 <body>
@@ -511,163 +274,61 @@
     </div>
 
     <div class="status-bar">
-        <div class="status-item">
-            <span class="status-dot"></span>
-            <span>Systems Online</span>
-        </div>
-        <div class="status-item">
-            <span id="current-time">00:00:00</span>
-        </div>
+        <div class="status-item"><span class="status-dot"></span><span>Systems Online</span></div>
+        <div class="status-item"><span id="current-time">00:00:00</span></div>
     </div>
 
     <script>
-        // ============== DITHER WEBGL BACKGROUND ==============
+        // WebGL Dither Background
         const canvas = document.getElementById('dither-canvas');
         const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
 
-        const vertexShaderSource = `
-            attribute vec2 a_position;
-            void main() {
-                gl_Position = vec4(a_position, 0.0, 1.0);
-            }
-        `;
+        const vertexShaderSource = `attribute vec2 a_position; void main() { gl_Position = vec4(a_position, 0.0, 1.0); }`;
 
         const fragmentShaderSource = `
             precision highp float;
-            uniform vec2 u_resolution;
-            uniform float u_time;
-            uniform vec2 u_mouse;
-            uniform float u_mouseRadius;
-            uniform int u_enableMouse;
-
-            const float waveSpeed = 0.05;
-            const float waveFrequency = 3.0;
-            const float waveAmplitude = 0.3;
-            const vec3 waveColor = vec3(0.4, 0.3, 0.6);
-
-            const float colorNum = 4.0;
-            const float pixelSize = 2.0;
-
+            uniform vec2 u_resolution; uniform float u_time; uniform vec2 u_mouse; uniform float u_mouseRadius; uniform int u_enableMouse;
+            const float waveSpeed = 0.05; const float waveFrequency = 3.0; const float waveAmplitude = 0.3; const vec3 waveColor = vec3(0.4, 0.3, 0.6);
+            const float colorNum = 4.0; const float pixelSize = 2.0;
             vec4 mod289(vec4 x) { return x - floor(x * (1.0/289.0)) * 289.0; }
             vec4 permute(vec4 x) { return mod289(((x * 34.0) + 1.0) * x); }
             vec4 taylorInvSqrt(vec4 r) { return 1.79284291400159 - 0.85373472095314 * r; }
             vec2 fade(vec2 t) { return t*t*t*(t*(t*6.0-15.0)+10.0); }
-
             float cnoise(vec2 P) {
-                vec4 Pi = floor(P.xyxy) + vec4(0.0,0.0,1.0,1.0);
-                vec4 Pf = fract(P.xyxy) - vec4(0.0,0.0,1.0,1.0);
-                Pi = mod289(Pi);
-                vec4 ix = Pi.xzxz, iy = Pi.yyww;
-                vec4 fx = Pf.xzxz, fy = Pf.yyww;
-                vec4 i = permute(permute(ix) + iy);
-                vec4 gx = fract(i * (1.0/41.0)) * 2.0 - 1.0;
-                vec4 gy = abs(gx) - 0.5;
-                vec4 tx = floor(gx + 0.5);
-                gx = gx - tx;
-                vec2 g00 = vec2(gx.x, gy.x), g10 = vec2(gx.y, gy.y);
-                vec2 g01 = vec2(gx.z, gy.z), g11 = vec2(gx.w, gy.w);
+                vec4 Pi = floor(P.xyxy) + vec4(0.0,0.0,1.0,1.0); vec4 Pf = fract(P.xyxy) - vec4(0.0,0.0,1.0,1.0); Pi = mod289(Pi);
+                vec4 ix = Pi.xzxz, iy = Pi.yyww; vec4 fx = Pf.xzxz, fy = Pf.yyww;
+                vec4 i = permute(permute(ix) + iy); vec4 gx = fract(i * (1.0/41.0)) * 2.0 - 1.0; vec4 gy = abs(gx) - 0.5;
+                vec4 tx = floor(gx + 0.5); gx = gx - tx;
+                vec2 g00 = vec2(gx.x, gy.x), g10 = vec2(gx.y, gy.y), g01 = vec2(gx.z, gy.z), g11 = vec2(gx.w, gy.w);
                 vec4 norm = taylorInvSqrt(vec4(dot(g00,g00), dot(g01,g01), dot(g10,g10), dot(g11,g11)));
                 g00 *= norm.x; g01 *= norm.y; g10 *= norm.z; g11 *= norm.w;
-                float n00 = dot(g00, vec2(fx.x, fy.x));
-                float n10 = dot(g10, vec2(fx.y, fy.y));
-                float n01 = dot(g01, vec2(fx.z, fy.z));
-                float n11 = dot(g11, vec2(fx.w, fy.w));
-                vec2 fade_xy = fade(Pf.xy);
-                vec2 n_x = mix(vec2(n00, n01), vec2(n10, n11), fade_xy.x);
+                float n00 = dot(g00, vec2(fx.x, fy.x)); float n10 = dot(g10, vec2(fx.y, fy.y));
+                float n01 = dot(g01, vec2(fx.z, fy.z)); float n11 = dot(g11, vec2(fx.w, fy.w));
+                vec2 fade_xy = fade(Pf.xy); vec2 n_x = mix(vec2(n00, n01), vec2(n10, n11), fade_xy.x);
                 return 2.3 * mix(n_x.x, n_x.y, fade_xy.y);
             }
-
-            float fbm(vec2 p) {
-                float value = 0.0, amp = 1.0, freq = waveFrequency;
-                for (int i = 0; i < 4; i++) {
-                    value += amp * abs(cnoise(p));
-                    p *= freq;
-                    amp *= waveAmplitude;
-                }
-                return value;
-            }
-
-            float pattern(vec2 p) {
-                vec2 p2 = p - u_time * waveSpeed;
-                return fbm(p + fbm(p2));
-            }
-
+            float fbm(vec2 p) { float value = 0.0, amp = 1.0, freq = waveFrequency; for (int i = 0; i < 4; i++) { value += amp * abs(cnoise(p)); p *= freq; amp *= waveAmplitude; } return value; }
+            float pattern(vec2 p) { vec2 p2 = p - u_time * waveSpeed; return fbm(p + fbm(p2)); }
             float bayer8(vec2 p) {
-                vec2 P = mod(floor(p), 8.0);
-                float x = P.x, y = P.y;
-                int idx = int(y) * 8 + int(x);
-                float values[64];
-                values[0]=0.0; values[1]=48.0; values[2]=12.0; values[3]=60.0; values[4]=3.0; values[5]=51.0; values[6]=15.0; values[7]=63.0;
-                values[8]=32.0; values[9]=16.0; values[10]=44.0; values[11]=28.0; values[12]=35.0; values[13]=19.0; values[14]=47.0; values[15]=31.0;
-                values[16]=8.0; values[17]=56.0; values[18]=4.0; values[19]=52.0; values[20]=11.0; values[21]=59.0; values[22]=7.0; values[23]=55.0;
-                values[24]=40.0; values[25]=24.0; values[26]=36.0; values[27]=20.0; values[28]=43.0; values[29]=27.0; values[30]=39.0; values[31]=23.0;
-                values[32]=2.0; values[33]=50.0; values[34]=14.0; values[35]=62.0; values[36]=1.0; values[37]=49.0; values[38]=13.0; values[39]=61.0;
-                values[40]=34.0; values[41]=18.0; values[42]=46.0; values[43]=30.0; values[44]=33.0; values[45]=17.0; values[46]=45.0; values[47]=29.0;
-                values[48]=10.0; values[49]=58.0; values[50]=6.0; values[51]=54.0; values[52]=9.0; values[53]=57.0; values[54]=5.0; values[55]=53.0;
-                values[56]=42.0; values[57]=26.0; values[58]=38.0; values[59]=22.0; values[60]=41.0; values[61]=25.0; values[62]=37.0; values[63]=21.0;
-                
-                float v = 0.0;
-                for (int i = 0; i < 64; i++) {
-                    if (i == idx) v = values[i];
-                }
-                return v / 64.0;
+                vec2 P = mod(floor(p), 8.0); float x = P.x, y = P.y; int idx = int(y) * 8 + int(x);
+                float values[64]; values[0]=0.0;values[1]=48.0;values[2]=12.0;values[3]=60.0;values[4]=3.0;values[5]=51.0;values[6]=15.0;values[7]=63.0;values[8]=32.0;values[9]=16.0;values[10]=44.0;values[11]=28.0;values[12]=35.0;values[13]=19.0;values[14]=47.0;values[15]=31.0;values[16]=8.0;values[17]=56.0;values[18]=4.0;values[19]=52.0;values[20]=11.0;values[21]=59.0;values[22]=7.0;values[23]=55.0;values[24]=40.0;values[25]=24.0;values[26]=36.0;values[27]=20.0;values[28]=43.0;values[29]=27.0;values[30]=39.0;values[31]=23.0;values[32]=2.0;values[33]=50.0;values[34]=14.0;values[35]=62.0;values[36]=1.0;values[37]=49.0;values[38]=13.0;values[39]=61.0;values[40]=34.0;values[41]=18.0;values[42]=46.0;values[43]=30.0;values[44]=33.0;values[45]=17.0;values[46]=45.0;values[47]=29.0;values[48]=10.0;values[49]=58.0;values[50]=6.0;values[51]=54.0;values[52]=9.0;values[53]=57.0;values[54]=5.0;values[55]=53.0;values[56]=42.0;values[57]=26.0;values[58]=38.0;values[59]=22.0;values[60]=41.0;values[61]=25.0;values[62]=37.0;values[63]=21.0;
+                float v = 0.0; for (int i = 0; i < 64; i++) { if (i == idx) v = values[i]; } return v / 64.0;
             }
-
             vec3 dither(vec2 coord, vec3 color) {
-                vec2 scaledCoord = floor(coord / pixelSize);
-                float threshold = bayer8(scaledCoord) - 0.25;
-                float step = 1.0 / (colorNum - 1.0);
-                color += threshold * step;
-                float bias = 0.2;
-                color = clamp(color - bias, 0.0, 1.0);
-                return floor(color * (colorNum - 1.0) + 0.5) / (colorNum - 1.0);
+                vec2 scaledCoord = floor(coord / pixelSize); float threshold = bayer8(scaledCoord) - 0.25;
+                float step = 1.0 / (colorNum - 1.0); color += threshold * step; float bias = 0.2;
+                color = clamp(color - bias, 0.0, 1.0); return floor(color * (colorNum - 1.0) + 0.5) / (colorNum - 1.0);
             }
-
             void main() {
-                vec2 pixelCoord = floor(gl_FragCoord.xy / pixelSize) * pixelSize;
-                vec2 uv = pixelCoord / u_resolution;
-                uv -= 0.5;
-                uv.x *= u_resolution.x / u_resolution.y;
-
-                float f = pattern(uv);
-
-                if (u_enableMouse == 1) {
-                    vec2 mouseNDC = (u_mouse / u_resolution - 0.5) * vec2(1.0, -1.0);
-                    mouseNDC.x *= u_resolution.x / u_resolution.y;
-                    float dist = length(uv - mouseNDC);
-                    float effect = 1.0 - smoothstep(0.0, u_mouseRadius, dist);
-                    f -= 0.5 * effect;
-                }
-
-                vec3 col = mix(vec3(0.0), waveColor, f);
-                col = dither(gl_FragCoord.xy, col);
-                gl_FragColor = vec4(col, 1.0);
+                vec2 pixelCoord = floor(gl_FragCoord.xy / pixelSize) * pixelSize; vec2 uv = pixelCoord / u_resolution;
+                uv -= 0.5; uv.x *= u_resolution.x / u_resolution.y; float f = pattern(uv);
+                if (u_enableMouse == 1) { vec2 mouseNDC = (u_mouse / u_resolution - 0.5) * vec2(1.0, -1.0); mouseNDC.x *= u_resolution.x / u_resolution.y; float dist = length(uv - mouseNDC); float effect = 1.0 - smoothstep(0.0, u_mouseRadius, dist); f -= 0.5 * effect; }
+                vec3 col = mix(vec3(0.0), waveColor, f); col = dither(gl_FragCoord.xy, col); gl_FragColor = vec4(col, 1.0);
             }
         `;
 
-        function createShader(gl, type, source) {
-            const shader = gl.createShader(type);
-            gl.shaderSource(shader, source);
-            gl.compileShader(shader);
-            if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-                console.error(gl.getShaderInfoLog(shader));
-                gl.deleteShader(shader);
-                return null;
-            }
-            return shader;
-        }
-
-        function createProgram(gl, vs, fs) {
-            const program = gl.createProgram();
-            gl.attachShader(program, vs);
-            gl.attachShader(program, fs);
-            gl.linkProgram(program);
-            if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-                console.error(gl.getProgramInfoLog(program));
-                return null;
-            }
-            return program;
-        }
+        function createShader(gl, type, source) { const shader = gl.createShader(type); gl.shaderSource(shader, source); gl.compileShader(shader); if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) { console.error(gl.getShaderInfoLog(shader)); gl.deleteShader(shader); return null; } return shader; }
+        function createProgram(gl, vs, fs) { const program = gl.createProgram(); gl.attachShader(program, vs); gl.attachShader(program, fs); gl.linkProgram(program); if (!gl.getProgramParameter(program, gl.LINK_STATUS)) { console.error(gl.getProgramInfoLog(program)); return null; } return program; }
 
         const vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexShaderSource);
         const fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource);
@@ -682,168 +343,38 @@
 
         const positionBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
-            -1, -1, 1, -1, -1, 1,
-            -1, 1, 1, -1, 1, 1
-        ]), gl.STATIC_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1,1,-1,-1,1,-1,1,1,-1,1,1]), gl.STATIC_DRAW);
 
         let mouseX = 0, mouseY = 0;
-        document.addEventListener('mousemove', (e) => {
-            mouseX = e.clientX * window.devicePixelRatio;
-            mouseY = e.clientY * window.devicePixelRatio;
-        });
+        document.addEventListener('mousemove', (e) => { mouseX = e.clientX * window.devicePixelRatio; mouseY = e.clientY * window.devicePixelRatio; });
 
-        function resize() {
-            const dpr = window.devicePixelRatio || 1;
-            canvas.width = window.innerWidth * dpr;
-            canvas.height = window.innerHeight * dpr;
-            canvas.style.width = window.innerWidth + 'px';
-            canvas.style.height = window.innerHeight + 'px';
-            gl.viewport(0, 0, canvas.width, canvas.height);
-        }
-
-        window.addEventListener('resize', resize);
-        resize();
+        function resize() { const dpr = window.devicePixelRatio || 1; canvas.width = window.innerWidth * dpr; canvas.height = window.innerHeight * dpr; canvas.style.width = window.innerWidth + 'px'; canvas.style.height = window.innerHeight + 'px'; gl.viewport(0, 0, canvas.width, canvas.height); }
+        window.addEventListener('resize', resize); resize();
 
         function render(time) {
-            gl.useProgram(program);
-            gl.uniform2f(resolutionLocation, canvas.width, canvas.height);
-            gl.uniform1f(timeLocation, time * 0.001);
-            gl.uniform2f(mouseLocation, mouseX, canvas.height - mouseY);
-            gl.uniform1f(mouseRadiusLocation, 0.3);
-            gl.uniform1i(enableMouseLocation, 1);
-
-            gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-            gl.enableVertexAttribArray(positionLocation);
-            gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
-
-            gl.drawArrays(gl.TRIANGLES, 0, 6);
-            requestAnimationFrame(render);
+            gl.useProgram(program); gl.uniform2f(resolutionLocation, canvas.width, canvas.height); gl.uniform1f(timeLocation, time * 0.001);
+            gl.uniform2f(mouseLocation, mouseX, canvas.height - mouseY); gl.uniform1f(mouseRadiusLocation, 0.3); gl.uniform1i(enableMouseLocation, 1);
+            gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer); gl.enableVertexAttribArray(positionLocation); gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
+            gl.drawArrays(gl.TRIANGLES, 0, 6); requestAnimationFrame(render);
         }
         requestAnimationFrame(render);
 
-        // ============== MODEL DATABASE ==============
+        // Model Database
         const providerModels = {
-            anthropic: {
-                name: 'Anthropic',
-                models: [
-                    { id: 'claude-sonnet-4-20250514', name: 'Claude Sonnet 4' },
-                    { id: 'claude-opus-4-20250514', name: 'Claude Opus 4' },
-                    { id: 'claude-3-7-sonnet-20250219', name: 'Claude 3.7 Sonnet' },
-                    { id: 'claude-3-5-sonnet-20241022', name: 'Claude 3.5 Sonnet' },
-                    { id: 'claude-3-5-haiku-20241022', name: 'Claude 3.5 Haiku' },
-                    { id: 'claude-3-opus-20240229', name: 'Claude 3 Opus' },
-                    { id: 'claude-3-sonnet-20240229', name: 'Claude 3 Sonnet' },
-                    { id: 'claude-3-haiku-20240307', name: 'Claude 3 Haiku' }
-                ]
-            },
-            openai: {
-                name: 'OpenAI',
-                models: [
-                    { id: 'gpt-4o', name: 'GPT-4o' },
-                    { id: 'gpt-4o-mini', name: 'GPT-4o Mini' },
-                    { id: 'gpt-4-turbo', name: 'GPT-4 Turbo' },
-                    { id: 'gpt-4', name: 'GPT-4' },
-                    { id: 'gpt-3.5-turbo', name: 'GPT-3.5 Turbo' },
-                    { id: 'o1-preview', name: 'o1 Preview' },
-                    { id: 'o1-mini', name: 'o1 Mini' }
-                ]
-            },
-            google: {
-                name: 'Google AI',
-                models: [
-                    { id: 'gemini-2.0-flash', name: 'Gemini 2.0 Flash' },
-                    { id: 'gemini-1.5-pro', name: 'Gemini 1.5 Pro' },
-                    { id: 'gemini-1.5-flash', name: 'Gemini 1.5 Flash' },
-                    { id: 'gemini-1.0-pro', name: 'Gemini 1.0 Pro' }
-                ]
-            },
-            groq: {
-                name: 'Groq',
-                models: [
-                    { id: 'llama-3.3-70b-versatile', name: 'Llama 3.3 70B' },
-                    { id: 'llama-3.1-70b-versatile', name: 'Llama 3.1 70B' },
-                    { id: 'llama-3.1-8b-instant', name: 'Llama 3.1 8B' },
-                    { id: 'llama3-70b-8192', name: 'Llama 3 70B' },
-                    { id: 'llama3-8b-8192', name: 'Llama 3 8B' },
-                    { id: 'mixtral-8x7b-32768', name: 'Mixtral 8x7B' },
-                    { id: 'gemma2-9b-it', name: 'Gemma 2 9B' }
-                ]
-            },
-            xai: {
-                name: 'xAI',
-                models: [
-                    { id: 'grok-2', name: 'Grok 2' },
-                    { id: 'grok-2-mini', name: 'Grok 2 Mini' },
-                    { id: 'grok-beta', name: 'Grok Beta' }
-                ]
-            },
-            openrouter: {
-                name: 'OpenRouter',
-                models: [
-                    { id: 'anthropic/claude-sonnet-4', name: 'Claude Sonnet 4' },
-                    { id: 'anthropic/claude-3.5-sonnet', name: 'Claude 3.5 Sonnet' },
-                    { id: 'openai/gpt-4o', name: 'GPT-4o' },
-                    { id: 'openai/gpt-4o-mini', name: 'GPT-4o Mini' },
-                    { id: 'google/gemini-pro-1.5', name: 'Gemini 1.5 Pro' },
-                    { id: 'meta-llama/llama-3.1-405b-instruct', name: 'Llama 3.1 405B' },
-                    { id: 'meta-llama/llama-3.1-70b-instruct', name: 'Llama 3.1 70B' },
-                    { id: 'mistralai/mistral-large', name: 'Mistral Large' },
-                    { id: 'cohere/command-r-plus', name: 'Command R+' }
-                ]
-            },
-            mistral: {
-                name: 'Mistral AI',
-                models: [
-                    { id: 'mistral-large-latest', name: 'Mistral Large' },
-                    { id: 'mistral-medium-latest', name: 'Mistral Medium' },
-                    { id: 'mistral-small-latest', name: 'Mistral Small' },
-                    { id: 'open-mixtral-8x22b', name: 'Mixtral 8x22B' },
-                    { id: 'open-mixtral-8x7b', name: 'Mixtral 8x7B' },
-                    { id: 'codestral-latest', name: 'Codestral' }
-                ]
-            },
-            cohere: {
-                name: 'Cohere',
-                models: [
-                    { id: 'command-r-plus', name: 'Command R+' },
-                    { id: 'command-r', name: 'Command R' },
-                    { id: 'command', name: 'Command' },
-                    { id: 'command-light', name: 'Command Light' }
-                ]
-            },
-            deepseek: {
-                name: 'DeepSeek',
-                models: [
-                    { id: 'deepseek-chat', name: 'DeepSeek Chat' },
-                    { id: 'deepseek-coder', name: 'DeepSeek Coder' },
-                    { id: 'deepseek-reasoner', name: 'DeepSeek Reasoner' }
-                ]
-            },
-            together: {
-                name: 'Together AI',
-                models: [
-                    { id: 'meta-llama/Meta-Llama-3.1-405B-Instruct-Turbo', name: 'Llama 3.1 405B' },
-                    { id: 'meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo', name: 'Llama 3.1 70B' },
-                    { id: 'mistralai/Mixtral-8x22B-Instruct-v0.1', name: 'Mixtral 8x22B' },
-                    { id: 'Qwen/Qwen2-72B-Instruct', name: 'Qwen2 72B' }
-                ]
-            },
-            unknown: {
-                name: 'Unknown Provider',
-                models: [
-                    { id: 'default', name: 'Default Model' }
-                ]
-            }
+            anthropic: { name: 'Anthropic', models: [{ id: 'claude-sonnet-4-20250514', name: 'Claude Sonnet 4' },{ id: 'claude-opus-4-20250514', name: 'Claude Opus 4' },{ id: 'claude-3-7-sonnet-20250219', name: 'Claude 3.7 Sonnet' },{ id: 'claude-3-5-sonnet-20241022', name: 'Claude 3.5 Sonnet' },{ id: 'claude-3-5-haiku-20241022', name: 'Claude 3.5 Haiku' },{ id: 'claude-3-opus-20240229', name: 'Claude 3 Opus' },{ id: 'claude-3-haiku-20240307', name: 'Claude 3 Haiku' }] },
+            openai: { name: 'OpenAI', models: [{ id: 'gpt-4o', name: 'GPT-4o' },{ id: 'gpt-4o-mini', name: 'GPT-4o Mini' },{ id: 'gpt-4-turbo', name: 'GPT-4 Turbo' },{ id: 'gpt-4', name: 'GPT-4' },{ id: 'gpt-3.5-turbo', name: 'GPT-3.5 Turbo' },{ id: 'o1-preview', name: 'o1 Preview' },{ id: 'o1-mini', name: 'o1 Mini' }] },
+            google: { name: 'Google AI', models: [{ id: 'gemini-2.0-flash', name: 'Gemini 2.0 Flash' },{ id: 'gemini-1.5-pro', name: 'Gemini 1.5 Pro' },{ id: 'gemini-1.5-flash', name: 'Gemini 1.5 Flash' }] },
+            groq: { name: 'Groq', models: [{ id: 'llama-3.3-70b-versatile', name: 'Llama 3.3 70B' },{ id: 'llama-3.1-70b-versatile', name: 'Llama 3.1 70B' },{ id: 'mixtral-8x7b-32768', name: 'Mixtral 8x7B' }] },
+            xai: { name: 'xAI', models: [{ id: 'grok-2', name: 'Grok 2' },{ id: 'grok-2-mini', name: 'Grok 2 Mini' }] },
+            openrouter: { name: 'OpenRouter', models: [{ id: 'anthropic/claude-sonnet-4', name: 'Claude Sonnet 4' },{ id: 'openai/gpt-4o', name: 'GPT-4o' },{ id: 'google/gemini-pro-1.5', name: 'Gemini 1.5 Pro' }] },
+            mistral: { name: 'Mistral AI', models: [{ id: 'mistral-large-latest', name: 'Mistral Large' },{ id: 'mistral-small-latest', name: 'Mistral Small' },{ id: 'codestral-latest', name: 'Codestral' }] },
+            deepseek: { name: 'DeepSeek', models: [{ id: 'deepseek-chat', name: 'DeepSeek Chat' },{ id: 'deepseek-coder', name: 'DeepSeek Coder' },{ id: 'deepseek-reasoner', name: 'DeepSeek Reasoner' }] },
+            unknown: { name: 'Unknown', models: [{ id: 'default', name: 'Default Model' }] }
         };
 
-        // ============== FORM FUNCTIONALITY ==============
-        function updateTime() {
-            const now = new Date();
-            document.getElementById('current-time').textContent = now.toTimeString().split(' ')[0];
-        }
-        setInterval(updateTime, 1000);
-        updateTime();
+        // Form Logic
+        function updateTime() { document.getElementById('current-time').textContent = new Date().toTimeString().split(' ')[0]; }
+        setInterval(updateTime, 1000); updateTime();
 
         const toggleBtn = document.getElementById('toggle-key');
         const apiKeyInput = document.getElementById('api-key');
@@ -852,64 +383,38 @@
         const modelGroup = document.getElementById('model-group');
         const modelSelect = document.getElementById('model-select');
         const submitBtn = document.getElementById('submit-btn');
+        const form = document.getElementById('api-form');
+        const errorMsg = document.getElementById('error-msg');
+        const errorText = document.getElementById('error-text');
 
         toggleBtn.addEventListener('click', () => {
             const type = apiKeyInput.type === 'password' ? 'text' : 'password';
             apiKeyInput.type = type;
-            toggleBtn.innerHTML = type === 'password'
-                ? `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>`
-                : `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>`;
+            toggleBtn.innerHTML = type === 'password' ? `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>` : `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>`;
         });
 
         function detectKeyType(key) {
             if (!key || key.length < 5) return null;
-            
             if (key.startsWith('sk-ant-')) return { type: 'Anthropic', provider: 'anthropic' };
             if (key.startsWith('sk-or-')) return { type: 'OpenRouter', provider: 'openrouter' };
             if (key.startsWith('sk-proj-') || key.startsWith('sk-')) return { type: 'OpenAI', provider: 'openai' };
             if (key.startsWith('AIzaSy')) return { type: 'Google AI', provider: 'google' };
             if (key.startsWith('gsk_')) return { type: 'Groq', provider: 'groq' };
             if (key.startsWith('xai-')) return { type: 'xAI', provider: 'xai' };
-            if (key.startsWith('sk-ds-') || key.startsWith('deepseek')) return { type: 'DeepSeek', provider: 'deepseek' };
-            if (key.match(/^[a-f0-9]{64}$/i)) return { type: 'Together AI', provider: 'together' };
-            if (key.match(/^[a-zA-Z0-9]{40,}$/)) return { type: 'Cohere', provider: 'cohere' };
+            if (key.startsWith('sk-ds-')) return { type: 'DeepSeek', provider: 'deepseek' };
             if (key.length >= 20) return { type: 'API Key', provider: 'unknown' };
-            
             return null;
         }
 
         function populateModels(provider) {
             const providerData = providerModels[provider] || providerModels.unknown;
             modelSelect.innerHTML = '<option value="">-- Select a model --</option>';
-            
-            providerData.models.forEach(model => {
-                const option = document.createElement('option');
-                option.value = model.id;
-                option.textContent = model.name;
-                modelSelect.appendChild(option);
-            });
-
+            providerData.models.forEach(model => { const option = document.createElement('option'); option.value = model.id; option.textContent = model.name; modelSelect.appendChild(option); });
             modelGroup.classList.add('show');
         }
 
-        const form = document.getElementById('api-form');
-        const errorMsg = document.getElementById('error-msg');
-        const errorText = document.getElementById('error-text');
-
-        function showError(message) {
-            errorText.textContent = message;
-            errorMsg.classList.add('show');
-            keyIndicator.classList.remove('show');
-            modelGroup.classList.remove('show');
-            apiKeyInput.classList.add('error');
-            apiKeyInput.classList.remove('success');
-            submitBtn.disabled = true;
-        }
-
-        function hideError() {
-            errorMsg.classList.remove('show');
-            apiKeyInput.classList.remove('error');
-        }
+        function showError(message) { errorText.textContent = message; errorMsg.classList.add('show'); keyIndicator.classList.remove('show'); modelGroup.classList.remove('show'); apiKeyInput.classList.add('error'); apiKeyInput.classList.remove('success'); submitBtn.disabled = true; }
+        function hideError() { errorMsg.classList.remove('show'); apiKeyInput.classList.remove('error'); }
 
         let currentProvider = null;
 
@@ -917,33 +422,16 @@
             hideError();
             const key = apiKeyInput.value.trim();
             const detected = detectKeyType(key);
-            
-            if (detected) {
-                keyTypeText.textContent = `${detected.type} key detected`;
-                keyIndicator.classList.add('show');
-                apiKeyInput.classList.add('success');
-                currentProvider = detected.provider;
-                populateModels(detected.provider);
-            } else {
-                keyIndicator.classList.remove('show');
-                modelGroup.classList.remove('show');
-                apiKeyInput.classList.remove('success');
-                submitBtn.disabled = true;
-                currentProvider = null;
-            }
+            if (detected) { keyTypeText.textContent = `${detected.type} key detected`; keyIndicator.classList.add('show'); apiKeyInput.classList.add('success'); currentProvider = detected.provider; populateModels(detected.provider); }
+            else { keyIndicator.classList.remove('show'); modelGroup.classList.remove('show'); apiKeyInput.classList.remove('success'); submitBtn.disabled = true; currentProvider = null; }
         });
 
-        modelSelect.addEventListener('change', () => {
-            submitBtn.disabled = !modelSelect.value;
-        });
+        modelSelect.addEventListener('change', () => { submitBtn.disabled = !modelSelect.value; });
 
         form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            hideError();
-
+            e.preventDefault(); hideError();
             const apiKey = apiKeyInput.value.trim();
             const selectedModel = modelSelect.value;
-
             if (!apiKey) { showError('Please enter your API key'); return; }
             if (apiKey.length < 10) { showError('API key seems too short'); return; }
             if (!selectedModel) { showError('Please select a model'); return; }
@@ -951,36 +439,21 @@
             submitBtn.classList.add('loading');
             await new Promise(resolve => setTimeout(resolve, 1500));
 
-            const credentials = { 
-                provider: currentProvider,
-                providerName: providerModels[currentProvider]?.name || 'Unknown',
-                apiKey, 
-                model: selectedModel,
-                modelName: modelSelect.options[modelSelect.selectedIndex].text,
-                timestamp: Date.now()
-            };
-            
-            localStorage.setItem('targetkey_credentials', JSON.stringify(credentials));
+            const credentials = { provider: currentProvider, providerName: providerModels[currentProvider]?.name || 'Unknown', apiKey, model: selectedModel, modelName: modelSelect.options[modelSelect.selectedIndex].text, timestamp: Date.now() };
+            localStorage.setItem('target_config', JSON.stringify(credentials));
 
             apiKeyInput.classList.add('success');
             submitBtn.classList.remove('loading');
-
             setTimeout(() => { window.location.href = 'dashboard.html'; }, 500);
         });
 
         document.addEventListener('DOMContentLoaded', () => {
-            const stored = localStorage.getItem('targetkey_credentials');
+            const stored = localStorage.getItem('target_config');
             if (stored) {
                 const creds = JSON.parse(stored);
                 apiKeyInput.value = creds.apiKey;
                 apiKeyInput.dispatchEvent(new Event('input'));
-                
-                setTimeout(() => {
-                    if (creds.model) {
-                        modelSelect.value = creds.model;
-                        modelSelect.dispatchEvent(new Event('change'));
-                    }
-                }, 100);
+                setTimeout(() => { if (creds.model) { modelSelect.value = creds.model; modelSelect.dispatchEvent(new Event('change')); } }, 100);
             }
         });
     </script>
