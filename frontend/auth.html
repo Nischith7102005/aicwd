@@ -33,7 +33,6 @@
             --error: #ef4444;
             --transition-fast: 0.15s ease;
             --transition-medium: 0.3s ease;
-            --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         body {
@@ -47,14 +46,12 @@
             overflow: hidden;
             position: relative;
             -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
         }
 
         .mono {
             font-family: 'JetBrains Mono', monospace;
         }
 
-        /* Background */
         .bg-wrapper {
             position: fixed;
             inset: 0;
@@ -87,7 +84,6 @@
             height: 600px;
             border-radius: 50%;
             filter: blur(120px);
-            opacity: 0.4;
             animation: breathe 8s ease-in-out infinite;
         }
 
@@ -120,7 +116,6 @@
             }
         }
 
-        /* Floating particles */
         .particles {
             position: absolute;
             inset: 0;
@@ -141,8 +136,6 @@
         .particle:nth-child(3) { left: 35%; animation-duration: 28s; animation-delay: -10s; }
         .particle:nth-child(4) { left: 50%; animation-duration: 22s; animation-delay: -15s; }
         .particle:nth-child(5) { left: 65%; animation-duration: 26s; animation-delay: -8s; }
-        .particle:nth-child(6) { left: 80%; animation-duration: 24s; animation-delay: -12s; }
-        .particle:nth-child(7) { left: 90%; animation-duration: 21s; animation-delay: -3s; }
 
         @keyframes drift {
             0% {
@@ -157,7 +150,6 @@
             }
         }
 
-        /* Container */
         .container {
             display: flex;
             justify-content: center;
@@ -174,7 +166,6 @@
             transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* Card */
         .form_front,
         .form_back {
             position: absolute;
@@ -196,7 +187,6 @@
             transform: rotateY(-180deg);
         }
 
-        /* Header */
         .form-header {
             text-align: center;
             margin-bottom: 40px;
@@ -234,7 +224,6 @@
             font-weight: 400;
         }
 
-        /* Input Groups */
         .input-group {
             margin-bottom: 24px;
         }
@@ -278,7 +267,6 @@
             background: var(--bg-secondary);
         }
 
-        /* Button */
         .btn-primary {
             width: 100%;
             padding: 14px 24px;
@@ -327,7 +315,17 @@
             gap: 8px;
         }
 
-        /* Divider */
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-primary:disabled:hover {
+            transform: none;
+            box-shadow: none;
+        }
+
         .divider {
             display: flex;
             align-items: center;
@@ -348,7 +346,6 @@
             letter-spacing: 0.1em;
         }
 
-        /* Switch */
         .switch-text {
             text-align: center;
             font-size: 0.875rem;
@@ -367,7 +364,6 @@
             color: var(--text-primary);
         }
 
-        /* Toggle */
         .container #signup_toggle {
             display: none;
         }
@@ -376,7 +372,6 @@
             transform: rotateY(-180deg);
         }
 
-        /* Message Area */
         .msg-area {
             min-height: 20px;
             margin-bottom: 8px;
@@ -398,7 +393,6 @@
             color: var(--success);
         }
 
-        /* Loader */
         .loader-container {
             display: none;
             flex-direction: column;
@@ -456,7 +450,6 @@
             display: none;
         }
 
-        /* Footer */
         .footer {
             position: fixed;
             bottom: 0;
@@ -493,7 +486,6 @@
             height: 16px;
         }
 
-        /* Password strength indicator */
         .password-strength {
             display: flex;
             gap: 4px;
@@ -512,7 +504,6 @@
         .strength-bar.medium { background: #f59e0b; }
         .strength-bar.strong { background: var(--success); }
 
-        /* Responsive */
         @media (max-width: 500px) {
             .form_front,
             .form_back {
@@ -529,7 +520,6 @@
 </head>
 <body>
 
-    <!-- Background -->
     <div class="bg-wrapper">
         <div class="bg-gradient"></div>
         <div class="bg-grid"></div>
@@ -565,34 +555,21 @@
                     <div class="input-group">
                         <label class="input-label" for="login-email">Email address</label>
                         <div class="input-wrapper">
-                            <input 
-                                type="email" 
-                                id="login-email" 
-                                class="input-field" 
-                                placeholder="name@company.com"
-                                autocomplete="email"
-                            >
+                            <input type="email" id="login-email" class="input-field" placeholder="name@company.com" autocomplete="email">
                         </div>
                     </div>
 
                     <div class="input-group">
                         <label class="input-label" for="login-password">Password</label>
                         <div class="input-wrapper">
-                            <input 
-                                type="password" 
-                                id="login-password" 
-                                class="input-field" 
-                                placeholder="Enter your password"
-                                autocomplete="current-password"
-                            >
+                            <input type="password" id="login-password" class="input-field" placeholder="Enter your password" autocomplete="current-password">
                         </div>
                     </div>
 
                     <div class="msg-area" id="login-msg"></div>
 
-                    <button class="btn-primary" onclick="login()">
-                        <span>
-                            Sign In
+                    <button class="btn-primary" id="login-btn" onclick="login()">
+                        <span>Sign In
                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <line x1="5" y1="12" x2="19" y2="12"/>
                                 <polyline points="12 5 19 12 12 19"/>
@@ -636,40 +613,21 @@
                     <div class="input-group">
                         <label class="input-label" for="signup-name">Display name</label>
                         <div class="input-wrapper">
-                            <input 
-                                type="text" 
-                                id="signup-name" 
-                                class="input-field" 
-                                placeholder="John Doe"
-                                autocomplete="name"
-                            >
+                            <input type="text" id="signup-name" class="input-field" placeholder="John Doe" autocomplete="name">
                         </div>
                     </div>
 
                     <div class="input-group">
                         <label class="input-label" for="signup-email">Email address</label>
                         <div class="input-wrapper">
-                            <input 
-                                type="email" 
-                                id="signup-email" 
-                                class="input-field" 
-                                placeholder="name@company.com"
-                                autocomplete="email"
-                            >
+                            <input type="email" id="signup-email" class="input-field" placeholder="name@company.com" autocomplete="email">
                         </div>
                     </div>
 
                     <div class="input-group">
                         <label class="input-label" for="signup-password">Password</label>
                         <div class="input-wrapper">
-                            <input 
-                                type="password" 
-                                id="signup-password" 
-                                class="input-field" 
-                                placeholder="Min. 6 characters"
-                                autocomplete="new-password"
-                                oninput="checkPasswordStrength(this.value)"
-                            >
+                            <input type="password" id="signup-password" class="input-field" placeholder="Min. 6 characters" autocomplete="new-password" oninput="checkPasswordStrength(this.value)">
                         </div>
                         <div class="password-strength" id="password-strength">
                             <div class="strength-bar" id="str-1"></div>
@@ -682,21 +640,14 @@
                     <div class="input-group">
                         <label class="input-label" for="signup-confirm">Confirm password</label>
                         <div class="input-wrapper">
-                            <input 
-                                type="password" 
-                                id="signup-confirm" 
-                                class="input-field" 
-                                placeholder="Re-enter password"
-                                autocomplete="new-password"
-                            >
+                            <input type="password" id="signup-confirm" class="input-field" placeholder="Re-enter password" autocomplete="new-password">
                         </div>
                     </div>
 
                     <div class="msg-area" id="signup-msg"></div>
 
-                    <button class="btn-primary" onclick="signup()">
-                        <span>
-                            Create Account
+                    <button class="btn-primary" id="signup-btn" onclick="signup()">
+                        <span>Create Account
                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <line x1="5" y1="12" x2="19" y2="12"/>
                                 <polyline points="12 5 19 12 12 19"/>
@@ -734,20 +685,21 @@
     </footer>
 
     <script>
-        // ⚠️ IMPORTANT: Replace with your actual Firebase config
+        // ============================================
+        // FIREBASE CONFIG - REPLACE WITH YOUR VALUES
+        // ============================================
         const firebaseConfig = {
-  "type": "service_account",
-  "project_id": "keyhound-6777b",
-  "private_key_id": "42c78488c0f4d8e36f4a620002b99d89ac5e272f",
-  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQC5nRS+3xMPBlN9\nawuZ9R7jtMyBXpeOaowAG5TH13AiqiXYAmkXqOmO9uaUWo9tfNa6mPnsTit9HA9V\nWxW1hVUsMMYILPOKP7Cg1mURC3qIVgcktLS6suWn6JLDMnQ1Xn00PrQR4nZWpWOu\nyzrHo6UEG7i/lenXJBu4KyL+vlnoSKP1RMLA80PYTC/lqS3me14mjK3SoDuQC4BY\nAPxraCfvCbtgQZxS1HE9TNcXrLkEM1VHBEDKxRz57plIuJagjYbSTSVt8i+tj7OX\npR/UwAl6YLRRMriKqqXBlMm4O5zgNG03HkjpP47c/M6OJMymKldp+AtYr55o3qYl\nhP5l4REDAgMBAAECggEANfUjgD8h77azk5yIMVfQBHrdDmicnzJ7A1cBP7zxpKoY\nuTwuJ8obJ0vACPVwh3AIjhMFaDvrKYH8NSB25Z9efKurDdpfa9uK8Z6Rn8xZ8QMt\nLW74sONrno2eCG+E17ThqcvmleJi61pF6Zy7uChqwpB6evtOEJQ3GKk1kZ9tTHg+\nFS6iOf3kPtWOxu87wPhF/iNQs7tJGfYmSdzrlBh9TPIfPaeCjVnj50oo1v/OTGJe\nqL+n1xPBrKS9yWisD6zcz8wsGxps6MpD7L4jLFoyOSdrrOQPbJuqmSt5+G9g7HIT\nsp1Db+WceiHF2/AABCrBd+pU9FcrfZJlShlqpV+9/QKBgQDwZ2A32YFcSaTZJt9n\nfELE0V6d4IbbXWhlmS2PgqWQJWljOPjnUvWANOrwFaL4r3GS8z8+K+xvGclVtLme\nSx1ME6tjGP2GSLeF1Q4sBsgMBckaTJY96bIBCyZrxF3UvV5yZf3EfNZACEyzCu1y\nxQE0byBPOfIs4N6rIvGxRTBfXwKBgQDFp7/1++Ndlk1XXsWnbQW7knMgECUfR3D8\noeEUFrU7IAdrSM5+Cv9oxQ+XNyIrZYmqJulpHC5g8R4yaPT8j9MG8R2qV7d2JeUu\n4cv/QNUJ6e5gAwrqZ4aXhPlp9cGcyjJrYo8cql6zbqzzKFr3mN8MaOBdAkIQl3KV\nAgPVxibE3QKBgQCnPrPAhu+o3Y7yh0mae+cTd7jESsRm7ffH3qXElhZKTsyfe64l\neCBU/fuH5PWI3r07h0AzJ2mH7T+VAXK0vfr2xyRPf744YnRSheMjG+CmBIxgYHGR\nRvhQI4qqJGVGsCt5mJzPyi1fRKbfVDXWx1lMOhcXJu/k6tfd5SSRt9msLwKBgC16\nLmHDpgm3dm4e4S1nmUUSKij7bf8naejGuknr+6Dx+qMFqnU3xJJvnOm3BsajYyxi\nLZxAnq8xazhAC/Y8hVp4idHSwuSNTZEe5NgDK8FPMMioio9qaH5eWyC1KeoQX89z\naug2jvmMAoEkDOIhK1jonI7p4Rd+MR/1ybobEHqFAoGBANh0g0WXKNi0sHrEJTYX\nBWlcpIcC3hoxQRUoP2Jgy4tOgusWTgRsGAQSt4nT7qWhY88DhKPEFEtgmXzg+DRq\nkyvX7bHecOGN1Vz6+PoIwYoWgNOPehSr/xYC8Z0mDcAkIrAwMAx1H7yAww8Mk2l2\nTSJmNbwOOM2RbkKwzczsc7Jb\n-----END PRIVATE KEY-----\n",
-  "client_email": "firebase-adminsdk-fbsvc@keyhound-6777b.iam.gserviceaccount.com",
-  "client_id": "112484202914081906938",
-  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-  "token_uri": "https://oauth2.googleapis.com/token",
-  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-fbsvc%40keyhound-6777b.iam.gserviceaccount.com",
-  "universe_domain": "googleapis.com"
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_PROJECT_ID.appspot.com",
+            messagingSenderId: "YOUR_SENDER_ID",
+            appId: "YOUR_APP_ID",
+            measurementId: "YOUR_MEASUREMENT_ID"
         };
+        // ============================================
+
+        // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
 
@@ -767,6 +719,10 @@
                 ? '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>'
                 : '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>';
             msgEl.innerHTML = `<span class="${isError ? 'text-error' : 'text-success'}">${icon} ${message}</span>`;
+        }
+
+        function clearMessage(type) {
+            document.getElementById(`${type}-msg`).innerHTML = '';
         }
 
         function checkPasswordStrength(password) {
@@ -793,7 +749,9 @@
             }
         }
 
-        function login() {
+        async function login() {
+            clearMessage('login');
+            
             const email = document.getElementById('login-email').value.trim();
             const password = document.getElementById('login-password').value;
 
@@ -802,27 +760,39 @@
                 return;
             }
 
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                showMessage('login', 'Please enter a valid email address');
+                return;
+            }
+
             showLoader('login');
 
-            auth.signInWithEmailAndPassword(email, password)
-                .then((userCredential) => userCredential.user.getIdToken())
-                .then((idToken) => {
-                    localStorage.setItem('firebase_id_token', idToken);
-                    window.location.href = 'key.html';
-                })
-                .catch((error) => {
-                    hideLoader('login');
-                    const messages = {
-                        'auth/user-not-found': 'No account found with this email',
-                        'auth/wrong-password': 'Incorrect password',
-                        'auth/invalid-email': 'Invalid email address',
-                        'auth/too-many-requests': 'Too many attempts. Try again later'
-                    };
-                    showMessage('login', messages[error.code] || 'Authentication failed');
-                });
+            try {
+                const userCredential = await auth.signInWithEmailAndPassword(email, password);
+                const idToken = await userCredential.user.getIdToken();
+                localStorage.setItem('firebase_id_token', idToken);
+                window.location.href = 'key.html';
+            } catch (error) {
+                hideLoader('login');
+                console.error('Login error:', error.code);
+                
+                const messages = {
+                    'auth/user-not-found': 'No account found with this email',
+                    'auth/wrong-password': 'Incorrect password',
+                    'auth/invalid-email': 'Invalid email address',
+                    'auth/invalid-credential': 'Invalid email or password',
+                    'auth/user-disabled': 'This account has been disabled',
+                    'auth/too-many-requests': 'Too many attempts. Please try again later',
+                    'auth/network-request-failed': 'Network error. Please check your connection'
+                };
+                showMessage('login', messages[error.code] || 'Authentication failed. Please try again.');
+            }
         }
 
-        function signup() {
+        async function signup() {
+            clearMessage('signup');
+            
             const name = document.getElementById('signup-name').value.trim();
             const email = document.getElementById('signup-email').value.trim();
             const password = document.getElementById('signup-password').value;
@@ -833,8 +803,14 @@
                 return;
             }
 
-            if (password !== confirm) {
-                showMessage('signup', 'Passwords do not match');
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                showMessage('signup', 'Please enter a valid email address');
+                return;
+            }
+
+            if (name.length < 2) {
+                showMessage('signup', 'Display name must be at least 2 characters');
                 return;
             }
 
@@ -843,35 +819,55 @@
                 return;
             }
 
+            if (password !== confirm) {
+                showMessage('signup', 'Passwords do not match');
+                return;
+            }
+
             showLoader('signup');
 
-            auth.createUserWithEmailAndPassword(email, password)
-                .then((userCredential) => {
-                    return userCredential.user.updateProfile({ displayName: name });
-                })
-                .then(() => auth.currentUser.getIdToken())
-                .then((idToken) => {
-                    localStorage.setItem('firebase_id_token', idToken);
-                    window.location.href = 'key.html';
-                })
-                .catch((error) => {
-                    hideLoader('signup');
-                    const messages = {
-                        'auth/email-already-in-use': 'Email is already registered',
-                        'auth/invalid-email': 'Invalid email address',
-                        'auth/weak-password': 'Password is too weak'
-                    };
-                    showMessage('signup', messages[error.code] || 'Registration failed');
-                });
+            try {
+                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                await userCredential.user.updateProfile({ displayName: name });
+                const idToken = await auth.currentUser.getIdToken();
+                localStorage.setItem('firebase_id_token', idToken);
+                window.location.href = 'key.html';
+            } catch (error) {
+                hideLoader('signup');
+                console.error('Signup error:', error.code);
+                
+                const messages = {
+                    'auth/email-already-in-use': 'This email is already registered',
+                    'auth/invalid-email': 'Invalid email address',
+                    'auth/operation-not-allowed': 'Email/password accounts are not enabled',
+                    'auth/weak-password': 'Password is too weak. Please use a stronger password',
+                    'auth/network-request-failed': 'Network error. Please check your connection'
+                };
+                showMessage('signup', messages[error.code] || 'Registration failed. Please try again.');
+            }
         }
 
         // Enter key handlers
         document.getElementById('login-email').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') document.getElementById('login-password').focus();
         });
+        
         document.getElementById('login-password').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') login();
         });
+        
+        document.getElementById('signup-name').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') document.getElementById('signup-email').focus();
+        });
+        
+        document.getElementById('signup-email').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') document.getElementById('signup-password').focus();
+        });
+        
+        document.getElementById('signup-password').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') document.getElementById('signup-confirm').focus();
+        });
+        
         document.getElementById('signup-confirm').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') signup();
         });
