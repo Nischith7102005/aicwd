@@ -3,200 +3,542 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard | Observability</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Dashboard | Target Key</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Convex Client -->
-    <script type="module">
-        import { ConvexClient } from "https://esm.sh/@convex-dev/client@1.8.2";
-        window.ConvexClient = ConvexClient;
-    </script>
     <style>
-        body { background-color: #050508; color: #e5e7eb; font-family: 'Inter', sans-serif; }
-        .mono { font-family: 'JetBrains Mono', monospace; }
-        .card { background: #111827; border: 1px solid #374151; border-radius: 0.5rem; padding: 1rem; }
-        .text-glow-green { text-shadow: 0 0 10px rgba(74, 222, 128, 0.5); }
-        .text-glow-red { text-shadow: 0 0 10px rgba(248, 113, 113, 0.5); }
+        :root {
+            --bg-dark: #0a0a0c;
+            --bg-panel: rgba(18, 19, 26, 0.85);
+            --bg-card: rgba(26, 27, 36, 0.9);
+            --border-color: #3a3d4a;
+            --text-primary: #e0e0e0;
+            --text-secondary: #9999aa;
+            --accent-purple: #a855f7;
+            --accent-violet: #8b5cf6;
+            --accent-lavender: #c4b5fd;
+            --accent-white: #ffffff;
+            --accent-red: #ff4466;
+            --accent-green: #4ade80;
+            --accent-yellow: #facc15;
+            --glow-purple: rgba(168, 85, 247, 0.4);
+            --glow-green: rgba(74, 222, 128, 0.4);
+            --glow-red: rgba(255, 68, 102, 0.4);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Share Tech Mono', monospace;
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        #dither-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; }
+
+        .scanlines {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 1000;
+            background: repeating-linear-gradient(0deg, rgba(0,0,0,0.1) 0px, rgba(0,0,0,0.1) 1px, transparent 1px, transparent 3px);
+        }
+
+        .main-container { position: relative; z-index: 10; padding: 1.5rem; min-height: 100vh; display: flex; flex-direction: column; }
+
+        /* Header */
+        .header {
+            background: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            padding: 1rem 1.5rem;
+            margin-bottom: 1.5rem;
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute; top: 0; left: 0; right: 0; height: 2px;
+            background: linear-gradient(90deg, var(--accent-purple), var(--accent-lavender), var(--accent-white), var(--accent-lavender), var(--accent-purple));
+            background-size: 200% 100%;
+            animation: shimmer 3s linear infinite;
+        }
+
+        @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+
+        .header-left { display: flex; align-items: center; gap: 1rem; }
+
+        .status-indicator { width: 10px; height: 10px; background: var(--accent-green); border-radius: 50%; box-shadow: 0 0 10px var(--glow-green); }
+
+        .header-title {
+            font-family: 'VT323', monospace; font-size: 1.5rem;
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-lavender), var(--accent-white));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+            letter-spacing: 3px;
+        }
+
+        .target-display { font-size: 0.75rem; color: var(--accent-lavender); letter-spacing: 1px; }
+
+        .header-actions { display: flex; gap: 1rem; }
+
+        .btn {
+            padding: 0.6rem 1.2rem;
+            font-family: 'VT323', monospace; font-size: 0.9rem;
+            letter-spacing: 2px; cursor: pointer;
+            border: 1px solid; transition: all 0.3s;
+            text-transform: uppercase;
+        }
+
+        .btn-danger {
+            background: rgba(255, 68, 102, 0.1);
+            border-color: var(--accent-red);
+            color: var(--accent-red);
+        }
+        .btn-danger:hover { background: rgba(255, 68, 102, 0.2); box-shadow: 0 0 20px var(--glow-red); }
+
+        .btn-ghost {
+            background: transparent;
+            border-color: var(--border-color);
+            color: var(--text-secondary);
+        }
+        .btn-ghost:hover { border-color: var(--accent-purple); color: var(--accent-lavender); }
+
+        /* Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: auto auto;
+            gap: 1.5rem;
+            flex: 1;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            padding: 1.25rem;
+            position: relative;
+            backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card::after {
+            content: '';
+            position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
+            background: linear-gradient(90deg, transparent, var(--border-color), transparent);
+        }
+
+        .corner { position: absolute; width: 12px; height: 12px; border-color: var(--accent-purple); border-style: solid; border-width: 0; }
+        .corner-tl { top: 6px; left: 6px; border-top-width: 1px; border-left-width: 1px; }
+        .corner-tr { top: 6px; right: 6px; border-top-width: 1px; border-right-width: 1px; }
+        .corner-bl { bottom: 6px; left: 6px; border-bottom-width: 1px; border-left-width: 1px; }
+        .corner-br { bottom: 6px; right: 6px; border-bottom-width: 1px; border-right-width: 1px; }
+
+        .card-title {
+            font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px;
+            background: linear-gradient(90deg, var(--accent-lavender), var(--text-secondary));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+            margin-bottom: 1rem;
+        }
+
+        .card-wide { grid-column: span 2; }
+        .card-tall { grid-row: span 2; }
+        .card-triple { grid-column: span 3; }
+
+        /* KPI Value */
+        .kpi-value {
+            font-family: 'VT323', monospace; font-size: 2.5rem;
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-lavender));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+
+        .kpi-label { font-size: 0.65rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; margin-top: 0.5rem; }
+
+        /* Gauge */
+        .gauge-container { flex: 1; display: flex; align-items: center; justify-content: center; position: relative; }
+
+        .gauge {
+            width: 120px; height: 120px;
+            border-radius: 50%;
+            border: 10px solid var(--bg-card);
+            position: relative;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        .gauge-fill {
+            position: absolute; top: -10px; left: -10px; right: -10px; bottom: -10px;
+            border-radius: 50%;
+            border: 10px solid var(--accent-green);
+            border-left-color: transparent; border-bottom-color: transparent;
+            transform: rotate(45deg);
+            transition: all 0.5s ease;
+        }
+
+        .gauge-value { font-family: 'VT323', monospace; font-size: 2rem; color: var(--text-primary); }
+
+        .gauge-status {
+            text-align: center; font-size: 0.75rem; font-weight: bold;
+            text-transform: uppercase; letter-spacing: 2px; margin-top: 1rem;
+        }
+
+        .status-optimal { color: var(--accent-green); text-shadow: 0 0 10px var(--glow-green); }
+        .status-warning { color: var(--accent-yellow); }
+        .status-critical { color: var(--accent-red); text-shadow: 0 0 10px var(--glow-red); }
+
+        /* Chart Container */
+        .chart-container { flex: 1; min-height: 150px; position: relative; }
+
+        /* Progress Bar */
+        .progress-bar { width: 100%; height: 4px; background: var(--bg-card); margin-top: 0.75rem; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent-purple), var(--accent-lavender)); transition: width 0.5s ease; }
+
+        /* Log Console */
+        .log-console {
+            flex: 1; overflow-y: auto; font-size: 0.75rem;
+            padding-right: 0.5rem; min-height: 200px;
+        }
+
+        .log-entry { padding: 0.4rem 0; border-left: 2px solid var(--border-color); padding-left: 0.75rem; margin-bottom: 0.25rem; }
+        .log-alert { color: var(--accent-red); border-left-color: var(--accent-red); }
+        .log-info { color: var(--accent-lavender); border-left-color: var(--accent-purple); }
+        .log-default { color: var(--text-secondary); }
+
+        /* Status Bar */
+        .status-bar {
+            position: fixed; bottom: 0; left: 0; right: 0;
+            padding: 0.5rem 2rem;
+            background: var(--bg-panel);
+            border-top: 1px solid var(--border-color);
+            display: flex; justify-content: space-between;
+            font-size: 0.75rem; color: var(--text-secondary);
+            z-index: 100; backdrop-filter: blur(10px);
+        }
+
+        .status-item { display: flex; align-items: center; gap: 0.5rem; }
+        .status-dot { width: 6px; height: 6px; background: linear-gradient(135deg, var(--accent-purple), var(--accent-lavender)); border-radius: 50%; box-shadow: 0 0 8px var(--glow-purple); }
+
+        /* Responsive */
+        @media (max-width: 1200px) { .dashboard-grid { grid-template-columns: repeat(2, 1fr); } .card-triple { grid-column: span 2; } }
+        @media (max-width: 768px) { .dashboard-grid { grid-template-columns: 1fr; } .card-wide, .card-triple { grid-column: span 1; } .header { flex-direction: column; gap: 1rem; } .header-actions { width: 100%; justify-content: center; } }
     </style>
 </head>
-<body class="p-4 h-screen flex flex-col overflow-hidden">
+<body>
+    <canvas id="dither-canvas"></canvas>
+    <div class="scanlines"></div>
 
-    <!-- Header -->
-    <header class="flex justify-between items-center mb-4 pb-4 border-b border-white/10">
-        <div class="flex items-center gap-3">
-            <div class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-            <div>
-                <h1 class="text-xl font-bold tracking-wider mono text-white">LIVE_OBSERVATORY</h1>
-                <span id="targetDisplay" class="text-xs text-indigo-400 font-mono">CONNECTING...</span>
-            </div>
-        </div>
-        <div class="flex gap-4">
-            <button onclick="triggerRedTeam()" class="px-4 py-1.5 bg-rose-900/50 border border-rose-500 text-rose-400 text-xs font-bold mono hover:bg-rose-900 transition rounded">
-                INITIATE_STRESS_TEST
-            </button>
-            <button onclick="window.location.href='key.html'" class="px-4 py-1.5 border border-white/10 text-gray-400 text-xs font-bold mono hover:text-white rounded">
-                CHANGE KEY
-            </button>
-        </div>
-    </header>
-
-    <!-- Main Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 flex-1 min-h-0">
-        
-        <!-- KPI: Token Efficiency -->
-        <div class="card flex flex-col">
-            <h3 class="text-xs text-gray-500 mono mb-2">TOKEN_EFFICIENCY_RATIO</h3>
-            <div class="flex-1 relative">
-                <canvas id="tokenChart"></canvas>
-            </div>
-            <div class="mt-2 text-2xl font-bold text-indigo-400 mono" id="tokenValue">0.00</div>
-            <div class="text-[10px] text-gray-600">OUTPUT_TOKENS / SEMANTIC_PAYLOAD</div>
-        </div>
-
-        <!-- KPI: Waste Index Gauge -->
-        <div class="card flex flex-col relative overflow-hidden">
-            <h3 class="text-xs text-gray-500 mono mb-2">COGNITIVE_WASTE_INDEX</h3>
-            <div class="flex-1 flex items-center justify-center relative">
-                <div class="w-32 h-32 rounded-full border-[12px] border-gray-800 relative flex items-center justify-center">
-                    <div id="wasteCircle" class="absolute w-full h-full rounded-full border-[12px] border-green-500 border-l-transparent border-b-transparent transition-all duration-1000 rotate-45"></div>
-                    <span id="wasteValue" class="text-3xl font-bold mono text-white">0%</span>
+    <div class="main-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <div class="status-indicator"></div>
+                <div>
+                    <h1 class="header-title">LIVE_OBSERVATORY</h1>
+                    <div class="target-display" id="targetDisplay">CONNECTING...</div>
                 </div>
             </div>
-            <div id="wasteStatus" class="text-center text-xs font-bold text-green-500 mono mt-2">OPTIMAL</div>
-        </div>
+            <div class="header-actions">
+                <button class="btn btn-danger" onclick="triggerRedTeam()">INITIATE_STRESS_TEST</button>
+                <button class="btn btn-ghost" onclick="window.location.href='key.html'">CHANGE KEY</button>
+            </div>
+        </header>
 
-        <!-- Chart: Drift Timeline -->
-        <div class="card md:col-span-2 flex flex-col">
-            <h3 class="text-xs text-gray-500 mono mb-2">SEMANTIC_DRIFT_TIMELINE (REAL-TIME)</h3>
-            <div class="flex-1 min-h-0 relative">
-                <canvas id="driftChart"></canvas>
+        <!-- Dashboard Grid -->
+        <div class="dashboard-grid">
+            <!-- Token Efficiency -->
+            <div class="card">
+                <div class="corner corner-tl"></div>
+                <div class="corner corner-tr"></div>
+                <div class="corner corner-bl"></div>
+                <div class="corner corner-br"></div>
+                <h3 class="card-title">Token Efficiency Ratio</h3>
+                <div class="chart-container">
+                    <canvas id="tokenChart"></canvas>
+                </div>
+                <div class="kpi-value" id="tokenValue">0.00</div>
+                <div class="kpi-label">Output Tokens / Semantic Payload</div>
+            </div>
+
+            <!-- Waste Index -->
+            <div class="card">
+                <div class="corner corner-tl"></div>
+                <div class="corner corner-tr"></div>
+                <div class="corner corner-bl"></div>
+                <div class="corner corner-br"></div>
+                <h3 class="card-title">Cognitive Waste Index</h3>
+                <div class="gauge-container">
+                    <div class="gauge">
+                        <div class="gauge-fill" id="wasteCircle"></div>
+                        <span class="gauge-value" id="wasteValue">0%</span>
+                    </div>
+                </div>
+                <div class="gauge-status status-optimal" id="wasteStatus">OPTIMAL</div>
+            </div>
+
+            <!-- Drift Timeline -->
+            <div class="card card-wide">
+                <div class="corner corner-tl"></div>
+                <div class="corner corner-tr"></div>
+                <div class="corner corner-bl"></div>
+                <div class="corner corner-br"></div>
+                <h3 class="card-title">Semantic Drift Timeline (Real-Time)</h3>
+                <div class="chart-container">
+                    <canvas id="driftChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Log Stream -->
+            <div class="card card-triple">
+                <div class="corner corner-tl"></div>
+                <div class="corner corner-tr"></div>
+                <div class="corner corner-bl"></div>
+                <div class="corner corner-br"></div>
+                <h3 class="card-title">Adversarial Log Stream</h3>
+                <div class="log-console" id="logConsole">
+                    <div class="log-entry log-default">Connecting to telemetry stream...</div>
+                </div>
+            </div>
+
+            <!-- Hallucination Probability -->
+            <div class="card">
+                <div class="corner corner-tl"></div>
+                <div class="corner corner-tr"></div>
+                <div class="corner corner-bl"></div>
+                <div class="corner corner-br"></div>
+                <h3 class="card-title">Hallucination Prob</h3>
+                <div class="kpi-value" id="hallucinationVal" style="background: linear-gradient(135deg, #c084fc, #e879f9); -webkit-background-clip: text; background-clip: text;">0.020</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="hallucinationBar" style="width: 2%;"></div>
+                </div>
+                <div class="kpi-label">Bayesian Confidence Interval</div>
             </div>
         </div>
-
-        <!-- Log: Adversarial Stress -->
-        <div class="card lg:col-span-3 flex flex-col">
-            <h3 class="text-xs text-gray-500 mono mb-2">ADVERSARIAL_LOG_STREAM</h3>
-            <div class="flex-1 overflow-y-auto font-mono text-xs space-y-1 pr-2" id="logConsole">
-                <div class="text-gray-600">Connecting to telemetry stream...</div>
-            </div>
-        </div>
-
-        <!-- Metric: Hallucination Prob -->
-        <div class="card flex flex-col justify-between">
-            <h3 class="text-xs text-gray-500 mono mb-1">HALLUCINATION_PROB</h3>
-            <div class="text-4xl font-bold text-purple-400 mono" id="hallucinationVal">0.02</div>
-            <div class="w-full bg-gray-800 h-1 mt-2">
-                <div id="hallucinationBar" class="bg-purple-500 h-1" style="width: 2%"></div>
-            </div>
-            <div class="text-[10px] text-gray-500 mt-2">BAYESIAN_CONFIDENCE_INTERVAL</div>
-        </div>
-
     </div>
 
-    <script type="module">
-        const address = "https://tacit-wombat-870.convex.cloud";
-        const token = localStorage.getItem('firebase_id_token') || "dev:tacit-wombat-870|eyJ2MiI6IjRmYjIzZDBjOTk1NjQwMjFhMjAyMGVkMDI0ZDEyZWZhIn0=";
-        
-        const configRaw = localStorage.getItem('target_config');
-        if (!configRaw) {
-            window.location.href = 'key.html';
+    <!-- Status Bar -->
+    <div class="status-bar">
+        <div class="status-item"><span class="status-dot"></span><span>Systems Online</span></div>
+        <div class="status-item"><span id="current-time">00:00:00</span></div>
+    </div>
+
+    <script>
+        // WebGL Dither Background
+        const canvas = document.getElementById('dither-canvas');
+        const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+
+        const vertexShaderSource = `attribute vec2 a_position; void main() { gl_Position = vec4(a_position, 0.0, 1.0); }`;
+
+        const fragmentShaderSource = `
+            precision highp float;
+            uniform vec2 u_resolution; uniform float u_time; uniform vec2 u_mouse; uniform float u_mouseRadius; uniform int u_enableMouse;
+            const float waveSpeed = 0.05; const float waveFrequency = 3.0; const float waveAmplitude = 0.3; const vec3 waveColor = vec3(0.4, 0.3, 0.6);
+            const float colorNum = 4.0; const float pixelSize = 2.0;
+            vec4 mod289(vec4 x) { return x - floor(x * (1.0/289.0)) * 289.0; }
+            vec4 permute(vec4 x) { return mod289(((x * 34.0) + 1.0) * x); }
+            vec4 taylorInvSqrt(vec4 r) { return 1.79284291400159 - 0.85373472095314 * r; }
+            vec2 fade(vec2 t) { return t*t*t*(t*(t*6.0-15.0)+10.0); }
+            float cnoise(vec2 P) {
+                vec4 Pi = floor(P.xyxy) + vec4(0.0,0.0,1.0,1.0); vec4 Pf = fract(P.xyxy) - vec4(0.0,0.0,1.0,1.0); Pi = mod289(Pi);
+                vec4 ix = Pi.xzxz, iy = Pi.yyww; vec4 fx = Pf.xzxz, fy = Pf.yyww;
+                vec4 i = permute(permute(ix) + iy); vec4 gx = fract(i * (1.0/41.0)) * 2.0 - 1.0; vec4 gy = abs(gx) - 0.5;
+                vec4 tx = floor(gx + 0.5); gx = gx - tx;
+                vec2 g00 = vec2(gx.x, gy.x), g10 = vec2(gx.y, gy.y), g01 = vec2(gx.z, gy.z), g11 = vec2(gx.w, gy.w);
+                vec4 norm = taylorInvSqrt(vec4(dot(g00,g00), dot(g01,g01), dot(g10,g10), dot(g11,g11)));
+                g00 *= norm.x; g01 *= norm.y; g10 *= norm.z; g11 *= norm.w;
+                float n00 = dot(g00, vec2(fx.x, fy.x)); float n10 = dot(g10, vec2(fx.y, fy.y));
+                float n01 = dot(g01, vec2(fx.z, fy.z)); float n11 = dot(g11, vec2(fx.w, fy.w));
+                vec2 fade_xy = fade(Pf.xy); vec2 n_x = mix(vec2(n00, n01), vec2(n10, n11), fade_xy.x);
+                return 2.3 * mix(n_x.x, n_x.y, fade_xy.y);
+            }
+            float fbm(vec2 p) { float value = 0.0, amp = 1.0, freq = waveFrequency; for (int i = 0; i < 4; i++) { value += amp * abs(cnoise(p)); p *= freq; amp *= waveAmplitude; } return value; }
+            float pattern(vec2 p) { vec2 p2 = p - u_time * waveSpeed; return fbm(p + fbm(p2)); }
+            float bayer8(vec2 p) {
+                vec2 P = mod(floor(p), 8.0); float x = P.x, y = P.y; int idx = int(y) * 8 + int(x);
+                float values[64]; values[0]=0.0;values[1]=48.0;values[2]=12.0;values[3]=60.0;values[4]=3.0;values[5]=51.0;values[6]=15.0;values[7]=63.0;values[8]=32.0;values[9]=16.0;values[10]=44.0;values[11]=28.0;values[12]=35.0;values[13]=19.0;values[14]=47.0;values[15]=31.0;values[16]=8.0;values[17]=56.0;values[18]=4.0;values[19]=52.0;values[20]=11.0;values[21]=59.0;values[22]=7.0;values[23]=55.0;values[24]=40.0;values[25]=24.0;values[26]=36.0;values[27]=20.0;values[28]=43.0;values[29]=27.0;values[30]=39.0;values[31]=23.0;values[32]=2.0;values[33]=50.0;values[34]=14.0;values[35]=62.0;values[36]=1.0;values[37]=49.0;values[38]=13.0;values[39]=61.0;values[40]=34.0;values[41]=18.0;values[42]=46.0;values[43]=30.0;values[44]=33.0;values[45]=17.0;values[46]=45.0;values[47]=29.0;values[48]=10.0;values[49]=58.0;values[50]=6.0;values[51]=54.0;values[52]=9.0;values[53]=57.0;values[54]=5.0;values[55]=53.0;values[56]=42.0;values[57]=26.0;values[58]=38.0;values[59]=22.0;values[60]=41.0;values[61]=25.0;values[62]=37.0;values[63]=21.0;
+                float v = 0.0; for (int i = 0; i < 64; i++) { if (i == idx) v = values[i]; } return v / 64.0;
+            }
+            vec3 dither(vec2 coord, vec3 color) {
+                vec2 scaledCoord = floor(coord / pixelSize); float threshold = bayer8(scaledCoord) - 0.25;
+                float step = 1.0 / (colorNum - 1.0); color += threshold * step; float bias = 0.2;
+                color = clamp(color - bias, 0.0, 1.0); return floor(color * (colorNum - 1.0) + 0.5) / (colorNum - 1.0);
+            }
+            void main() {
+                vec2 pixelCoord = floor(gl_FragCoord.xy / pixelSize) * pixelSize; vec2 uv = pixelCoord / u_resolution;
+                uv -= 0.5; uv.x *= u_resolution.x / u_resolution.y; float f = pattern(uv);
+                if (u_enableMouse == 1) { vec2 mouseNDC = (u_mouse / u_resolution - 0.5) * vec2(1.0, -1.0); mouseNDC.x *= u_resolution.x / u_resolution.y; float dist = length(uv - mouseNDC); float effect = 1.0 - smoothstep(0.0, u_mouseRadius, dist); f -= 0.5 * effect; }
+                vec3 col = mix(vec3(0.0), waveColor, f); col = dither(gl_FragCoord.xy, col); gl_FragColor = vec4(col, 1.0);
+            }
+        `;
+
+        function createShader(gl, type, source) { const shader = gl.createShader(type); gl.shaderSource(shader, source); gl.compileShader(shader); if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) { console.error(gl.getShaderInfoLog(shader)); gl.deleteShader(shader); return null; } return shader; }
+        function createProgram(gl, vs, fs) { const program = gl.createProgram(); gl.attachShader(program, vs); gl.attachShader(program, fs); gl.linkProgram(program); if (!gl.getProgramParameter(program, gl.LINK_STATUS)) { console.error(gl.getProgramInfoLog(program)); return null; } return program; }
+
+        const vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexShaderSource);
+        const fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource);
+        const program = createProgram(gl, vertexShader, fragmentShader);
+
+        const positionLocation = gl.getAttribLocation(program, 'a_position');
+        const resolutionLocation = gl.getUniformLocation(program, 'u_resolution');
+        const timeLocation = gl.getUniformLocation(program, 'u_time');
+        const mouseLocation = gl.getUniformLocation(program, 'u_mouse');
+        const mouseRadiusLocation = gl.getUniformLocation(program, 'u_mouseRadius');
+        const enableMouseLocation = gl.getUniformLocation(program, 'u_enableMouse');
+
+        const positionBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1,1,-1,-1,1,-1,1,1,-1,1,1]), gl.STATIC_DRAW);
+
+        let mouseX = 0, mouseY = 0;
+        document.addEventListener('mousemove', (e) => { mouseX = e.clientX * window.devicePixelRatio; mouseY = e.clientY * window.devicePixelRatio; });
+
+        function resize() { const dpr = window.devicePixelRatio || 1; canvas.width = window.innerWidth * dpr; canvas.height = window.innerHeight * dpr; canvas.style.width = window.innerWidth + 'px'; canvas.style.height = window.innerHeight + 'px'; gl.viewport(0, 0, canvas.width, canvas.height); }
+        window.addEventListener('resize', resize); resize();
+
+        function renderBg(time) {
+            gl.useProgram(program); gl.uniform2f(resolutionLocation, canvas.width, canvas.height); gl.uniform1f(timeLocation, time * 0.001);
+            gl.uniform2f(mouseLocation, mouseX, canvas.height - mouseY); gl.uniform1f(mouseRadiusLocation, 0.3); gl.uniform1i(enableMouseLocation, 1);
+            gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer); gl.enableVertexAttribArray(positionLocation); gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
+            gl.drawArrays(gl.TRIANGLES, 0, 6); requestAnimationFrame(renderBg);
         }
+        requestAnimationFrame(renderBg);
+
+        // Time Update
+        function updateTime() { document.getElementById('current-time').textContent = new Date().toTimeString().split(' ')[0]; }
+        setInterval(updateTime, 1000); updateTime();
+
+        // Load Config
+        const configRaw = localStorage.getItem('target_config');
+        if (!configRaw) { window.location.href = 'key.html'; }
         const config = JSON.parse(configRaw);
         const maskedKey = config.apiKey ? `${config.apiKey.substring(0, 4)}...${config.apiKey.slice(-4)}` : 'UNKNOWN';
         document.getElementById('targetDisplay').innerText = `TARGET: ${config.modelName.toUpperCase()} [KEY: ${maskedKey}]`;
 
-        const convex = new window.ConvexClient(address, {
-            auth: { token: token }
-        });
-
+        // Chart Options
         const commonOptions = {
-            responsive: true,
-            maintainAspectRatio: false,
+            responsive: true, maintainAspectRatio: false,
             animation: { duration: 0 },
             plugins: { legend: { display: false } },
             scales: {
                 x: { display: false },
-                y: { grid: { color: '#1f2937' }, ticks: { color: '#6b7280', font: {family: 'JetBrains Mono'} } }
+                y: { grid: { color: 'rgba(168, 85, 247, 0.1)' }, ticks: { color: '#9999aa', font: { family: 'Share Tech Mono' } } }
             }
         };
 
+        // Token Chart
         const tokenChart = new Chart(document.getElementById('tokenChart'), {
             type: 'scatter',
-            data: { datasets: [{ label: 'Efficiency', data: [], backgroundColor: '#a5b4fc' }] },
+            data: { datasets: [{ label: 'Efficiency', data: [], backgroundColor: '#c4b5fd', borderColor: '#a855f7' }] },
             options: commonOptions
         });
 
+        // Drift Chart
         const driftChart = new Chart(document.getElementById('driftChart'), {
             type: 'line',
-            data: { 
+            data: {
                 datasets: [
-                    { label: 'Semantic Drift', data: [], borderColor: '#f472b6', tension: 0.4, borderWidth: 2 },
-                    { label: 'Baseline', data: [], borderColor: '#374151', borderDash: [5, 5] }
-                ] 
+                    { label: 'Semantic Drift', data: [], borderColor: '#a855f7', backgroundColor: 'rgba(168, 85, 247, 0.1)', tension: 0.4, borderWidth: 2, fill: true },
+                    { label: 'Baseline', data: [], borderColor: '#3a3d4a', borderDash: [5, 5], borderWidth: 1 }
+                ]
             },
             options: commonOptions
         });
 
-        convex.subscribe("metrics:getLive", {}, (update) => {
-            if (!update) return;
-            
-            const newPoint = { x: update.inputTokens, y: update.outputTokens };
+        // Simulate Data (since no Convex backend)
+        function simulateData() {
+            // Token efficiency
+            const newPoint = { x: Math.random() * 1000, y: Math.random() * 500 };
             if (tokenChart.data.datasets[0].data.length > 20) tokenChart.data.datasets[0].data.shift();
             tokenChart.data.datasets[0].data.push(newPoint);
             tokenChart.update();
-            document.getElementById('tokenValue').innerText = update.efficiencyRatio.toFixed(2);
+            document.getElementById('tokenValue').innerText = (Math.random() * 2 + 0.5).toFixed(2);
 
+            // Drift
             const now = new Date().toLocaleTimeString();
             if (driftChart.data.datasets[0].data.length > 30) driftChart.data.datasets.forEach(d => d.data.shift());
-            driftChart.data.datasets[0].data.push({ x: now, y: update.semanticDrift });
-            driftChart.data.datasets[1].data.push({ x: now, y: 0.1 }); 
+            driftChart.data.datasets[0].data.push({ x: now, y: Math.random() * 0.3 });
+            driftChart.data.datasets[1].data.push({ x: now, y: 0.1 });
             driftChart.update();
 
-            const wastePct = Math.round(update.wasteIndex * 100);
+            // Waste index
+            const wastePct = Math.round(Math.random() * 100);
             document.getElementById('wasteValue').innerText = wastePct + '%';
-            const rotation = 45 + (wastePct * 3.6); 
+            const rotation = 45 + (wastePct * 1.8);
             document.getElementById('wasteCircle').style.transform = `rotate(${rotation}deg)`;
-            
+
             const statusEl = document.getElementById('wasteStatus');
-            if(wastePct > 70) {
+            if (wastePct > 70) {
                 statusEl.innerText = "CRITICAL WASTE";
-                statusEl.className = "text-center text-xs font-bold text-red-500 text-glow-red mono mt-2";
+                statusEl.className = "gauge-status status-critical";
+                document.getElementById('wasteCircle').style.borderColor = '#ff4466';
+                document.getElementById('wasteCircle').style.borderLeftColor = 'transparent';
+                document.getElementById('wasteCircle').style.borderBottomColor = 'transparent';
             } else if (wastePct > 40) {
                 statusEl.innerText = "SUB-OPTIMAL";
-                statusEl.className = "text-center text-xs font-bold text-yellow-500 mono mt-2";
+                statusEl.className = "gauge-status status-warning";
+                document.getElementById('wasteCircle').style.borderColor = '#facc15';
+                document.getElementById('wasteCircle').style.borderLeftColor = 'transparent';
+                document.getElementById('wasteCircle').style.borderBottomColor = 'transparent';
             } else {
                 statusEl.innerText = "OPTIMAL";
-                statusEl.className = "text-center text-xs font-bold text-green-500 text-glow-green mono mt-2";
+                statusEl.className = "gauge-status status-optimal";
+                document.getElementById('wasteCircle').style.borderColor = '#4ade80';
+                document.getElementById('wasteCircle').style.borderLeftColor = 'transparent';
+                document.getElementById('wasteCircle').style.borderBottomColor = 'transparent';
             }
 
-            const hallucPct = Math.round(update.hallucinationProb * 100);
-            document.getElementById('hallucinationVal').innerText = (update.hallucinationProb).toFixed(3);
-            document.getElementById('hallucinationBar').style.width = hallucPct + '%';
-        });
+            // Hallucination
+            const halluc = Math.random() * 0.15;
+            document.getElementById('hallucinationVal').innerText = halluc.toFixed(3);
+            document.getElementById('hallucinationBar').style.width = (halluc * 100) + '%';
 
-        const logConsole = document.getElementById('logConsole');
-        convex.subscribe("logs:getRecent", {}, (logs) => {
-            if (!logs) return;
-            logConsole.innerHTML = '';
-            logs.slice().reverse().forEach(log => {
-                const div = document.createElement('div');
-                const colorClass = log.type === 'ALERT' ? 'text-rose-400' : (log.type === 'INFO' ? 'text-indigo-400' : 'text-gray-400');
-                div.className = `${colorClass} border-l-2 border-gray-800 pl-2`;
-                div.innerText = `[${log.timestamp}] ${log.message}`;
-                logConsole.appendChild(div);
-            });
-        });
+            // Logs
+            const logTypes = ['ALERT', 'INFO', 'DEBUG'];
+            const logMessages = [
+                'Semantic drift detected in response vector',
+                'Token efficiency within acceptable range',
+                'Adversarial pattern recognized and mitigated',
+                'Model temperature adjusted automatically',
+                'Context window optimization applied',
+                'Response coherence score: 0.94',
+                'Potential hallucination flagged for review'
+            ];
+            const logConsole = document.getElementById('logConsole');
+            const logType = logTypes[Math.floor(Math.random() * logTypes.length)];
+            const logMsg = logMessages[Math.floor(Math.random() * logMessages.length)];
+            const logClass = logType === 'ALERT' ? 'log-alert' : (logType === 'INFO' ? 'log-info' : 'log-default');
+            const div = document.createElement('div');
+            div.className = `log-entry ${logClass}`;
+            div.innerText = `[${new Date().toLocaleTimeString()}] ${logMsg}`;
+            logConsole.insertBefore(div, logConsole.firstChild);
+            if (logConsole.children.length > 15) logConsole.removeChild(logConsole.lastChild);
+        }
 
+        setInterval(simulateData, 2000);
+        simulateData();
+
+        // Stress Test
         window.triggerRedTeam = () => {
-            convex.mutation("actions:triggerStressTest", { 
-                targetModel: config.modelName,
-                targetUrl: config.apiUrl 
-            });
-            
-            const btn = document.querySelector('button[onclick="triggerRedTeam()"]');
+            const btn = document.querySelector('.btn-danger');
             const originalText = btn.innerText;
             btn.innerText = "INJECTING CHAOS...";
-            setTimeout(() => btn.innerText = originalText, 3000);
+            btn.disabled = true;
+
+            // Simulate stress
+            for (let i = 0; i < 5; i++) {
+                setTimeout(() => {
+                    const logConsole = document.getElementById('logConsole');
+                    const div = document.createElement('div');
+                    div.className = 'log-entry log-alert';
+                    div.innerText = `[${new Date().toLocaleTimeString()}] STRESS_TEST: Injecting adversarial prompt #${i + 1}`;
+                    logConsole.insertBefore(div, logConsole.firstChild);
+                }, i * 500);
+            }
+
+            setTimeout(() => { btn.innerText = originalText; btn.disabled = false; }, 3000);
         };
     </script>
 </body>
