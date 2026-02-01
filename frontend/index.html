@@ -9,7 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/scroll-trigger.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
     <style>
         @layer base, background, components, kinetic, sections, navigation, responsive;
 
@@ -32,8 +32,6 @@
                 --gradient-cool: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
                 --gradient-text: linear-gradient(135deg, #ffffff 0%, #a5b4fc 50%, #c4b5fd 100%);
                 --gradient-text-warm: linear-gradient(135deg, #ffffff 0%, #fda4af 50%, #fcd34d 100%);
-                --gradient-text-cool: linear-gradient(135deg, #ffffff 0%, #67e8f9 50%, #a5f3fc 100%);
-                --gradient-text-purple: linear-gradient(135deg, #ffffff 0%, #c4b5fd 50%, #a78bfa 100%);
             }
 
             * {
@@ -176,6 +174,7 @@
                     rgba(255, 255, 255, 0.08) 100%
                 );
                 -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+                mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
                 -webkit-mask-composite: xor;
                 mask-composite: exclude;
                 pointer-events: none;
@@ -251,6 +250,7 @@
                     rgba(196, 181, 253, 0.2) 100%
                 );
                 -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+                mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
                 -webkit-mask-composite: xor;
                 mask-composite: exclude;
                 z-index: -1;
@@ -290,6 +290,51 @@
                 line-height: 1.8;
                 margin-left: auto;
                 margin-right: auto;
+            }
+
+            .hero-button {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                gap: 0.5rem;
+                margin-top: 2.5rem;
+                padding: 1rem 3rem;
+                background: linear-gradient(135deg, #a5b4fc 0%, #c4b5fd 100%);
+                color: var(--color-bg);
+                text-decoration: none;
+                font-size: 0.95rem;
+                font-weight: 600;
+                letter-spacing: 0.05em;
+                text-transform: uppercase;
+                border-radius: 100px;
+                border: none;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                position: relative;
+                overflow: hidden;
+            }
+
+            .hero-button::before {
+                content: '';
+                position: absolute;
+                inset: 0;
+                background: linear-gradient(135deg, #c4b5fd 0%, #a5b4fc 100%);
+                opacity: 0;
+                transition: opacity 0.3s ease;
+            }
+
+            .hero-button:hover {
+                transform: scale(1.05);
+                box-shadow: 0 20px 40px rgba(165, 180, 252, 0.4);
+            }
+
+            .hero-button:hover::before {
+                opacity: 1;
+            }
+
+            .hero-button span {
+                position: relative;
+                z-index: 1;
             }
 
             .scroll-indicator {
@@ -957,6 +1002,11 @@
                     border-radius: 24px;
                 }
 
+                .hero-button {
+                    padding: 0.9rem 2.5rem;
+                    font-size: 0.85rem;
+                }
+
                 .kinetic-hero-content {
                     padding: 3rem 2rem;
                 }
@@ -969,7 +1019,6 @@
                 .cta-card {
                     padding: 3rem 2rem;
                     margin: 0 1rem;
-                    border-radius: 20px;
                 }
 
                 .cta-buttons {
@@ -985,6 +1034,10 @@
 
                 .bg-columns {
                     gap: 0.5rem;
+                }
+
+                .bg-columns__box {
+                    max-width: 45vw;
                 }
 
                 .bg-columns__box:nth-child(3),
@@ -1095,7 +1148,7 @@
                     <img class="bg-columns__img" src="https://images.unsplash.com/photo-1535378917042-10a22c95931a?w=800&q=80" alt="AI Robot">
                 </figure>
                 <figure class="bg-columns__item">
-                    <img class="bg-columns__img" src="https://images.unsplash.com/photo-1526374965328-7f61d4e7?w=800&q=80" alt="Matrix Code">
+                    <img class="bg-columns__img" src="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=800&q=80" alt="Matrix Code">
                 </figure>
             </div>
         </div>
@@ -1114,10 +1167,10 @@
                     <img class="bg-columns__img" src="https://images.unsplash.com/photo-1531746790731-6c087fecd65a?w=800&q=80" alt="AI Face">
                 </figure>
                 <figure class="bg-columns__item">
-                    <img class="bg-columns__img" src="https://images.unsplash.com/photo-1517433456452-f963a875f6f?w=800&q=80" alt="Laptop Code">
+                    <img class="bg-columns__img" src="https://images.unsplash.com/photo-1517433456452-f9633a875f6f?w=800&q=80" alt="Laptop Code">
                 </figure>
                 <figure class="bg-columns__item">
-                    <img class="bg-columns__img" src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&q=80" alt="Data Center 2">
+                    <img class="bg-columns__img" src="https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=800&q=80" alt="Data Center 2">
                 </figure>
             </div>
         </div>
@@ -1174,6 +1227,7 @@
                 <span class="hero-label">LLM Observability Platform</span>
                 <h1 class="hero-title">Every token<br>has a cost</h1>
                 <p class="hero-tagline">Adversarial systems exposing hidden inefficiencies in your AI infrastructure. Real-time visibility, actionable insights.</p>
+                <a href="auth.html" class="hero-button"><span>Deploy</span></a>
             </div>
             <div class="scroll-indicator">
                 <div class="scroll-icon"></div>
@@ -1336,6 +1390,7 @@
         // ============================================
         gsap.registerPlugin(ScrollTrigger);
 
+        // Animate odd columns (1st, 3rd, 5th) - they scroll up as you scroll down
         const oddColumns = gsap.utils.toArray('.bg-columns__box:nth-child(odd) .bg-columns__list');
         oddColumns.forEach((element) => {
             const elementHeight = element.offsetHeight;
@@ -1355,6 +1410,7 @@
             });
         });
 
+        // Animate even columns (2nd, 4th) - they scroll down as you scroll down
         const evenColumns = gsap.utils.toArray('.bg-columns__box:nth-child(even) .bg-columns__list');
         evenColumns.forEach((element) => {
             const elementHeight = element.offsetHeight;
