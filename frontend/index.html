@@ -175,7 +175,7 @@
                     rgba(255, 255, 255, 0.02) 50%,
                     rgba(255, 255, 255, 0.08) 100%
                 );
-                -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0) content-box;
+                -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
                 -webkit-mask-composite: xor;
                 mask-composite: exclude;
                 pointer-events: none;
@@ -250,7 +250,7 @@
                     rgba(255, 255, 255, 0.05) 50%,
                     rgba(196, 181, 253, 0.2) 100%
                 );
-                -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0) content-box;
+                -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
                 -webkit-mask-composite: xor;
                 mask-composite: exclude;
                 z-index: -1;
@@ -611,7 +611,7 @@
 
             .cta-button {
                 display: inline-flex;
-                align-items: center,
+                align-items: center;
                 gap: 0.75rem;
                 padding: 1.1rem 2.75rem;
                 background: linear-gradient(135deg, #a5b4fc 0%, #c4b5fd 100%);
@@ -667,7 +667,7 @@
                 color: var(--color-white-50);
                 text-decoration: none;
                 font-size: 0.85rem;
-                font-weight: 0.500;
+                font-weight: 500;
                 transition: all 0.3s ease;
             }
 
@@ -730,7 +730,7 @@
                 height: 100%;
                 background: rgba(5, 5, 8, 0.98);
                 backdrop-filter: blur(30px);
-                z-index: 0;
+                z-index: 1000;
                 display: flex;
                 flex-direction: column;
                 justify-content: center;
@@ -1028,7 +1028,6 @@
         <a href="#features" onclick="closeMenu()">Features</a>
         <a href="#process" onclick="closeMenu()">Process</a>
         <a href="#contact" onclick="closeMenu()">Contact</a>
-        <!-- Added Sign In Link -->
         <a href="auth.html" onclick="closeMenu()">Sign In</a>
     </nav>
 
@@ -1073,7 +1072,8 @@
                 <figure class="bg-columns__item">
                     <img class="bg-columns__img" src="https://images.unsplash.com/photo-1563986768609-322da13575f3?w=800&q=80" alt="Server Room">
                 </figure>
-                <figure class="bg-columns__img" src="https://images.unsplash.com/photo-1639322537228-f710d846310a?w=800&q=80" alt="AI Visualization">
+                <figure class="bg-columns__item">
+                    <img class="bg-columns__img" src="https://images.unsplash.com/photo-1639322537228-f710d846310a?w=800&q=80" alt="AI Visualization">
                 </figure>
             </div>
         </div>
@@ -1309,41 +1309,62 @@
                 </ul>
                 <p class="copyright">© 2025 Observability. All rights reserved.</p>
             </div>
-        </main>
+        </footer>
+    </main>
 
-        <script>
-            // ============================================
-            // LENIS SMOOTH SCROLL
-            // ============================================
-            const lenis = new Lenis({
-                duration: 1.2,
-                easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-                orientation: 'vertical',
-                smoothWheel: true
+    <script>
+        // ============================================
+        // LENIS SMOOTH SCROLL
+        // ============================================
+        const lenis = new Lenis({
+            duration: 1.2,
+            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+            orientation: 'vertical',
+            smoothWheel: true
+        });
+
+        lenis.on('scroll', ScrollTrigger.update);
+
+        gsap.ticker.add((time) => {
+            lenis.raf(time * 1000);
+        });
+
+        gsap.ticker.lagSmoothing(0);
+
+        // ============================================
+        // GSAP SCROLL TRIGGER FOR COLUMNS
+        // ============================================
+        gsap.registerPlugin(ScrollTrigger);
+
+        const oddColumns = gsap.utils.toArray('.bg-columns__box:nth-child(odd) .bg-columns__list');
+        oddColumns.forEach((element) => {
+            const elementHeight = element.offsetHeight;
+            const viewportHeight = window.innerHeight;
+            const extraSpace = viewportHeight * 0.2;
+            const scrollDistance = elementHeight + viewportHeight + extraSpace;
+
+            gsap.to(element, {
+                yPercent: 100,
+                ease: 'none',
+                scrollTrigger: {
+                    trigger: document.body,
+                    start: 'top top',
+                    end: `+=${scrollDistance * 2}`,
+                    scrub: 1
+                }
             });
+        });
 
-            lenis.on('scroll', ScrollTrigger.update);
+        const evenColumns = gsap.utils.toArray('.bg-columns__box:nth-child(even) .bg-columns__list');
+        evenColumns.forEach((element) => {
+            const elementHeight = element.offsetHeight;
+            const viewportHeight = window.innerHeight;
+            const scrollDistance = elementHeight + viewportHeight;
 
-            gsap.ticker.add((time) => {
-                lenis.raf(time * 1000);
-            });
-
-            gsap.ticker.lagSmoothing(0);
-
-            // ============================================
-            // GSAP SCROLL TRIGGER FOR COLUMNS
-            // ============================================
-            gsap.registerPlugin(ScrollTrigger);
-
-            const oddColumns = gsap.utils.toArray('.bg-columns__box:nth-child(odd) .bg-columns__list');
-            oddColumns.forEach((element) => {
-                const elementHeight = element.offsetHeight;
-                const viewportHeight = window.innerHeight;
-                const extraSpace = viewportHeight * 0.2;
-                const scrollDistance = elementHeight + viewportHeight + extraSpace;
-
-                gsap.to(element, {
-                    yPercent: 100,
+            gsap.fromTo(element, 
+                { yPercent: -50 },
+                {
+                    yPercent: 0,
                     ease: 'none',
                     scrollTrigger: {
                         trigger: document.body,
@@ -1351,129 +1372,109 @@
                         end: `+=${scrollDistance * 2}`,
                         scrub: 1
                     }
-                });
-            });
+                }
+            );
+        });
 
-            const evenColumns = gsap.utils.toArray('.bg-columns__box:nth-child(even) .bg-columns__list');
-            evenColumns.forEach((element) => {
-                const elementHeight = element.offsetHeight;
-                const viewportHeight = window.innerHeight;
-                const scrollDistance = elementHeight + viewportHeight;
+        // ============================================
+        // MENU FUNCTIONALITY
+        // ============================================
+        const menuToggle = document.getElementById('menuToggle');
+        const menuOverlay = document.getElementById('menuOverlay');
 
-                gsap.fromTo(element, 
-                    { yPercent: -50 },
-                    {
-                        yPercent: 0,
-                        ease: 'none',
-                        scrollTrigger: {
-                            trigger: document.body,
-                            start: 'top top',
-                            end: `+=${scrollDistance * 2}`,
-                            scrub: 1
-                        }
-                    }
-                );
-            });
+        menuToggle.addEventListener('click', () => {
+            const isActive = menuToggle.classList.toggle('active');
+            menuOverlay.classList.toggle('active');
+            menuToggle.setAttribute('aria-expanded', isActive);
+            
+            if (isActive) {
+                lenis.stop();
+            } else {
+                lenis.start();
+            }
+        });
 
-            // ============================================
-            // MENU FUNCTIONALITY
-            // ============================================
-            const menuToggle = document.getElementById('menuToggle');
-            const menuOverlay = document.getElementById('menuOverlay');
+        function closeMenu() {
+            menuToggle.classList.remove('active');
+            menuOverlay.classList.remove('active');
+            menuToggle.setAttribute('aria-expanded', 'false');
+            lenis.start();
+        }
 
-            menuToggle.addEventListener('click', () => {
-                const isActive = menuToggle.classList.toggle('active');
-                menuOverlay.classList.toggle('active');
-                menuToggle.setAttribute('aria-expanded', isActive);
-                
-                if (isActive) {
-                    lenis.stop();
-                } else {
-                    lenis.start();
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeMenu();
+            }
+        });
+
+        // ============================================
+        // STICKY NAV ACTIVE STATE
+        // ============================================
+        const navItems = document.querySelectorAll('.sticky-nav .nav-item');
+        const sections = document.querySelectorAll('section[id]');
+
+        function updateActiveNav() {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (window.pageYOffset >= sectionTop - 300) {
+                    current = section.getAttribute('id');
                 }
             });
 
-            function closeMenu() {
-                menuToggle.classList.remove('active');
-                menuOverlay.classList.remove('active');
-                menuToggle.setAttribute('aria-expanded', 'false');
-                lenis.start();
-            }
+            navItems.forEach(item => {
+                item.classList.remove('active');
+                if (item.getAttribute('data-section') === current) {
+                    item.classList.add('active');
+                }
+            });
+        }
 
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape') {
+        // ============================================
+        // SCROLL PROGRESS
+        // ============================================
+        const scrollFill = document.getElementById('scrollFill');
+        const scrollPercent = document.getElementById('scrollPercent');
+
+        function updateScrollProgress() {
+            const scrollTop = window.pageYOffset;
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const scrolled = (scrollTop / docHeight) * 100;
+            
+            scrollFill.style.height = scrolled + '%';
+            scrollPercent.textContent = Math.round(scrolled) + '%';
+        }
+
+        // ============================================
+        // SMOOTH SCROLL FOR NAV LINKS
+        // ============================================
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                const target = document.querySelector(targetId);
+                if (target) {
+                    lenis.scrollTo(target, {
+                        offset: 0,
+                        duration: 1.5,
+                        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t))
+                    });
                     closeMenu();
                 }
             });
+        });
 
-            // ============================================
-            // STICKY NAV ACTIVE STATE
-            // ============================================
-            const navItems = document.querySelectorAll('.sticky-nav .nav-item');
-            const sections = document.querySelectorAll('section[id]');
-
-            function updateActiveNav() {
-                let current = '';
-                sections.forEach(section => {
-                    const sectionTop = section.offsetTop;
-                    if (window.pageYOffset >= sectionTop - 300) {
-                        current = section.getAttribute('id');
-                    }
-                });
-
-                navItems.forEach(item => {
-                    item.classList.remove('active');
-                    if (item.getAttribute('data-section') === current) {
-                        item.classList.add('active');
-                    }
-                });
-            }
-
-            // ============================================
-            // SCROLL PROGRESS
-            // ============================================
-            const scrollFill = document.getElementById('scrollFill');
-            const scrollPercent = document.getElementById('scrollPercent');
-
-            function updateScrollProgress() {
-                const scrollTop = window.pageYOffset;
-                const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-                const scrolled = (scrollTop / docHeight) * 100;
-                
-                scrollFill.style.height = scrolled + '%';
-                scrollPercent.textContent = Math.round(scrolled) + '%';
-            }
-
-            // ============================================
-            // SMOOTH SCROLL FOR NAV LINKS
-            // ============================================
-            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-                anchor.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    const targetId = this.getAttribute('href');
-                    const target = document.querySelector(targetId);
-                    if (target) {
-                        lenis.scrollTo(target, {
-                            offset: 0,
-                            duration: 1.5,
-                            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-                            });
-                        closeMenu();
-                    }
-                });
-            });
-
-            // ============================================
-            // SCROLL EVENT LISTENER
-            // ============================================
-            lenis.on('scroll', () => {
-                updateActiveNav();
-                updateScrollProgress();
-            });
-
-            // Initialize on load
+        // ============================================
+        // SCROLL EVENT LISTENER
+        // ============================================
+        lenis.on('scroll', () => {
             updateActiveNav();
             updateScrollProgress();
-        </script>
+        });
+
+        // Initialize on load
+        updateActiveNav();
+        updateScrollProgress();
+    </script>
 </body>
 </html>
