@@ -2,28 +2,32 @@ import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
 export default defineSchema({
-  raw_logs: defineTable({
-    timestamp: v.number(),
-    prompt: v.string(),
-    response: v.string(),
-    inputTokens: v.number(),
-    outputTokens: v.number(),
-    model: v.string(),
-    isAdversarial: v.boolean()
-  }).index("by_time", ["timestamp"]),
-
   metrics: defineTable({
     timestamp: v.number(),
     efficiencyRatio: v.number(),
     semanticDrift: v.number(),
     wasteIndex: v.number(),
     hallucinationProb: v.number(),
-    targetModel: v.optional(v.string())
-  }),
+    targetModel: v.string(),
+    inputTokens: v.number(),
+    outputTokens: v.number(),
+    latencyMs: v.number(),
+  }).index("by_timestamp", ["timestamp"]),
 
-  system_logs: defineTable({
-    timestamp: v.string(),
-    type: v.string(),
-    message: v.string()
-  })
+  logs: defineTable({
+    timestamp: v.number(),
+    level: v.union(v.literal("INFO"), v.literal("ALERT"), v.literal("DEBUG")),
+    message: v.string(),
+    metadata: v.optional(v.any()),
+  }).index("by_timestamp", ["timestamp"]),
+
+  raw_inferences: defineTable({
+    timestamp: v.number(),
+    prompt: v.string(),
+    response: v.string(),
+    inputTokens: v.number(),
+    outputTokens: v.number(),
+    model: v.string(),
+    isAdversarial: v.boolean(),
+  }).index("by_timestamp", ["timestamp"]),
 });
