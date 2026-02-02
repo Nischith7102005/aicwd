@@ -325,221 +325,223 @@
         <div class="status-item"><span id="current-time">00:00:00</span></div>
     </div>
 
-    <script>
-        // WebGL Dither Background
-        const canvas = document.getElementById('dither-canvas');
-        const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+    <script type="module">
+    import { ConvexClient } from "https://esm.sh/convex@1.17.4/browser";
 
-        const vertexShaderSource = `attribute vec2 a_position; void main() { gl_Position = vec4(a_position, 0.0, 1.0); }`;
+    // ═══════════════════════════════════════════════════════════════
+    // CONFIG - Replace with your Convex deployment URL
+    // ═══════════════════════════════════════════════════════════════
+    const CONVEX_URL = "https://YOUR_DEPLOYMENT.convex.cloud";
 
-        const fragmentShaderSource = `
-            precision highp float;
-            uniform vec2 u_resolution; uniform float u_time; uniform vec2 u_mouse; uniform float u_mouseRadius; uniform int u_enableMouse;
-            const float waveSpeed = 0.05; const float waveFrequency = 3.0; const float waveAmplitude = 0.3; const vec3 waveColor = vec3(0.4, 0.3, 0.6);
-            const float colorNum = 4.0; const float pixelSize = 2.0;
-            vec4 mod289(vec4 x) { return x - floor(x * (1.0/289.0)) * 289.0; }
-            vec4 permute(vec4 x) { return mod289(((x * 34.0) + 1.0) * x); }
-            vec4 taylorInvSqrt(vec4 r) { return 1.79284291400159 - 0.85373472095314 * r; }
-            vec2 fade(vec2 t) { return t*t*t*(t*(t*6.0-15.0)+10.0); }
-            float cnoise(vec2 P) {
-                vec4 Pi = floor(P.xyxy) + vec4(0.0,0.0,1.0,1.0); vec4 Pf = fract(P.xyxy) - vec4(0.0,0.0,1.0,1.0); Pi = mod289(Pi);
-                vec4 ix = Pi.xzxz, iy = Pi.yyww; vec4 fx = Pf.xzxz, fy = Pf.yyww;
-                vec4 i = permute(permute(ix) + iy); vec4 gx = fract(i * (1.0/41.0)) * 2.0 - 1.0; vec4 gy = abs(gx) - 0.5;
-                vec4 tx = floor(gx + 0.5); gx = gx - tx;
-                vec2 g00 = vec2(gx.x, gy.x), g10 = vec2(gx.y, gy.y), g01 = vec2(gx.z, gy.z), g11 = vec2(gx.w, gy.w);
-                vec4 norm = taylorInvSqrt(vec4(dot(g00,g00), dot(g01,g01), dot(g10,g10), dot(g11,g11)));
-                g00 *= norm.x; g01 *= norm.y; g10 *= norm.z; g11 *= norm.w;
-                float n00 = dot(g00, vec2(fx.x, fy.x)); float n10 = dot(g10, vec2(fx.y, fy.y));
-                float n01 = dot(g01, vec2(fx.z, fy.z)); float n11 = dot(g11, vec2(fx.w, fy.w));
-                vec2 fade_xy = fade(Pf.xy); vec2 n_x = mix(vec2(n00, n01), vec2(n10, n11), fade_xy.x);
-                return 2.3 * mix(n_x.x, n_x.y, fade_xy.y);
-            }
-            float fbm(vec2 p) { float value = 0.0, amp = 1.0, freq = waveFrequency; for (int i = 0; i < 4; i++) { value += amp * abs(cnoise(p)); p *= freq; amp *= waveAmplitude; } return value; }
-            float pattern(vec2 p) { vec2 p2 = p - u_time * waveSpeed; return fbm(p + fbm(p2)); }
-            float bayer8(vec2 p) {
-                vec2 P = mod(floor(p), 8.0); float x = P.x, y = P.y; int idx = int(y) * 8 + int(x);
-                float values[64]; values[0]=0.0;values[1]=48.0;values[2]=12.0;values[3]=60.0;values[4]=3.0;values[5]=51.0;values[6]=15.0;values[7]=63.0;values[8]=32.0;values[9]=16.0;values[10]=44.0;values[11]=28.0;values[12]=35.0;values[13]=19.0;values[14]=47.0;values[15]=31.0;values[16]=8.0;values[17]=56.0;values[18]=4.0;values[19]=52.0;values[20]=11.0;values[21]=59.0;values[22]=7.0;values[23]=55.0;values[24]=40.0;values[25]=24.0;values[26]=36.0;values[27]=20.0;values[28]=43.0;values[29]=27.0;values[30]=39.0;values[31]=23.0;values[32]=2.0;values[33]=50.0;values[34]=14.0;values[35]=62.0;values[36]=1.0;values[37]=49.0;values[38]=13.0;values[39]=61.0;values[40]=34.0;values[41]=18.0;values[42]=46.0;values[43]=30.0;values[44]=33.0;values[45]=17.0;values[46]=45.0;values[47]=29.0;values[48]=10.0;values[49]=58.0;values[50]=6.0;values[51]=54.0;values[52]=9.0;values[53]=57.0;values[54]=5.0;values[55]=53.0;values[56]=42.0;values[57]=26.0;values[58]=38.0;values[59]=22.0;values[60]=41.0;values[61]=25.0;values[62]=37.0;values[63]=21.0;
-                float v = 0.0; for (int i = 0; i < 64; i++) { if (i == idx) v = values[i]; } return v / 64.0;
-            }
-            vec3 dither(vec2 coord, vec3 color) {
-                vec2 scaledCoord = floor(coord / pixelSize); float threshold = bayer8(scaledCoord) - 0.25;
-                float step = 1.0 / (colorNum - 1.0); color += threshold * step; float bias = 0.2;
-                color = clamp(color - bias, 0.0, 1.0); return floor(color * (colorNum - 1.0) + 0.5) / (colorNum - 1.0);
-            }
-            void main() {
-                vec2 pixelCoord = floor(gl_FragCoord.xy / pixelSize) * pixelSize; vec2 uv = pixelCoord / u_resolution;
-                uv -= 0.5; uv.x *= u_resolution.x / u_resolution.y; float f = pattern(uv);
-                if (u_enableMouse == 1) { vec2 mouseNDC = (u_mouse / u_resolution - 0.5) * vec2(1.0, -1.0); mouseNDC.x *= u_resolution.x / u_resolution.y; float dist = length(uv - mouseNDC); float effect = 1.0 - smoothstep(0.0, u_mouseRadius, dist); f -= 0.5 * effect; }
-                vec3 col = mix(vec3(0.0), waveColor, f); col = dither(gl_FragCoord.xy, col); gl_FragColor = vec4(col, 1.0);
-            }
-        `;
+    const client = new ConvexClient(CONVEX_URL);
 
-        function createShader(gl, type, source) { const shader = gl.createShader(type); gl.shaderSource(shader, source); gl.compileShader(shader); if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) { console.error(gl.getShaderInfoLog(shader)); gl.deleteShader(shader); return null; } return shader; }
-        function createProgram(gl, vs, fs) { const program = gl.createProgram(); gl.attachShader(program, vs); gl.attachShader(program, fs); gl.linkProgram(program); if (!gl.getProgramParameter(program, gl.LINK_STATUS)) { console.error(gl.getProgramInfoLog(program)); return null; } return program; }
+    // Load saved config
+    const configRaw = localStorage.getItem("target_config");
+    if (!configRaw) {
+        window.location.href = "key.html";
+    }
+    const config = JSON.parse(configRaw);
 
-        const vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexShaderSource);
-        const fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource);
-        const program = createProgram(gl, vertexShader, fragmentShader);
+    // Display target info
+    const maskedKey = config.apiKey ? `${config.apiKey.slice(0, 4)}...${config.apiKey.slice(-4)}` : "UNKNOWN";
+    document.getElementById("targetDisplay").innerText = `TARGET: ${(config.modelName || config.model || "UNKNOWN").toUpperCase()} [KEY: ${maskedKey}]`;
 
-        const positionLocation = gl.getAttribLocation(program, 'a_position');
-        const resolutionLocation = gl.getUniformLocation(program, 'u_resolution');
-        const timeLocation = gl.getUniformLocation(program, 'u_time');
-        const mouseLocation = gl.getUniformLocation(program, 'u_mouse');
-        const mouseRadiusLocation = gl.getUniformLocation(program, 'u_mouseRadius');
-        const enableMouseLocation = gl.getUniformLocation(program, 'u_enableMouse');
+    // ═══════════════════════════════════════════════════════════════
+    // WEBGL BACKGROUND (keep existing code)
+    // ═══════════════════════════════════════════════════════════════
+    const canvas = document.getElementById("dither-canvas");
+    const gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
 
-        const positionBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1,1,-1,-1,1,-1,1,1,-1,1,1]), gl.STATIC_DRAW);
-
-        let mouseX = 0, mouseY = 0;
-        document.addEventListener('mousemove', (e) => { mouseX = e.clientX * window.devicePixelRatio; mouseY = e.clientY * window.devicePixelRatio; });
-
-        function resize() { const dpr = window.devicePixelRatio || 1; canvas.width = window.innerWidth * dpr; canvas.height = window.innerHeight * dpr; canvas.style.width = window.innerWidth + 'px'; canvas.style.height = window.innerHeight + 'px'; gl.viewport(0, 0, canvas.width, canvas.height); }
-        window.addEventListener('resize', resize); resize();
-
-        function renderBg(time) {
-            gl.useProgram(program); gl.uniform2f(resolutionLocation, canvas.width, canvas.height); gl.uniform1f(timeLocation, time * 0.001);
-            gl.uniform2f(mouseLocation, mouseX, canvas.height - mouseY); gl.uniform1f(mouseRadiusLocation, 0.3); gl.uniform1i(enableMouseLocation, 1);
-            gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer); gl.enableVertexAttribArray(positionLocation); gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
-            gl.drawArrays(gl.TRIANGLES, 0, 6); requestAnimationFrame(renderBg);
+    const vertexShaderSource = `attribute vec2 a_position; void main() { gl_Position = vec4(a_position, 0.0, 1.0); }`;
+    const fragmentShaderSource = `
+        precision highp float;
+        uniform vec2 u_resolution; uniform float u_time; uniform vec2 u_mouse; uniform float u_mouseRadius; uniform int u_enableMouse;
+        const float waveSpeed = 0.05; const float waveFrequency = 3.0; const float waveAmplitude = 0.3; const vec3 waveColor = vec3(0.4, 0.3, 0.6);
+        const float colorNum = 4.0; const float pixelSize = 2.0;
+        vec4 mod289(vec4 x) { return x - floor(x * (1.0/289.0)) * 289.0; }
+        vec4 permute(vec4 x) { return mod289(((x * 34.0) + 1.0) * x); }
+        vec4 taylorInvSqrt(vec4 r) { return 1.79284291400159 - 0.85373472095314 * r; }
+        vec2 fade(vec2 t) { return t*t*t*(t*(t*6.0-15.0)+10.0); }
+        float cnoise(vec2 P) {
+            vec4 Pi = floor(P.xyxy) + vec4(0.0,0.0,1.0,1.0); vec4 Pf = fract(P.xyxy) - vec4(0.0,0.0,1.0,1.0); Pi = mod289(Pi);
+            vec4 ix = Pi.xzxz, iy = Pi.yyww; vec4 fx = Pf.xzxz, fy = Pf.yyww;
+            vec4 i = permute(permute(ix) + iy); vec4 gx = fract(i * (1.0/41.0)) * 2.0 - 1.0; vec4 gy = abs(gx) - 0.5;
+            vec4 tx = floor(gx + 0.5); gx = gx - tx;
+            vec2 g00 = vec2(gx.x, gy.x), g10 = vec2(gx.y, gy.y), g01 = vec2(gx.z, gy.z), g11 = vec2(gx.w, gy.w);
+            vec4 norm = taylorInvSqrt(vec4(dot(g00,g00), dot(g01,g01), dot(g10,g10), dot(g11,g11)));
+            g00 *= norm.x; g01 *= norm.y; g10 *= norm.z; g11 *= norm.w;
+            float n00 = dot(g00, vec2(fx.x, fy.x)); float n10 = dot(g10, vec2(fx.y, fy.y));
+            float n01 = dot(g01, vec2(fx.z, fy.z)); float n11 = dot(g11, vec2(fx.w, fy.w));
+            vec2 fade_xy = fade(Pf.xy); vec2 n_x = mix(vec2(n00, n01), vec2(n10, n11), fade_xy.x);
+            return 2.3 * mix(n_x.x, n_x.y, fade_xy.y);
         }
-        requestAnimationFrame(renderBg);
+        float fbm(vec2 p) { float value = 0.0, amp = 1.0, freq = waveFrequency; for (int i = 0; i < 4; i++) { value += amp * abs(cnoise(p)); p *= freq; amp *= waveAmplitude; } return value; }
+        float pattern(vec2 p) { vec2 p2 = p - u_time * waveSpeed; return fbm(p + fbm(p2)); }
+        float bayer8(vec2 p) {
+            vec2 P = mod(floor(p), 8.0); float x = P.x, y = P.y; int idx = int(y) * 8 + int(x);
+            float values[64]; values[0]=0.0;values[1]=48.0;values[2]=12.0;values[3]=60.0;values[4]=3.0;values[5]=51.0;values[6]=15.0;values[7]=63.0;values[8]=32.0;values[9]=16.0;values[10]=44.0;values[11]=28.0;values[12]=35.0;values[13]=19.0;values[14]=47.0;values[15]=31.0;values[16]=8.0;values[17]=56.0;values[18]=4.0;values[19]=52.0;values[20]=11.0;values[21]=59.0;values[22]=7.0;values[23]=55.0;values[24]=40.0;values[25]=24.0;values[26]=36.0;values[27]=20.0;values[28]=43.0;values[29]=27.0;values[30]=39.0;values[31]=23.0;values[32]=2.0;values[33]=50.0;values[34]=14.0;values[35]=62.0;values[36]=1.0;values[37]=49.0;values[38]=13.0;values[39]=61.0;values[40]=34.0;values[41]=18.0;values[42]=46.0;values[43]=30.0;values[44]=33.0;values[45]=17.0;values[46]=45.0;values[47]=29.0;values[48]=10.0;values[49]=58.0;values[50]=6.0;values[51]=54.0;values[52]=9.0;values[53]=57.0;values[54]=5.0;values[55]=53.0;values[56]=42.0;values[57]=26.0;values[58]=38.0;values[59]=22.0;values[60]=41.0;values[61]=25.0;values[62]=37.0;values[63]=21.0;
+            float v = 0.0; for (int i = 0; i < 64; i++) { if (i == idx) v = values[i]; } return v / 64.0;
+        }
+        vec3 dither(vec2 coord, vec3 color) {
+            vec2 scaledCoord = floor(coord / pixelSize); float threshold = bayer8(scaledCoord) - 0.25;
+            float step = 1.0 / (colorNum - 1.0); color += threshold * step; float bias = 0.2;
+            color = clamp(color - bias, 0.0, 1.0); return floor(color * (colorNum - 1.0) + 0.5) / (colorNum - 1.0);
+        }
+        void main() {
+            vec2 pixelCoord = floor(gl_FragCoord.xy / pixelSize) * pixelSize; vec2 uv = pixelCoord / u_resolution;
+            uv -= 0.5; uv.x *= u_resolution.x / u_resolution.y; float f = pattern(uv);
+            if (u_enableMouse == 1) { vec2 mouseNDC = (u_mouse / u_resolution - 0.5) * vec2(1.0, -1.0); mouseNDC.x *= u_resolution.x / u_resolution.y; float dist = length(uv - mouseNDC); float effect = 1.0 - smoothstep(0.0, u_mouseRadius, dist); f -= 0.5 * effect; }
+            vec3 col = mix(vec3(0.0), waveColor, f); col = dither(gl_FragCoord.xy, col); gl_FragColor = vec4(col, 1.0);
+        }
+    `;
 
-        // Time Update
-        function updateTime() { document.getElementById('current-time').textContent = new Date().toTimeString().split(' ')[0]; }
-        setInterval(updateTime, 1000); updateTime();
+    function createShader(gl, type, source) { const shader = gl.createShader(type); gl.shaderSource(shader, source); gl.compileShader(shader); return shader; }
+    function createProgram(gl, vs, fs) { const program = gl.createProgram(); gl.attachShader(program, vs); gl.attachShader(program, fs); gl.linkProgram(program); return program; }
 
-        // Load Config
-        const configRaw = localStorage.getItem('target_config');
-        if (!configRaw) { window.location.href = 'key.html'; }
-        const config = JSON.parse(configRaw);
-        const maskedKey = config.apiKey ? `${config.apiKey.substring(0, 4)}...${config.apiKey.slice(-4)}` : 'UNKNOWN';
-        document.getElementById('targetDisplay').innerText = `TARGET: ${config.modelName.toUpperCase()} [KEY: ${maskedKey}]`;
+    const vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexShaderSource);
+    const fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource);
+    const program = createProgram(gl, vertexShader, fragmentShader);
 
-        // Chart Options
-        const commonOptions = {
-            responsive: true, maintainAspectRatio: false,
-            animation: { duration: 0 },
-            plugins: { legend: { display: false } },
-            scales: {
-                x: { display: false },
-                y: { grid: { color: 'rgba(168, 85, 247, 0.1)' }, ticks: { color: '#9999aa', font: { family: 'Share Tech Mono' } } }
-            }
-        };
+    const positionLocation = gl.getAttribLocation(program, "a_position");
+    const resolutionLocation = gl.getUniformLocation(program, "u_resolution");
+    const timeLocation = gl.getUniformLocation(program, "u_time");
+    const mouseLocation = gl.getUniformLocation(program, "u_mouse");
+    const mouseRadiusLocation = gl.getUniformLocation(program, "u_mouseRadius");
+    const enableMouseLocation = gl.getUniformLocation(program, "u_enableMouse");
 
-        // Token Chart
-        const tokenChart = new Chart(document.getElementById('tokenChart'), {
-            type: 'scatter',
-            data: { datasets: [{ label: 'Efficiency', data: [], backgroundColor: '#c4b5fd', borderColor: '#a855f7' }] },
-            options: commonOptions
-        });
+    const positionBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1,1,-1,-1,1,-1,1,1,-1,1,1]), gl.STATIC_DRAW);
 
-        // Drift Chart
-        const driftChart = new Chart(document.getElementById('driftChart'), {
-            type: 'line',
-            data: {
-                datasets: [
-                    { label: 'Semantic Drift', data: [], borderColor: '#a855f7', backgroundColor: 'rgba(168, 85, 247, 0.1)', tension: 0.4, borderWidth: 2, fill: true },
-                    { label: 'Baseline', data: [], borderColor: '#3a3d4a', borderDash: [5, 5], borderWidth: 1 }
-                ]
-            },
-            options: commonOptions
-        });
+    let mouseX = 0, mouseY = 0;
+    document.addEventListener("mousemove", (e) => { mouseX = e.clientX * devicePixelRatio; mouseY = e.clientY * devicePixelRatio; });
 
-        // Simulate Data (since no Convex backend)
-        function simulateData() {
-            // Token efficiency
-            const newPoint = { x: Math.random() * 1000, y: Math.random() * 500 };
-            if (tokenChart.data.datasets[0].data.length > 20) tokenChart.data.datasets[0].data.shift();
-            tokenChart.data.datasets[0].data.push(newPoint);
-            tokenChart.update();
-            document.getElementById('tokenValue').innerText = (Math.random() * 2 + 0.5).toFixed(2);
+    function resize() { const dpr = devicePixelRatio || 1; canvas.width = innerWidth * dpr; canvas.height = innerHeight * dpr; canvas.style.width = innerWidth + "px"; canvas.style.height = innerHeight + "px"; gl.viewport(0, 0, canvas.width, canvas.height); }
+    addEventListener("resize", resize); resize();
 
-            // Drift
-            const now = new Date().toLocaleTimeString();
-            if (driftChart.data.datasets[0].data.length > 30) driftChart.data.datasets.forEach(d => d.data.shift());
-            driftChart.data.datasets[0].data.push({ x: now, y: Math.random() * 0.3 });
-            driftChart.data.datasets[1].data.push({ x: now, y: 0.1 });
-            driftChart.update();
+    function renderBg(time) {
+        gl.useProgram(program); gl.uniform2f(resolutionLocation, canvas.width, canvas.height); gl.uniform1f(timeLocation, time * 0.001);
+        gl.uniform2f(mouseLocation, mouseX, canvas.height - mouseY); gl.uniform1f(mouseRadiusLocation, 0.3); gl.uniform1i(enableMouseLocation, 1);
+        gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer); gl.enableVertexAttribArray(positionLocation); gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
+        gl.drawArrays(gl.TRIANGLES, 0, 6); requestAnimationFrame(renderBg);
+    }
+    requestAnimationFrame(renderBg);
 
-            // Waste index
-            const wastePct = Math.round(Math.random() * 100);
-            document.getElementById('wasteValue').innerText = wastePct + '%';
-            const rotation = 45 + (wastePct * 1.8);
-            document.getElementById('wasteCircle').style.transform = `rotate(${rotation}deg)`;
+    // ═══════════════════════════════════════════════════════════════
+    // CHARTS
+    // ═══════════════════════════════════════════════════════════════
+    const commonOptions = {
+        responsive: true, maintainAspectRatio: false, animation: { duration: 300 },
+        plugins: { legend: { display: false } },
+        scales: { x: { display: false }, y: { grid: { color: "rgba(168,85,247,0.1)" }, ticks: { color: "#9999aa" } } }
+    };
 
-            const statusEl = document.getElementById('wasteStatus');
-            if (wastePct > 70) {
-                statusEl.innerText = "CRITICAL WASTE";
-                statusEl.className = "gauge-status status-critical";
-                document.getElementById('wasteCircle').style.borderColor = '#ff4466';
-                document.getElementById('wasteCircle').style.borderLeftColor = 'transparent';
-                document.getElementById('wasteCircle').style.borderBottomColor = 'transparent';
-            } else if (wastePct > 40) {
-                statusEl.innerText = "SUB-OPTIMAL";
-                statusEl.className = "gauge-status status-warning";
-                document.getElementById('wasteCircle').style.borderColor = '#facc15';
-                document.getElementById('wasteCircle').style.borderLeftColor = 'transparent';
-                document.getElementById('wasteCircle').style.borderBottomColor = 'transparent';
-            } else {
-                statusEl.innerText = "OPTIMAL";
-                statusEl.className = "gauge-status status-optimal";
-                document.getElementById('wasteCircle').style.borderColor = '#4ade80';
-                document.getElementById('wasteCircle').style.borderLeftColor = 'transparent';
-                document.getElementById('wasteCircle').style.borderBottomColor = 'transparent';
-            }
+    const tokenChart = new Chart(document.getElementById("tokenChart"), {
+        type: "scatter",
+        data: { datasets: [{ data: [], backgroundColor: "#c4b5fd", borderColor: "#a855f7" }] },
+        options: commonOptions
+    });
 
-            // Hallucination
-            const halluc = Math.random() * 0.15;
-            document.getElementById('hallucinationVal').innerText = halluc.toFixed(3);
-            document.getElementById('hallucinationBar').style.width = (halluc * 100) + '%';
+    const driftChart = new Chart(document.getElementById("driftChart"), {
+        type: "line",
+        data: {
+            labels: [],
+            datasets: [
+                { label: "Drift", data: [], borderColor: "#a855f7", backgroundColor: "rgba(168,85,247,0.1)", tension: 0.4, fill: true },
+                { label: "Baseline", data: [], borderColor: "#3a3d4a", borderDash: [5, 5], borderWidth: 1 }
+            ]
+        },
+        options: commonOptions
+    });
 
-            // Logs
-            const logTypes = ['ALERT', 'INFO', 'DEBUG'];
-            const logMessages = [
-                'Semantic drift detected in response vector',
-                'Token efficiency within acceptable range',
-                'Adversarial pattern recognized and mitigated',
-                'Model temperature adjusted automatically',
-                'Context window optimization applied',
-                'Response coherence score: 0.94',
-                'Potential hallucination flagged for review'
-            ];
-            const logConsole = document.getElementById('logConsole');
-            const logType = logTypes[Math.floor(Math.random() * logTypes.length)];
-            const logMsg = logMessages[Math.floor(Math.random() * logMessages.length)];
-            const logClass = logType === 'ALERT' ? 'log-alert' : (logType === 'INFO' ? 'log-info' : 'log-default');
-            const div = document.createElement('div');
-            div.className = `log-entry ${logClass}`;
-            div.innerText = `[${new Date().toLocaleTimeString()}] ${logMsg}`;
-            logConsole.insertBefore(div, logConsole.firstChild);
-            if (logConsole.children.length > 15) logConsole.removeChild(logConsole.lastChild);
+    // ═══════════════════════════════════════════════════════════════
+    // REAL-TIME SUBSCRIPTIONS
+    // ═══════════════════════════════════════════════════════════════
+    
+    // Subscribe to metrics history
+    client.onUpdate("queries:getMetricsHistory", { limit: 30 }, (metrics) => {
+        if (!metrics || metrics.length === 0) return;
+
+        // Update drift chart
+        driftChart.data.labels = metrics.map((_, i) => i);
+        driftChart.data.datasets[0].data = metrics.map((m) => m.semanticDrift);
+        driftChart.data.datasets[1].data = metrics.map(() => 0.1);
+        driftChart.update();
+
+        // Update token scatter
+        tokenChart.data.datasets[0].data = metrics.map((m) => ({ x: m.inputTokens, y: m.outputTokens }));
+        tokenChart.update();
+
+        // Update KPIs from latest
+        const latest = metrics[metrics.length - 1];
+        document.getElementById("tokenValue").innerText = latest.efficiencyRatio.toFixed(2);
+
+        const wastePct = Math.round(latest.wasteIndex * 100);
+        document.getElementById("wasteValue").innerText = wastePct + "%";
+        document.getElementById("wasteCircle").style.transform = `rotate(${45 + wastePct * 1.8}deg)`;
+
+        const statusEl = document.getElementById("wasteStatus");
+        const wasteCircle = document.getElementById("wasteCircle");
+        if (wastePct > 70) {
+            statusEl.innerText = "CRITICAL"; statusEl.className = "gauge-status status-critical";
+            wasteCircle.style.borderColor = "#ff4466";
+        } else if (wastePct > 40) {
+            statusEl.innerText = "SUB-OPTIMAL"; statusEl.className = "gauge-status status-warning";
+            wasteCircle.style.borderColor = "#facc15";
+        } else {
+            statusEl.innerText = "OPTIMAL"; statusEl.className = "gauge-status status-optimal";
+            wasteCircle.style.borderColor = "#4ade80";
+        }
+        wasteCircle.style.borderLeftColor = "transparent";
+        wasteCircle.style.borderBottomColor = "transparent";
+
+        document.getElementById("hallucinationVal").innerText = latest.hallucinationProb.toFixed(3);
+        document.getElementById("hallucinationBar").style.width = (latest.hallucinationProb * 100) + "%";
+    });
+
+    // Subscribe to logs
+    client.onUpdate("queries:getLogs", { limit: 15 }, (logs) => {
+        if (!logs) return;
+        const logConsole = document.getElementById("logConsole");
+        logConsole.innerHTML = "";
+
+        for (const log of logs) {
+            const div = document.createElement("div");
+            const cls = log.level === "ALERT" ? "log-alert" : log.level === "INFO" ? "log-info" : "log-default";
+            div.className = `log-entry ${cls}`;
+            div.innerText = `[${new Date(log.timestamp).toLocaleTimeString()}] ${log.message}`;
+            logConsole.appendChild(div);
+        }
+    });
+
+    // ═══════════════════════════════════════════════════════════════
+    // ACTIONS
+    // ═══════════════════════════════════════════════════════════════
+
+    window.triggerRedTeam = async () => {
+        const btn = document.querySelector(".btn-danger");
+        btn.innerText = "RUNNING...";
+        btn.disabled = true;
+
+        try {
+            await client.action("agent:runStressTest", {
+                apiKey: config.apiKey,
+                provider: config.provider || "openai",
+                model: config.model || config.modelName,
+                count: 5,
+            });
+        } catch (e) {
+            console.error("Stress test error:", e);
         }
 
-        setInterval(simulateData, 2000);
-        simulateData();
+        btn.innerText = "INITIATE_STRESS_TEST";
+        btn.disabled = false;
+    };
 
-        // Stress Test
-        window.triggerRedTeam = () => {
-            const btn = document.querySelector('.btn-danger');
-            const originalText = btn.innerText;
-            btn.innerText = "INJECTING CHAOS...";
-            btn.disabled = true;
-
-            // Simulate stress
-            for (let i = 0; i < 5; i++) {
-                setTimeout(() => {
-                    const logConsole = document.getElementById('logConsole');
-                    const div = document.createElement('div');
-                    div.className = 'log-entry log-alert';
-                    div.innerText = `[${new Date().toLocaleTimeString()}] STRESS_TEST: Injecting adversarial prompt #${i + 1}`;
-                    logConsole.insertBefore(div, logConsole.firstChild);
-                }, i * 500);
-            }
-
-            setTimeout(() => { btn.innerText = originalText; btn.disabled = false; }, 3000);
-        };
-    </script>
+    // Time update
+    setInterval(() => {
+        document.getElementById("current-time").textContent = new Date().toTimeString().split(" ")[0];
+    }, 1000);
+</script>
 </body>
 </html>
