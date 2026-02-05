@@ -228,6 +228,7 @@
     </style>
 </head>
 <body>
+
     <canvas id="dither-canvas"></canvas>
     <div class="scanlines"></div>
 
@@ -316,6 +317,34 @@
                 </div>
                 <div class="kpi-label">Bayesian Confidence Interval</div>
             </div>
+
+            <!-- Censorship Score -->
+            <div class="card">
+                <div class="corner corner-tl"></div>
+                <div class="corner corner-tr"></div>
+                <div class="corner corner-bl"></div>
+                <div class="corner corner-br"></div>
+                <h3 class="card-title">Censorship Score</h3>
+                <div class="kpi-value" id="censorshipVal" style="background: linear-gradient(135deg, #ef4444, #f87171); -webkit-background-clip: text; background-clip: text;">0.00</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="censorshipBar" style="width: 0%; background: linear-gradient(90deg, #ef4444, #f87171);"></div>
+                </div>
+                <div class="kpi-label">Detected by Uncensored AI</div>
+            </div>
+
+            <!-- Bias Score -->
+            <div class="card">
+                <div class="corner corner-tl"></div>
+                <div class="corner corner-tr"></div>
+                <div class="corner corner-bl"></div>
+                <div class="corner corner-br"></div>
+                <h3 class="card-title">Bias Score</h3>
+                <div class="kpi-value" id="biasVal" style="background: linear-gradient(135deg, #facc15, #fbbf24); -webkit-background-clip: text; background-clip: text;">0.00</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="biasBar" style="width: 0%; background: linear-gradient(90deg, #facc15, #fbbf24);"></div>
+                </div>
+                <div class="kpi-label">Detected by Uncensored AI</div>
+            </div>
         </div>
     </div>
 
@@ -328,11 +357,8 @@
     <script type="module">
     import { ConvexClient } from "https://esm.sh/convex@1.17.4/browser";
 
-    // ═══════════════════════════════════════════════════════════════
-    // CONFIG - Replace with your Convex deployment URL
-    // ═══════════════════════════════════════════════════════════════
+    // Convex Configuration
     const CONVEX_URL = "https://neat-chameleon-935.convex.cloud";
-
     const client = new ConvexClient(CONVEX_URL);
 
     // Load saved config
@@ -346,9 +372,7 @@
     const maskedKey = config.apiKey ? `${config.apiKey.slice(0, 4)}...${config.apiKey.slice(-4)}` : "UNKNOWN";
     document.getElementById("targetDisplay").innerText = `TARGET: ${(config.modelName || config.model || "UNKNOWN").toUpperCase()} [KEY: ${maskedKey}]`;
 
-    // ═══════════════════════════════════════════════════════════════
-    // WEBGL BACKGROUND (keep existing code)
-    // ═══════════════════════════════════════════════════════════════
+    // WebGL Background (keep existing code)
     const canvas = document.getElementById("dither-canvas");
     const gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
 
@@ -427,9 +451,7 @@
     }
     requestAnimationFrame(renderBg);
 
-    // ═══════════════════════════════════════════════════════════════
-    // CHARTS
-    // ═══════════════════════════════════════════════════════════════
+    // Charts
     const commonOptions = {
         responsive: true, maintainAspectRatio: false, animation: { duration: 300 },
         plugins: { legend: { display: false } },
@@ -454,11 +476,7 @@
         options: commonOptions
     });
 
-    // ═══════════════════════════════════════════════════════════════
-    // REAL-TIME SUBSCRIPTIONS
-    // ═══════════════════════════════════════════════════════════════
-    
-    // Subscribe to metrics history
+    // Real-Time Subscriptions
     client.onUpdate("queries:getMetricsHistory", { limit: 30 }, (metrics) => {
         if (!metrics || metrics.length === 0) return;
 
@@ -497,6 +515,13 @@
 
         document.getElementById("hallucinationVal").innerText = latest.hallucinationProb.toFixed(3);
         document.getElementById("hallucinationBar").style.width = (latest.hallucinationProb * 100) + "%";
+
+        // Update uncensored AI metrics
+        document.getElementById("censorshipVal").innerText = latest.censorshipScore.toFixed(2);
+        document.getElementById("censorshipBar").style.width = (latest.censorshipScore * 100) + "%";
+
+        document.getElementById("biasVal").innerText = latest.biasScore.toFixed(2);
+        document.getElementById("biasBar").style.width = (latest.biasScore * 100) + "%";
     });
 
     // Subscribe to logs
@@ -514,10 +539,7 @@
         }
     });
 
-    // ═══════════════════════════════════════════════════════════════
-    // ACTIONS
-    // ═══════════════════════════════════════════════════════════════
-
+    // Actions
     window.triggerRedTeam = async () => {
         const btn = document.querySelector(".btn-danger");
         btn.innerText = "RUNNING...";
