@@ -3,239 +3,539 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Target Key | Connect</title>
+    <title>API Configuration | Observability</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --bg-dark: #0a0a0c;
-            --bg-panel: rgba(18, 19, 26, 0.85);
-            --bg-card: rgba(26, 27, 36, 0.9);
-            --border-color: #3a3d4a;
-            --text-primary: #e0e0e0;
-            --text-secondary: #9999aa;
-            --accent-purple: #a855f7;
-            --accent-violet: #8b5cf6;
-            --accent-lavender: #c4b5fd;
-            --accent-white: #ffffff;
-            --accent-red: #ff4466;
-            --glow-purple: rgba(168, 85, 247, 0.4);
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg-primary: #0c0c0f;
+            --bg-secondary: #12121a;
+            --bg-tertiary: #1a1a24;
+            --bg-card: rgba(18, 18, 26, 0.8);
+            --border-subtle: rgba(255, 255, 255, 0.06);
+            --border-light: rgba(255, 255, 255, 0.1);
+            --text-primary: #f4f4f5;
+            --text-secondary: #a1a1aa;
+            --text-muted: #71717a;
+            --accent-primary: #6366f1;
+            --accent-secondary: #818cf8;
+            --accent-glow: rgba(99, 102, 241, 0.15);
+            --success: #22c55e;
+            --error: #ef4444;
+            --transition-fast: 0.15s ease;
+            --transition-medium: 0.3s ease;
+        }
 
         body {
-            font-family: 'Share Tech Mono', monospace;
-            background-color: var(--bg-dark);
+            background-color: var(--bg-primary);
             color: var(--text-primary);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .bg-wrapper {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .bg-gradient {
+            position: absolute;
+            inset: 0;
+            background: 
+                radial-gradient(ellipse 80% 50% at 50% -20%, rgba(99, 102, 241, 0.15), transparent),
+                radial-gradient(ellipse 60% 40% at 100% 100%, rgba(99, 102, 241, 0.08), transparent),
+                radial-gradient(ellipse 50% 30% at 0% 100%, rgba(129, 140, 248, 0.06), transparent);
+        }
+
+        .bg-grid {
+            position: absolute;
+            inset: 0;
+            background-image: 
+                linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+            background-size: 60px 60px;
+            mask-image: radial-gradient(ellipse 80% 60% at 50% 50%, black, transparent);
+        }
+
+        .bg-glow {
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            filter: blur(120px);
+            animation: breathe 8s ease-in-out infinite;
+        }
+
+        .bg-glow-1 {
+            background: var(--accent-primary);
+            top: -300px;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0.12;
+        }
+
+        .bg-glow-2 {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            bottom: -400px;
+            right: -200px;
+            width: 500px;
+            height: 500px;
+            opacity: 0.08;
+            animation-delay: -4s;
+        }
+
+        @keyframes breathe {
+            0%, 100% { 
+                transform: translateX(-50%) scale(1); 
+                opacity: 0.12;
+            }
+            50% { 
+                transform: translateX(-50%) scale(1.1); 
+                opacity: 0.18;
+            }
+        }
+
+        .particles {
+            position: absolute;
+            inset: 0;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 50%;
+            animation: drift 20s linear infinite;
+        }
+
+        .particle:nth-child(1) { left: 10%; animation-duration: 25s; animation-delay: 0s; }
+        .particle:nth-child(2) { left: 20%; animation-duration: 20s; animation-delay: -5s; }
+        .particle:nth-child(3) { left: 35%; animation-duration: 28s; animation-delay: -10s; }
+        .particle:nth-child(4) { left: 50%; animation-duration: 22s; animation-delay: -15s; }
+        .particle:nth-child(5) { left: 65%; animation-duration: 26s; animation-delay: -8s; }
+
+        @keyframes drift {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% { opacity: 0.6; }
+            90% { opacity: 0.6; }
+            100% {
+                transform: translateY(-100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        .container {
+            width: 100%;
+            max-width: 480px;
+            padding: 2rem;
+            z-index: 10;
+        }
+
+        .api-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(40px);
+            -webkit-backdrop-filter: blur(40px);
+            border: 1px solid var(--border-subtle);
+            border-radius: 24px;
+            padding: 48px;
+            box-shadow: 
+                0 0 0 1px rgba(255, 255, 255, 0.03),
+                0 20px 50px -12px rgba(0, 0, 0, 0.5),
+                0 0 100px -20px var(--accent-glow);
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .form-logo {
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 20px;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            overflow: hidden;
+            box-shadow: 0 8px 24px -8px rgba(99, 102, 241, 0.4);
         }
 
-        #dither-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; }
-
-        .scanlines {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            pointer-events: none; z-index: 1000;
-            background: repeating-linear-gradient(0deg, rgba(0,0,0,0.1) 0px, rgba(0,0,0,0.1) 1px, transparent 1px, transparent 3px);
+        .form-logo svg {
+            width: 24px;
+            height: 24px;
+            color: white;
         }
 
-        .container { position: relative; z-index: 10; width: 100%; max-width: 480px; padding: 2rem; }
+        .form-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            letter-spacing: -0.02em;
+        }
 
-        .login-card {
-            background: var(--bg-panel);
-            border: 1px solid var(--border-color);
-            padding: 3rem 2.5rem;
+        .form-subtitle {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        .input-group {
+            margin-bottom: 24px;
+        }
+
+        .input-label {
+            display: block;
+            font-size: 0.8125rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .input-wrapper {
             position: relative;
-            overflow: hidden;
-            backdrop-filter: blur(10px);
         }
 
-        .login-card::before {
-            content: '';
-            position: absolute; top: 0; left: 0; right: 0; height: 2px;
-            background: linear-gradient(90deg, var(--accent-purple), var(--accent-lavender), var(--accent-white), var(--accent-lavender), var(--accent-purple));
-            background-size: 200% 100%;
-            animation: shimmer 3s linear infinite;
-        }
-
-        @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
-
-        .login-card::after {
-            content: '';
-            position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
-            background: linear-gradient(90deg, transparent, var(--border-color), transparent);
-        }
-
-        .corner { position: absolute; width: 20px; height: 20px; border-color: var(--accent-purple); border-style: solid; border-width: 0; }
-        .corner-tl { top: 10px; left: 10px; border-top-width: 2px; border-left-width: 2px; }
-        .corner-tr { top: 10px; right: 10px; border-top-width: 2px; border-right-width: 2px; }
-        .corner-bl { bottom: 10px; left: 10px; border-bottom-width: 2px; border-left-width: 2px; }
-        .corner-br { bottom: 10px; right: 10px; border-bottom-width: 2px; border-right-width: 2px; }
-
-        .logo { text-align: center; margin-bottom: 2.5rem; }
-
-        .logo h1 {
-            font-family: 'VT323', monospace;
-            font-size: 2rem;
-            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-lavender) 50%, var(--accent-white) 100%);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-            letter-spacing: 4px;
-            filter: drop-shadow(0 0 15px var(--glow-purple));
-        }
-
-        .logo span {
-            font-size: 0.8rem;
-            background: linear-gradient(90deg, var(--accent-lavender), var(--text-secondary));
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-            text-transform: uppercase; letter-spacing: 3px;
-        }
-
-        .form-group { margin-bottom: 1.5rem; }
-
-        .form-label {
-            display: block; font-size: 0.75rem;
-            background: linear-gradient(90deg, var(--accent-lavender), var(--text-secondary));
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-            text-transform: uppercase; letter-spacing: 2px; margin-bottom: 0.75rem;
-        }
-
-        .form-select {
-            width: 100%; padding: 1rem 1.25rem;
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
+        .input-field {
+            width: 100%;
+            padding: 14px 48px 14px 16px;
+            font-size: 0.9375rem;
+            font-family: 'JetBrains Mono', monospace;
             color: var(--text-primary);
-            font-family: inherit; font-size: 0.95rem;
-            cursor: pointer; appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23a855f7' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 1rem center;
-            transition: all 0.2s;
-        }
-
-        .form-select:hover, .form-select:focus {
-            border-color: var(--accent-purple);
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
             outline: none;
-            box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.15);
+            transition: all var(--transition-fast);
+            letter-spacing: 0.5px;
         }
 
-        .form-select:disabled { opacity: 0.5; cursor: not-allowed; }
+        .input-field::placeholder {
+            color: var(--text-muted);
+            font-family: 'Inter', sans-serif;
+            letter-spacing: normal;
+        }
 
-        .input-wrapper { position: relative; }
+        .input-field:hover {
+            border-color: var(--border-light);
+        }
 
-        .form-input {
-            width: 100%; padding: 1rem 3rem 1rem 1.25rem;
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
+        .input-field:focus {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+            background: var(--bg-secondary);
+        }
+
+        .input-field.error {
+            border-color: var(--error);
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+        }
+
+        .input-field.success {
+            border-color: var(--success);
+            box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
+        }
+
+        .select-field {
+            width: 100%;
+            padding: 14px 40px 14px 16px;
+            font-size: 0.9375rem;
+            font-family: inherit;
             color: var(--text-primary);
-            font-family: inherit; font-size: 0.95rem;
-            letter-spacing: 1px; transition: all 0.2s;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            outline: none;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236366f1' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            transition: all var(--transition-fast);
         }
 
-        .form-input::placeholder { color: var(--text-secondary); opacity: 0.6; }
-        .form-input:hover, .form-input:focus { border-color: var(--accent-purple); outline: none; box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.15); }
-        .form-input.error { border-color: var(--accent-red); box-shadow: 0 0 0 2px rgba(255, 68, 102, 0.1); }
-        .form-input.success { border-color: var(--accent-purple); box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.2); }
+        .select-field:hover {
+            border-color: var(--border-light);
+        }
+
+        .select-field:focus {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+            background-color: var(--bg-secondary);
+        }
+
+        .select-field:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
 
         .toggle-visibility {
-            position: absolute; right: 1rem; top: 50%; transform: translateY(-50%);
-            background: none; border: none; color: var(--text-secondary);
-            cursor: pointer; padding: 0.25rem; transition: color 0.2s;
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 4px;
+            transition: color var(--transition-fast);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-        .toggle-visibility:hover { color: var(--accent-purple); }
 
-        .error-message {
-            display: none; align-items: center; gap: 0.5rem;
-            margin-top: 0.75rem; padding: 0.75rem 1rem;
-            background: rgba(255, 68, 102, 0.1);
-            border: 1px solid rgba(255, 68, 102, 0.3);
-            color: var(--accent-red); font-size: 0.85rem;
+        .toggle-visibility:hover {
+            color: var(--accent-secondary);
         }
-        .error-message.show { display: flex; }
+
+        .toggle-visibility svg {
+            width: 20px;
+            height: 20px;
+        }
 
         .key-indicator {
-            display: none; align-items: center; gap: 0.5rem;
-            margin-top: 0.75rem; padding: 0.75rem 1rem;
-            background: rgba(168, 85, 247, 0.1);
-            border: 1px solid rgba(168, 85, 247, 0.3);
-            font-size: 0.85rem;
+            display: none;
+            align-items: center;
+            gap: 8px;
+            margin-top: 12px;
+            padding: 12px 16px;
+            background: rgba(99, 102, 241, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            border-radius: 8px;
+            font-size: 0.8125rem;
         }
-        .key-indicator.show { display: flex; }
-        .key-indicator .indicator-icon { width: 8px; height: 8px; border-radius: 50%; background: var(--accent-purple); box-shadow: 0 0 8px var(--glow-purple); }
-        .key-indicator .indicator-text { background: linear-gradient(90deg, var(--accent-purple), var(--accent-lavender)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
 
-        .model-select-group { display: none; margin-top: 1.5rem; animation: fadeIn 0.3s ease; }
-        .model-select-group.show { display: block; }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-
-        .submit-btn {
-            width: 100%; padding: 1rem 2rem;
-            background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(196, 181, 253, 0.2));
-            border: 1px solid var(--accent-purple);
-            font-family: 'VT323', monospace; font-size: 1.3rem;
-            letter-spacing: 3px; cursor: pointer;
-            position: relative; overflow: hidden;
-            transition: all 0.3s; text-transform: uppercase;
+        .key-indicator.show {
+            display: flex;
         }
-        .submit-btn .btn-text { background: linear-gradient(135deg, var(--accent-purple), var(--accent-lavender), var(--accent-white)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-        .submit-btn::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(168, 85, 247, 0.2), transparent); transition: left 0.5s; }
-        .submit-btn:hover::before { left: 100%; }
-        .submit-btn:hover { background: linear-gradient(135deg, rgba(168, 85, 247, 0.3), rgba(196, 181, 253, 0.3)); box-shadow: 0 0 30px var(--glow-purple); }
-        .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        .submit-btn.loading { pointer-events: none; }
-        .submit-btn.loading .btn-text { opacity: 0; }
-        .submit-btn .spinner { display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 24px; height: 24px; border: 2px solid transparent; border-top-color: var(--accent-purple); border-radius: 50%; animation: spin 0.8s linear infinite; }
-        .submit-btn.loading .spinner { display: block; }
 
-        @keyframes spin { to { transform: translate(-50%, -50%) rotate(360deg); } }
-
-        .info-text { text-align: center; margin-top: 1.5rem; font-size: 0.8rem; color: var(--text-secondary); line-height: 1.6; }
-        .info-text a { background: linear-gradient(90deg, var(--accent-purple), var(--accent-lavender)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; text-decoration: none; }
-
-        .status-bar {
-            position: fixed; bottom: 0; left: 0; right: 0;
-            padding: 0.5rem 2rem;
-            background: var(--bg-panel);
-            border-top: 1px solid var(--border-color);
-            display: flex; justify-content: space-between;
-            font-size: 0.75rem; color: var(--text-secondary);
-            z-index: 100; backdrop-filter: blur(10px);
+        .indicator-icon {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent-primary);
+            box-shadow: 0 0 12px rgba(99, 102, 241, 0.6);
+            animation: pulse 2s ease-in-out infinite;
         }
-        .status-item { display: flex; align-items: center; gap: 0.5rem; }
-        .status-dot { width: 6px; height: 6px; background: linear-gradient(135deg, var(--accent-purple), var(--accent-lavender)); border-radius: 50%; box-shadow: 0 0 8px var(--glow-purple); }
 
-        @media (max-width: 520px) { .container { padding: 1rem; } .login-card { padding: 2rem 1.5rem; } .logo h1 { font-size: 1.5rem; } }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .indicator-text {
+            color: var(--accent-secondary);
+            font-weight: 500;
+        }
+
+        .error-message {
+            display: none;
+            align-items: center;
+            gap: 8px;
+            margin-top: 12px;
+            padding: 12px 16px;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            border-radius: 8px;
+            color: var(--error);
+            font-size: 0.8125rem;
+        }
+
+        .error-message.show {
+            display: flex;
+        }
+
+        .error-message svg {
+            flex-shrink: 0;
+        }
+
+        .model-select-group {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .model-select-group.show {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 14px 24px;
+            font-size: 0.9375rem;
+            font-weight: 600;
+            font-family: inherit;
+            color: white;
+            background: linear-gradient(135deg, var(--accent-primary), #7c3aed);
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all var(--transition-medium);
+            position: relative;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, #7c3aed, var(--accent-primary));
+            opacity: 0;
+            transition: opacity var(--transition-medium);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 32px -8px rgba(99, 102, 241, 0.5);
+        }
+
+        .btn-primary:hover::before {
+            opacity: 1;
+        }
+
+        .btn-primary:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn-text {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary.loading .btn-text {
+            opacity: 0;
+        }
+
+        .spinner {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        .btn-primary.loading .spinner {
+            display: block;
+        }
+
+        @keyframes spin {
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        @media (max-width: 520px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .api-card {
+                padding: 32px 24px;
+                border-radius: 20px;
+            }
+            
+            .form-title {
+                font-size: 1.25rem;
+            }
+        }
     </style>
 </head>
 <body>
-    <canvas id="dither-canvas"></canvas>
-    <div class="scanlines"></div>
+
+    <div class="bg-wrapper">
+        <div class="bg-gradient"></div>
+        <div class="bg-grid"></div>
+        <div class="bg-glow bg-glow-1"></div>
+        <div class="bg-glow bg-glow-2"></div>
+        <div class="particles">
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+        </div>
+    </div>
 
     <div class="container">
-        <div class="login-card">
-            <div class="corner corner-tl"></div>
-            <div class="corner corner-tr"></div>
-            <div class="corner corner-bl"></div>
-            <div class="corner corner-br"></div>
-
-            <div class="logo">
-                <h1>TARGET KEY</h1>
-                <span>Observability Platform</span>
+        <div class="api-card">
+            <div class="form-header">
+                <div class="form-logo">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                        <path d="M2 17l10 5 10-5"/>
+                        <path d="M2 12l10 5 10-5"/>
+                    </svg>
+                </div>
+                <h1 class="form-title">API Configuration</h1>
+                <p class="form-subtitle">Connect your AI provider to get started</p>
             </div>
 
             <form id="api-form">
-                <div class="form-group">
-                    <label class="form-label">API Key</label>
+                <div class="input-group">
+                    <label class="input-label" for="api-key">API Key</label>
                     <div class="input-wrapper">
-                        <input type="password" class="form-input" id="api-key" placeholder="Enter your API key" required autocomplete="off">
+                        <input 
+                            type="password" 
+                            class="input-field" 
+                            id="api-key" 
+                            placeholder="Enter your API key" 
+                            required 
+                            autocomplete="off"
+                        >
                         <button type="button" class="toggle-visibility" id="toggle-key">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                                <circle cx="12" cy="12" r="3"></circle>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                <circle cx="12" cy="12" r="3"/>
                             </svg>
                         </button>
                     </div>
@@ -244,121 +544,37 @@
                         <span class="indicator-text" id="key-type-text">API key detected</span>
                     </div>
                     <div class="error-message" id="error-msg">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="10"></circle>
-                            <line x1="15" y1="9" x2="9" y2="15"></line>
-                            <line x1="9" y1="9" x2="15" y2="15"></line>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"/>
+                            <line x1="15" y1="9" x2="9" y2="15"/>
+                            <line x1="9" y1="9" x2="15" y2="15"/>
                         </svg>
                         <span id="error-text">Invalid API key format</span>
                     </div>
                 </div>
 
-                <div class="form-group model-select-group" id="model-group">
-                    <label class="form-label">Select Model</label>
-                    <select class="form-select" id="model-select">
+                <div class="input-group model-select-group" id="model-group">
+                    <label class="input-label" for="model-select">Select Model</label>
+                    <select class="select-field" id="model-select">
                         <option value="">-- Select a model --</option>
                     </select>
                 </div>
 
-                <button type="submit" class="submit-btn" id="submit-btn" disabled>
-                    <span class="btn-text">Connect & Launch</span>
+                <button type="submit" class="btn-primary" id="submit-btn" disabled>
+                    <span class="btn-text">
+                        Connect & Launch
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="5" y1="12" x2="19" y2="12"/>
+                            <polyline points="12 5 19 12 12 19"/>
+                        </svg>
+                    </span>
                     <div class="spinner"></div>
                 </button>
             </form>
-
-            <p class="info-text">
-                Your API key is stored locally and never sent to our servers.<br>
-                <a href="#">Learn more about security</a>
-            </p>
         </div>
     </div>
 
-    <div class="status-bar">
-        <div class="status-item"><span class="status-dot"></span><span>Systems Online</span></div>
-        <div class="status-item"><span id="current-time">00:00:00</span></div>
-    </div>
-
     <script>
-        // WebGL Dither Background
-        const canvas = document.getElementById('dither-canvas');
-        const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-
-        const vertexShaderSource = `attribute vec2 a_position; void main() { gl_Position = vec4(a_position, 0.0, 1.0); }`;
-
-        const fragmentShaderSource = `
-            precision highp float;
-            uniform vec2 u_resolution; uniform float u_time; uniform vec2 u_mouse; uniform float u_mouseRadius; uniform int u_enableMouse;
-            const float waveSpeed = 0.05; const float waveFrequency = 3.0; const float waveAmplitude = 0.3; const vec3 waveColor = vec3(0.4, 0.3, 0.6);
-            const float colorNum = 4.0; const float pixelSize = 2.0;
-            vec4 mod289(vec4 x) { return x - floor(x * (1.0/289.0)) * 289.0; }
-            vec4 permute(vec4 x) { return mod289(((x * 34.0) + 1.0) * x); }
-            vec4 taylorInvSqrt(vec4 r) { return 1.79284291400159 - 0.85373472095314 * r; }
-            vec2 fade(vec2 t) { return t*t*t*(t*(t*6.0-15.0)+10.0); }
-            float cnoise(vec2 P) {
-                vec4 Pi = floor(P.xyxy) + vec4(0.0,0.0,1.0,1.0); vec4 Pf = fract(P.xyxy) - vec4(0.0,0.0,1.0,1.0); Pi = mod289(Pi);
-                vec4 ix = Pi.xzxz, iy = Pi.yyww; vec4 fx = Pf.xzxz, fy = Pf.yyww;
-                vec4 i = permute(permute(ix) + iy); vec4 gx = fract(i * (1.0/41.0)) * 2.0 - 1.0; vec4 gy = abs(gx) - 0.5;
-                vec4 tx = floor(gx + 0.5); gx = gx - tx;
-                vec2 g00 = vec2(gx.x, gy.x), g10 = vec2(gx.y, gy.y), g01 = vec2(gx.z, gy.z), g11 = vec2(gx.w, gy.w);
-                vec4 norm = taylorInvSqrt(vec4(dot(g00,g00), dot(g01,g01), dot(g10,g10), dot(g11,g11)));
-                g00 *= norm.x; g01 *= norm.y; g10 *= norm.z; g11 *= norm.w;
-                float n00 = dot(g00, vec2(fx.x, fy.x)); float n10 = dot(g10, vec2(fx.y, fy.y));
-                float n01 = dot(g01, vec2(fx.z, fy.z)); float n11 = dot(g11, vec2(fx.w, fy.w));
-                vec2 fade_xy = fade(Pf.xy); vec2 n_x = mix(vec2(n00, n01), vec2(n10, n11), fade_xy.x);
-                return 2.3 * mix(n_x.x, n_x.y, fade_xy.y);
-            }
-            float fbm(vec2 p) { float value = 0.0, amp = 1.0, freq = waveFrequency; for (int i = 0; i < 4; i++) { value += amp * abs(cnoise(p)); p *= freq; amp *= waveAmplitude; } return value; }
-            float pattern(vec2 p) { vec2 p2 = p - u_time * waveSpeed; return fbm(p + fbm(p2)); }
-            float bayer8(vec2 p) {
-                vec2 P = mod(floor(p), 8.0); float x = P.x, y = P.y; int idx = int(y) * 8 + int(x);
-                float values[64]; values[0]=0.0;values[1]=48.0;values[2]=12.0;values[3]=60.0;values[4]=3.0;values[5]=51.0;values[6]=15.0;values[7]=63.0;values[8]=32.0;values[9]=16.0;values[10]=44.0;values[11]=28.0;values[12]=35.0;values[13]=19.0;values[14]=47.0;values[15]=31.0;values[16]=8.0;values[17]=56.0;values[18]=4.0;values[19]=52.0;values[20]=11.0;values[21]=59.0;values[22]=7.0;values[23]=55.0;values[24]=40.0;values[25]=24.0;values[26]=36.0;values[27]=20.0;values[28]=43.0;values[29]=27.0;values[30]=39.0;values[31]=23.0;values[32]=2.0;values[33]=50.0;values[34]=14.0;values[35]=62.0;values[36]=1.0;values[37]=49.0;values[38]=13.0;values[39]=61.0;values[40]=34.0;values[41]=18.0;values[42]=46.0;values[43]=30.0;values[44]=33.0;values[45]=17.0;values[46]=45.0;values[47]=29.0;values[48]=10.0;values[49]=58.0;values[50]=6.0;values[51]=54.0;values[52]=9.0;values[53]=57.0;values[54]=5.0;values[55]=53.0;values[56]=42.0;values[57]=26.0;values[58]=38.0;values[59]=22.0;values[60]=41.0;values[61]=25.0;values[62]=37.0;values[63]=21.0;
-                float v = 0.0; for (int i = 0; i < 64; i++) { if (i == idx) v = values[i]; } return v / 64.0;
-            }
-            vec3 dither(vec2 coord, vec3 color) {
-                vec2 scaledCoord = floor(coord / pixelSize); float threshold = bayer8(scaledCoord) - 0.25;
-                float step = 1.0 / (colorNum - 1.0); color += threshold * step; float bias = 0.2;
-                color = clamp(color - bias, 0.0, 1.0); return floor(color * (colorNum - 1.0) + 0.5) / (colorNum - 1.0);
-            }
-            void main() {
-                vec2 pixelCoord = floor(gl_FragCoord.xy / pixelSize) * pixelSize; vec2 uv = pixelCoord / u_resolution;
-                uv -= 0.5; uv.x *= u_resolution.x / u_resolution.y; float f = pattern(uv);
-                if (u_enableMouse == 1) { vec2 mouseNDC = (u_mouse / u_resolution - 0.5) * vec2(1.0, -1.0); mouseNDC.x *= u_resolution.x / u_resolution.y; float dist = length(uv - mouseNDC); float effect = 1.0 - smoothstep(0.0, u_mouseRadius, dist); f -= 0.5 * effect; }
-                vec3 col = mix(vec3(0.0), waveColor, f); col = dither(gl_FragCoord.xy, col); gl_FragColor = vec4(col, 1.0);
-            }
-        `;
-
-        function createShader(gl, type, source) { const shader = gl.createShader(type); gl.shaderSource(shader, source); gl.compileShader(shader); if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) { console.error(gl.getShaderInfoLog(shader)); gl.deleteShader(shader); return null; } return shader; }
-        function createProgram(gl, vs, fs) { const program = gl.createProgram(); gl.attachShader(program, vs); gl.attachShader(program, fs); gl.linkProgram(program); if (!gl.getProgramParameter(program, gl.LINK_STATUS)) { console.error(gl.getProgramInfoLog(program)); return null; } return program; }
-
-        const vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexShaderSource);
-        const fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource);
-        const program = createProgram(gl, vertexShader, fragmentShader);
-
-        const positionLocation = gl.getAttribLocation(program, 'a_position');
-        const resolutionLocation = gl.getUniformLocation(program, 'u_resolution');
-        const timeLocation = gl.getUniformLocation(program, 'u_time');
-        const mouseLocation = gl.getUniformLocation(program, 'u_mouse');
-        const mouseRadiusLocation = gl.getUniformLocation(program, 'u_mouseRadius');
-        const enableMouseLocation = gl.getUniformLocation(program, 'u_enableMouse');
-
-        const positionBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1,1,-1,-1,1,-1,1,1,-1,1,1]), gl.STATIC_DRAW);
-
-        let mouseX = 0, mouseY = 0;
-        document.addEventListener('mousemove', (e) => { mouseX = e.clientX * window.devicePixelRatio; mouseY = e.clientY * window.devicePixelRatio; });
-
-        function resize() { const dpr = window.devicePixelRatio || 1; canvas.width = window.innerWidth * dpr; canvas.height = window.innerHeight * dpr; canvas.style.width = window.innerWidth + 'px'; canvas.style.height = window.innerHeight + 'px'; gl.viewport(0, 0, canvas.width, canvas.height); }
-        window.addEventListener('resize', resize); resize();
-
-        function render(time) {
-            gl.useProgram(program); gl.uniform2f(resolutionLocation, canvas.width, canvas.height); gl.uniform1f(timeLocation, time * 0.001);
-            gl.uniform2f(mouseLocation, mouseX, canvas.height - mouseY); gl.uniform1f(mouseRadiusLocation, 0.3); gl.uniform1i(enableMouseLocation, 1);
-            gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer); gl.enableVertexAttribArray(positionLocation); gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
-            gl.drawArrays(gl.TRIANGLES, 0, 6); requestAnimationFrame(render);
-        }
-        requestAnimationFrame(render);
-
         // Model Database
         const providerModels = {
             anthropic: { name: 'Anthropic', models: [{ id: 'claude-sonnet-4-20250514', name: 'Claude Sonnet 4' },{ id: 'claude-opus-4-20250514', name: 'Claude Opus 4' },{ id: 'claude-3-7-sonnet-20250219', name: 'Claude 3.7 Sonnet' },{ id: 'claude-3-5-sonnet-20241022', name: 'Claude 3.5 Sonnet' },{ id: 'claude-3-5-haiku-20241022', name: 'Claude 3.5 Haiku' },{ id: 'claude-3-opus-20240229', name: 'Claude 3 Opus' },{ id: 'claude-3-haiku-20240307', name: 'Claude 3 Haiku' }] },
@@ -373,9 +589,6 @@
         };
 
         // Form Logic
-        function updateTime() { document.getElementById('current-time').textContent = new Date().toTimeString().split(' ')[0]; }
-        setInterval(updateTime, 1000); updateTime();
-
         const toggleBtn = document.getElementById('toggle-key');
         const apiKeyInput = document.getElementById('api-key');
         const keyIndicator = document.getElementById('key-indicator');
@@ -390,7 +603,9 @@
         toggleBtn.addEventListener('click', () => {
             const type = apiKeyInput.type === 'password' ? 'text' : 'password';
             apiKeyInput.type = type;
-            toggleBtn.innerHTML = type === 'password' ? `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>` : `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>`;
+            toggleBtn.innerHTML = type === 'password' 
+                ? `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`
+                : `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>`;
         });
 
         function detectKeyType(key) {
@@ -409,12 +624,29 @@
         function populateModels(provider) {
             const providerData = providerModels[provider] || providerModels.unknown;
             modelSelect.innerHTML = '<option value="">-- Select a model --</option>';
-            providerData.models.forEach(model => { const option = document.createElement('option'); option.value = model.id; option.textContent = model.name; modelSelect.appendChild(option); });
+            providerData.models.forEach(model => {
+                const option = document.createElement('option');
+                option.value = model.id;
+                option.textContent = model.name;
+                modelSelect.appendChild(option);
+            });
             modelGroup.classList.add('show');
         }
 
-        function showError(message) { errorText.textContent = message; errorMsg.classList.add('show'); keyIndicator.classList.remove('show'); modelGroup.classList.remove('show'); apiKeyInput.classList.add('error'); apiKeyInput.classList.remove('success'); submitBtn.disabled = true; }
-        function hideError() { errorMsg.classList.remove('show'); apiKeyInput.classList.remove('error'); }
+        function showError(message) {
+            errorText.textContent = message;
+            errorMsg.classList.add('show');
+            keyIndicator.classList.remove('show');
+            modelGroup.classList.remove('show');
+            apiKeyInput.classList.add('error');
+            apiKeyInput.classList.remove('success');
+            submitBtn.disabled = true;
+        }
+
+        function hideError() {
+            errorMsg.classList.remove('show');
+            apiKeyInput.classList.remove('error');
+        }
 
         let currentProvider = null;
 
@@ -422,29 +654,68 @@
             hideError();
             const key = apiKeyInput.value.trim();
             const detected = detectKeyType(key);
-            if (detected) { keyTypeText.textContent = `${detected.type} key detected`; keyIndicator.classList.add('show'); apiKeyInput.classList.add('success'); currentProvider = detected.provider; populateModels(detected.provider); }
-            else { keyIndicator.classList.remove('show'); modelGroup.classList.remove('show'); apiKeyInput.classList.remove('success'); submitBtn.disabled = true; currentProvider = null; }
+            
+            if (detected) {
+                keyTypeText.textContent = `${detected.type} key detected`;
+                keyIndicator.classList.add('show');
+                apiKeyInput.classList.add('success');
+                currentProvider = detected.provider;
+                populateModels(detected.provider);
+            } else {
+                keyIndicator.classList.remove('show');
+                modelGroup.classList.remove('show');
+                apiKeyInput.classList.remove('success');
+                submitBtn.disabled = true;
+                currentProvider = null;
+            }
         });
 
-        modelSelect.addEventListener('change', () => { submitBtn.disabled = !modelSelect.value; });
+        modelSelect.addEventListener('change', () => {
+            submitBtn.disabled = !modelSelect.value;
+        });
 
         form.addEventListener('submit', async (e) => {
-            e.preventDefault(); hideError();
+            e.preventDefault();
+            hideError();
+
             const apiKey = apiKeyInput.value.trim();
             const selectedModel = modelSelect.value;
-            if (!apiKey) { showError('Please enter your API key'); return; }
-            if (apiKey.length < 10) { showError('API key seems too short'); return; }
-            if (!selectedModel) { showError('Please select a model'); return; }
+
+            if (!apiKey) {
+                showError('Please enter your API key');
+                return;
+            }
+
+            if (apiKey.length < 10) {
+                showError('API key seems too short');
+                return;
+            }
+
+            if (!selectedModel) {
+                showError('Please select a model');
+                return;
+            }
 
             submitBtn.classList.add('loading');
             await new Promise(resolve => setTimeout(resolve, 1500));
 
-            const credentials = { provider: currentProvider, providerName: providerModels[currentProvider]?.name || 'Unknown', apiKey, model: selectedModel, modelName: modelSelect.options[modelSelect.selectedIndex].text, timestamp: Date.now() };
+            const credentials = {
+                provider: currentProvider,
+                providerName: providerModels[currentProvider]?.name || 'Unknown',
+                apiKey,
+                model: selectedModel,
+                modelName: modelSelect.options[modelSelect.selectedIndex].text,
+                timestamp: Date.now()
+            };
+
             localStorage.setItem('target_config', JSON.stringify(credentials));
 
             apiKeyInput.classList.add('success');
             submitBtn.classList.remove('loading');
-            setTimeout(() => { window.location.href = 'dashboard.html'; }, 500);
+
+            setTimeout(() => {
+                window.location.href = 'dashboard.html';
+            }, 500);
         });
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -453,7 +724,12 @@
                 const creds = JSON.parse(stored);
                 apiKeyInput.value = creds.apiKey;
                 apiKeyInput.dispatchEvent(new Event('input'));
-                setTimeout(() => { if (creds.model) { modelSelect.value = creds.model; modelSelect.dispatchEvent(new Event('change')); } }, 100);
+                setTimeout(() => {
+                    if (creds.model) {
+                        modelSelect.value = creds.model;
+                        modelSelect.dispatchEvent(new Event('change'));
+                    }
+                }, 100);
             }
         });
     </script>
