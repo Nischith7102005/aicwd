@@ -52,100 +52,253 @@ function computeHallucinationProb(response: string, latencyMs: number): number {
   return Math.max(0.01, Math.min(0.5, prob));
 }
 
+// Simple coherence score based on sentence structure
+function computeCoherenceScore(response: string): number {
+  const sentences = response.match(/[^.!?]+[.!?]+/g) || [];
+  if (sentences.length === 0) return 0.5;
+  
+  // Check for basic coherence markers
+  const hasTransitions = /\b(however|therefore|moreover|additionally|furthermore|consequently)\b/i.test(response);
+  const avgSentenceLength = response.split(/\s+/).length / sentences.length;
+  
+  let score = 0.7; // Base score
+  if (hasTransitions) score += 0.15;
+  if (avgSentenceLength > 10 && avgSentenceLength < 30) score += 0.15; // Good length
+  
+  return Math.max(0, Math.min(1, score));
+}
+
+// Simple relevance score based on keyword overlap
+function computeRelevanceScore(prompt: string, response: string): number {
+  const extractKeywords = (text: string) => {
+    return new Set(text.toLowerCase().match(/\b[a-z]{4,}\b/g) || []);
+  };
+  
+  const promptKeywords = extractKeywords(prompt);
+  const responseKeywords = extractKeywords(response);
+  
+  if (promptKeywords.size === 0) return 0.5;
+  
+  let overlap = 0;
+  for (const keyword of promptKeywords) {
+    if (responseKeywords.has(keyword)) overlap++;
+  }
+  
+  return Math.min(1, overlap / promptKeywords.size + 0.3);
+}
+
 export const storeInference = internalMutation({
   args: {
     prompt: v.string(),
-    response: v.string(),
+    response: v.optional(v.string()),
+    systemPrompt: v.optional(v.string()),
     inputTokens: v.number(),
     outputTokens: v.number(),
     latencyMs: v.number(),
+    firstTokenLatencyMs: v.optional(v.number()),
     model: v.string(),
-    isAdversarial: v.boolean(),
+    provider: v.string(),
+    endpoint: v.string(),
     apiConfigId: v.id("api_configs"),
+    temperature: v.optional(v.number()),
+    maxTokens: v.optional(v.number()),
+    finishReason: v.optional(v.string()),
+    isAdversarial: v.optional(v.boolean()),
+    testType: v.optional(v.string()),
     success: v.optional(v.boolean()),
     errorMessage: v.optional(v.string()),
+    errorType: v.optional(v.string()),
+    statusCode: v.optional(v.number()),
+    batchId: v.optional(v.string()),
+    userId: v.optional(v.string()),
+    sessionId: v.optional(v.string()),
+    tags: v.optional(v.array(v.string())),
   },
   handler: async (ctx, args) => {
     const timestamp = Date.now();
     const success = args.success ?? true;
+    const isAdversarial = args.isAdversarial ?? false;
     
-    // Only compute metrics if the inference was successful
-    let semanticDrift = 0;
-    let hallucinationProb = 0;
-    let efficiencyRatio = 0;
-    let wasteIndex = 0;
+    // Get API config for pricing info
+    const apiConfig = await ctx.db.get(args.apiConfigId);
+    if (!apiConfig) {
+      throw new Error(`API config not found: ${args.apiConfigId}`);
+    }
+
+    // Calculate costs
+    const inputCostUsd = apiConfig.inputPricePer1M 
+      ? (args.inputTokens / 1_000_000) * apiConfig.inputPricePer1M 
+      : 0;
+    const outputCostUsd = apiConfig.outputPricePer1M 
+      ? (args.outputTokens / 1_000_000) * apiConfig.outputPricePer1M 
+      : 0;
+    const costUsd = inputCostUsd + outputCostUsd;
+
+    // Calculate basic metrics
+    const totalTokens = args.inputTokens + args.outputTokens;
+    const tokensPerSecond = args.latencyMs > 0 
+      ? (args.outputTokens / (args.latencyMs / 1000)) 
+      : 0;
+    const outputRatio = totalTokens > 0 
+      ? args.outputTokens / totalTokens 
+      : 0;
+
+    // Only compute quality metrics if the inference was successful and has a response
+    let semanticDrift = undefined;
+    let hallucinationScore = undefined;
+    let coherenceScore = undefined;
+    let relevanceScore = undefined;
+    let efficiencyRatio = undefined;
+    let wasteIndex = undefined;
 
     if (success && args.response) {
       semanticDrift = computeSemanticDrift(args.prompt, args.response);
-      hallucinationProb = computeHallucinationProb(args.response, args.latencyMs);
+      hallucinationScore = computeHallucinationProb(args.response, args.latencyMs);
+      coherenceScore = computeCoherenceScore(args.response);
+      relevanceScore = computeRelevanceScore(args.prompt, args.response);
       efficiencyRatio = args.inputTokens > 0 ? args.outputTokens / args.inputTokens : 0;
       wasteIndex = Math.min(1, semanticDrift * efficiencyRatio * 0.8);
     }
 
-    // Store metrics
+    // Store aggregated metrics
     await ctx.db.insert("metrics", {
       timestamp,
-      efficiencyRatio,
-      semanticDrift,
-      wasteIndex,
-      hallucinationProb,
-      targetModel: args.model,
       inputTokens: args.inputTokens,
       outputTokens: args.outputTokens,
+      totalTokens,
       latencyMs: args.latencyMs,
+      tokensPerSecond,
+      costUsd,
+      inputCostUsd,
+      outputCostUsd,
+      efficiencyRatio,
+      outputRatio,
+      semanticDrift,
+      wasteIndex,
+      hallucinationScore,
+      coherenceScore,
+      relevanceScore,
+      targetModel: args.model,
+      provider: args.provider,
       apiConfigId: args.apiConfigId,
+      endpoint: args.endpoint,
       success,
       errorMessage: args.errorMessage,
+      errorType: args.errorType,
+      temperature: args.temperature,
+      maxTokens: args.maxTokens,
+      systemPrompt: args.systemPrompt,
+      batchId: args.batchId,
     });
 
-    // Store raw inference (even if failed)
+    // Store raw inference data
     await ctx.db.insert("raw_inferences", {
       timestamp,
       prompt: args.prompt,
-      response: success ? args.response : (args.errorMessage || "ERROR"),
+      response: args.response,
+      systemPrompt: args.systemPrompt,
+      temperature: args.temperature,
+      maxTokens: args.maxTokens,
+      finishReason: args.finishReason,
       inputTokens: args.inputTokens,
       outputTokens: args.outputTokens,
       model: args.model,
-      isAdversarial: args.isAdversarial,
+      provider: args.provider,
       apiConfigId: args.apiConfigId,
+      endpoint: args.endpoint,
+      latencyMs: args.latencyMs,
+      firstTokenLatencyMs: args.firstTokenLatencyMs,
+      success,
+      errorMessage: args.errorMessage,
+      errorType: args.errorType,
+      statusCode: args.statusCode,
+      isAdversarial,
+      testType: args.testType,
+      batchId: args.batchId,
+      userId: args.userId,
+      sessionId: args.sessionId,
+      tags: args.tags,
     });
 
-    // Generate log
-    let level: "INFO" | "ALERT" | "DEBUG" = "INFO";
+    // Generate appropriate logs
+    let level: "INFO" | "ALERT" | "DEBUG" | "WARN" | "ERROR" = "INFO";
     let message = "";
+    let category = "api";
 
     if (!success) {
-      level = "ALERT";
+      level = "ERROR";
+      category = "performance";
       message = `Inference failed for ${args.model}: ${args.errorMessage || "Unknown error"}`;
-    } else if (semanticDrift > 0.6) {
+    } else if (semanticDrift !== undefined && semanticDrift > 0.6) {
       level = "ALERT";
+      category = "performance";
       message = `High semantic drift (${args.model}): ${(semanticDrift * 100).toFixed(1)}%`;
-    } else if (hallucinationProb > 0.15) {
-      level = "ALERT";
-      message = `Elevated hallucination risk (${args.model}): ${(hallucinationProb * 100).toFixed(1)}%`;
-    } else if (args.isAdversarial) {
+    } else if (hallucinationScore !== undefined && hallucinationScore > 0.15) {
+      level = "WARN";
+      category = "performance";
+      message = `Elevated hallucination risk (${args.model}): ${(hallucinationScore * 100).toFixed(1)}%`;
+    } else if (isAdversarial) {
       level = "DEBUG";
-      message = `Adversarial probe processed (${args.model}): drift=${(semanticDrift * 100).toFixed(1)}%`;
+      category = "security";
+      message = `Adversarial probe processed (${args.model}): drift=${semanticDrift !== undefined ? (semanticDrift * 100).toFixed(1) : 'N/A'}%`;
     } else {
-      message = `Inference: ${args.model} ${args.inputTokens}→${args.outputTokens} tokens (${args.latencyMs}ms)`;
+      level = "INFO";
+      message = `Inference: ${args.model} ${args.inputTokens}→${args.outputTokens} tokens (${args.latencyMs}ms, $${costUsd.toFixed(6)})`;
     }
 
-    await ctx.db.insert("logs", { timestamp, level, message });
+    await ctx.db.insert("logs", {
+      timestamp,
+      level,
+      message,
+      category,
+      apiConfigId: args.apiConfigId,
+      source: "storeInference",
+      metadata: {
+        batchId: args.batchId,
+        success,
+        model: args.model,
+        provider: args.provider,
+      },
+    });
 
-    return { semanticDrift, hallucinationProb, wasteIndex, efficiencyRatio, success };
+    return {
+      semanticDrift,
+      hallucinationScore: hallucinationScore,
+      coherenceScore,
+      relevanceScore,
+      wasteIndex,
+      efficiencyRatio,
+      success,
+      costUsd,
+      tokensPerSecond,
+    };
   },
 });
 
 export const addLog = internalMutation({
   args: {
-    level: v.union(v.literal("INFO"), v.literal("ALERT"), v.literal("DEBUG")),
+    level: v.union(
+      v.literal("INFO"),
+      v.literal("ALERT"),
+      v.literal("DEBUG"),
+      v.literal("WARN"),
+      v.literal("ERROR")
+    ),
     message: v.string(),
+    category: v.optional(v.string()),
+    apiConfigId: v.optional(v.id("api_configs")),
+    source: v.optional(v.string()),
+    metadata: v.optional(v.any()),
   },
   handler: async (ctx, args) => {
     await ctx.db.insert("logs", {
       timestamp: Date.now(),
       level: args.level,
       message: args.message,
+      category: args.category,
+      apiConfigId: args.apiConfigId,
+      source: args.source,
+      metadata: args.metadata,
     });
   },
 });
@@ -153,34 +306,44 @@ export const addLog = internalMutation({
 export const createApiConfig = internalMutation({
   args: {
     name: v.string(),
-    provider: v.union(
-      v.literal("openai"),
-      v.literal("anthropic"),
-      v.literal("google"),
-      v.literal("groq"),
-      v.literal("deepseek"),
-      v.literal("openrouter")
-    ),
-    baseUrl: v.optional(v.string()),
-    model: v.string(),
-    isActive: v.boolean(),
+    endpoint: v.string(),
+    apiKey: v.string(),
+    modelName: v.string(),
+    provider: v.string(),
+    isActive: v.optional(v.boolean()),
+    inputPricePer1M: v.optional(v.number()),
+    outputPricePer1M: v.optional(v.number()),
+    defaultTemperature: v.optional(v.number()),
+    defaultMaxTokens: v.optional(v.number()),
+    description: v.optional(v.string()),
+    tags: v.optional(v.array(v.string())),
   },
   handler: async (ctx, args) => {
     const configId = await ctx.db.insert("api_configs", {
       name: args.name,
+      endpoint: args.endpoint,
+      apiKey: args.apiKey,
+      modelName: args.modelName,
       provider: args.provider,
-      baseUrl: args.baseUrl,
-      model: args.model,
-      isActive: args.isActive,
+      isActive: args.isActive ?? true,
       createdAt: Date.now(),
+      inputPricePer1M: args.inputPricePer1M,
+      outputPricePer1M: args.outputPricePer1M,
+      defaultTemperature: args.defaultTemperature,
+      defaultMaxTokens: args.defaultMaxTokens,
+      description: args.description,
+      tags: args.tags,
     });
-    
+
     await ctx.db.insert("logs", {
       timestamp: Date.now(),
       level: "INFO",
-      message: `API config created: ${args.name} (${args.provider}/${args.model})`,
+      message: `API config created: ${args.name} (${args.provider}/${args.modelName})`,
+      category: "api",
+      apiConfigId: configId,
+      source: "createApiConfig",
     });
-    
+
     return configId;
   },
 });
@@ -188,18 +351,30 @@ export const createApiConfig = internalMutation({
 export const updateApiConfig = internalMutation({
   args: {
     id: v.id("api_configs"),
+    name: v.optional(v.string()),
+    endpoint: v.optional(v.string()),
+    apiKey: v.optional(v.string()),
+    modelName: v.optional(v.string()),
     isActive: v.optional(v.boolean()),
-    model: v.optional(v.string()),
-    baseUrl: v.optional(v.string()),
+    inputPricePer1M: v.optional(v.number()),
+    outputPricePer1M: v.optional(v.number()),
+    defaultTemperature: v.optional(v.number()),
+    defaultMaxTokens: v.optional(v.number()),
+    description: v.optional(v.string()),
+    tags: v.optional(v.array(v.string())),
   },
   handler: async (ctx, args) => {
     const { id, ...updates } = args;
     await ctx.db.patch(id, updates);
-    
+
     await ctx.db.insert("logs", {
       timestamp: Date.now(),
       level: "INFO",
       message: `API config updated: ${id}`,
+      category: "api",
+      apiConfigId: id,
+      source: "updateApiConfig",
+      metadata: { updates: Object.keys(updates) },
     });
   },
 });
@@ -209,12 +384,17 @@ export const deleteApiConfig = internalMutation({
     id: v.id("api_configs"),
   },
   handler: async (ctx, args) => {
-    await ctx.db.delete(args.id);
+    const config = await ctx.db.get(args.id);
     
+    await ctx.db.delete(args.id);
+
     await ctx.db.insert("logs", {
       timestamp: Date.now(),
-      level: "INFO",
-      message: `API config deleted: ${args.id}`,
+      level: "WARN",
+      message: `API config deleted: ${config?.name || args.id}`,
+      category: "api",
+      source: "deleteApiConfig",
+      metadata: { configId: args.id },
     });
   },
 });
