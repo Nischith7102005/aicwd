@@ -27,6 +27,12 @@ export const runInference = action({
       return { success: false, error: result.error };
     }
 
+    // Call the uncensored AI to analyze the response
+    const analysis = await ctx.runAction(internal.llm.callUncensoredAI, {
+      prompt: args.prompt,
+      response: result.content,
+    });
+
     // Store and compute metrics
     const metrics = await ctx.runMutation(internal.metrics.storeInference, {
       prompt: args.prompt,
@@ -36,6 +42,8 @@ export const runInference = action({
       latencyMs: result.latencyMs,
       model: args.model,
       isAdversarial: args.isAdversarial || false,
+      censorshipScore: analysis.censorshipScore,
+      biasScore: analysis.biasScore,
     });
 
     return { success: true, response: result.content, metrics };
