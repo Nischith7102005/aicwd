@@ -46,6 +46,9 @@ function computeHallucinationProb(response: string, latencyMs: number): number {
   // Very fast = likely cached/memorized
   if (latencyMs < 300) prob *= 0.5;
 
+  // Very slow might indicate uncertainty or complex generation
+  if (latencyMs > 5000) prob += 0.02;
+
   return Math.max(0.01, Math.min(0.5, prob));
 }
 
@@ -58,13 +61,26 @@ export const storeInference = internalMutation({
     latencyMs: v.number(),
     model: v.string(),
     isAdversarial: v.boolean(),
+    apiConfigId: v.id("api_configs"),
+    success: v.optional(v.boolean()),
+    errorMessage: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const timestamp = Date.now();
-    const semanticDrift = computeSemanticDrift(args.prompt, args.response);
-    const hallucinationProb = computeHallucinationProb(args.response, args.latencyMs);
-    const efficiencyRatio = args.inputTokens > 0 ? args.outputTokens / args.inputTokens : 0;
-    const wasteIndex = Math.min(1, semanticDrift * efficiencyRatio * 0.8);
+    const success = args.success ?? true;
+    
+    // Only compute metrics if the inference was successful
+    let semanticDrift = 0;
+    let hallucinationProb = 0;
+    let efficiencyRatio = 0;
+    let wasteIndex = 0;
+
+    if (success && args.response) {
+      semanticDrift = computeSemanticDrift(args.prompt, args.response);
+      hallucinationProb = computeHallucinationProb(args.response, args.latencyMs);
+      efficiencyRatio = args.inputTokens > 0 ? args.outputTokens / args.inputTokens : 0;
+      wasteIndex = Math.min(1, semanticDrift * efficiencyRatio * 0.8);
+    }
 
     // Store metrics
     await ctx.db.insert("metrics", {
@@ -77,37 +93,46 @@ export const storeInference = internalMutation({
       inputTokens: args.inputTokens,
       outputTokens: args.outputTokens,
       latencyMs: args.latencyMs,
+      apiConfigId: args.apiConfigId,
+      success,
+      errorMessage: args.errorMessage,
     });
 
-    // Store raw inference
+    // Store raw inference (even if failed)
     await ctx.db.insert("raw_inferences", {
       timestamp,
       prompt: args.prompt,
-      response: args.response,
+      response: success ? args.response : (args.errorMessage || "ERROR"),
       inputTokens: args.inputTokens,
       outputTokens: args.outputTokens,
       model: args.model,
       isAdversarial: args.isAdversarial,
+      apiConfigId: args.apiConfigId,
     });
 
     // Generate log
     let level: "INFO" | "ALERT" | "DEBUG" = "INFO";
-    let message = `Inference: ${args.inputTokens}→${args.outputTokens} tokens (${args.latencyMs}ms)`;
+    let message = "";
 
-    if (semanticDrift > 0.6) {
+    if (!success) {
       level = "ALERT";
-      message = `High semantic drift: ${(semanticDrift * 100).toFixed(1)}%`;
-    } else if (hallucinationProb > 0.1) {
+      message = `Inference failed for ${args.model}: ${args.errorMessage || "Unknown error"}`;
+    } else if (semanticDrift > 0.6) {
       level = "ALERT";
-      message = `Elevated hallucination risk: ${(hallucinationProb * 100).toFixed(1)}%`;
+      message = `High semantic drift (${args.model}): ${(semanticDrift * 100).toFixed(1)}%`;
+    } else if (hallucinationProb > 0.15) {
+      level = "ALERT";
+      message = `Elevated hallucination risk (${args.model}): ${(hallucinationProb * 100).toFixed(1)}%`;
     } else if (args.isAdversarial) {
       level = "DEBUG";
-      message = `Adversarial probe processed: drift=${(semanticDrift * 100).toFixed(1)}%`;
+      message = `Adversarial probe processed (${args.model}): drift=${(semanticDrift * 100).toFixed(1)}%`;
+    } else {
+      message = `Inference: ${args.model} ${args.inputTokens}→${args.outputTokens} tokens (${args.latencyMs}ms)`;
     }
 
     await ctx.db.insert("logs", { timestamp, level, message });
 
-    return { semanticDrift, hallucinationProb, wasteIndex, efficiencyRatio };
+    return { semanticDrift, hallucinationProb, wasteIndex, efficiencyRatio, success };
   },
 });
 
@@ -121,6 +146,75 @@ export const addLog = internalMutation({
       timestamp: Date.now(),
       level: args.level,
       message: args.message,
+    });
+  },
+});
+
+export const createApiConfig = internalMutation({
+  args: {
+    name: v.string(),
+    provider: v.union(
+      v.literal("openai"),
+      v.literal("anthropic"),
+      v.literal("google"),
+      v.literal("groq"),
+      v.literal("deepseek"),
+      v.literal("openrouter")
+    ),
+    baseUrl: v.optional(v.string()),
+    model: v.string(),
+    isActive: v.boolean(),
+  },
+  handler: async (ctx, args) => {
+    const configId = await ctx.db.insert("api_configs", {
+      name: args.name,
+      provider: args.provider,
+      baseUrl: args.baseUrl,
+      model: args.model,
+      isActive: args.isActive,
+      createdAt: Date.now(),
+    });
+    
+    await ctx.db.insert("logs", {
+      timestamp: Date.now(),
+      level: "INFO",
+      message: `API config created: ${args.name} (${args.provider}/${args.model})`,
+    });
+    
+    return configId;
+  },
+});
+
+export const updateApiConfig = internalMutation({
+  args: {
+    id: v.id("api_configs"),
+    isActive: v.optional(v.boolean()),
+    model: v.optional(v.string()),
+    baseUrl: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const { id, ...updates } = args;
+    await ctx.db.patch(id, updates);
+    
+    await ctx.db.insert("logs", {
+      timestamp: Date.now(),
+      level: "INFO",
+      message: `API config updated: ${id}`,
+    });
+  },
+});
+
+export const deleteApiConfig = internalMutation({
+  args: {
+    id: v.id("api_configs"),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.delete(args.id);
+    
+    await ctx.db.insert("logs", {
+      timestamp: Date.now(),
+      level: "INFO",
+      message: `API config deleted: ${args.id}`,
     });
   },
 });
