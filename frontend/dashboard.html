@@ -357,11 +357,11 @@
     <script type="module">
     import { ConvexClient } from "https://esm.sh/convex@1.17.4/browser";
 
-    // Convex Configuration
+    // ── Convex Configuration ─────────────────────────────────────────
     const CONVEX_URL = "https://neat-chameleon-935.convex.cloud";
     const client = new ConvexClient(CONVEX_URL);
 
-    // Load saved config
+    // ── Load saved config ────────────────────────────────────────────
     const configRaw = localStorage.getItem("target_config");
     if (!configRaw) {
         window.location.href = "key.html";
@@ -369,10 +369,13 @@
     const config = JSON.parse(configRaw);
 
     // Display target info
-    const maskedKey = config.apiKey ? `${config.apiKey.slice(0, 4)}...${config.apiKey.slice(-4)}` : "UNKNOWN";
-    document.getElementById("targetDisplay").innerText = `TARGET: ${(config.modelName || config.model || "UNKNOWN").toUpperCase()} [KEY: ${maskedKey}]`;
+    const maskedKey = config.apiKey
+        ? `${config.apiKey.slice(0, 4)}...${config.apiKey.slice(-4)}`
+        : "UNKNOWN";
+    document.getElementById("targetDisplay").innerText =
+        `TARGET: ${(config.modelName || config.model || "UNKNOWN").toUpperCase()} [KEY: ${maskedKey}]`;
 
-    // WebGL Background (keep existing code)
+    // ── WebGL Dither Background ──────────────────────────────────────
     const canvas = document.getElementById("dither-canvas");
     const gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
 
@@ -419,8 +422,19 @@
         }
     `;
 
-    function createShader(gl, type, source) { const shader = gl.createShader(type); gl.shaderSource(shader, source); gl.compileShader(shader); return shader; }
-    function createProgram(gl, vs, fs) { const program = gl.createProgram(); gl.attachShader(program, vs); gl.attachShader(program, fs); gl.linkProgram(program); return program; }
+    function createShader(gl, type, source) {
+        const shader = gl.createShader(type);
+        gl.shaderSource(shader, source);
+        gl.compileShader(shader);
+        return shader;
+    }
+    function createProgram(gl, vs, fs) {
+        const program = gl.createProgram();
+        gl.attachShader(program, vs);
+        gl.attachShader(program, fs);
+        gl.linkProgram(program);
+        return program;
+    }
 
     const vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexShaderSource);
     const fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource);
@@ -438,30 +452,75 @@
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1,1,-1,-1,1,-1,1,1,-1,1,1]), gl.STATIC_DRAW);
 
     let mouseX = 0, mouseY = 0;
-    document.addEventListener("mousemove", (e) => { mouseX = e.clientX * devicePixelRatio; mouseY = e.clientY * devicePixelRatio; });
+    document.addEventListener("mousemove", (e) => {
+        mouseX = e.clientX * devicePixelRatio;
+        mouseY = e.clientY * devicePixelRatio;
+    });
 
-    function resize() { const dpr = devicePixelRatio || 1; canvas.width = innerWidth * dpr; canvas.height = innerHeight * dpr; canvas.style.width = innerWidth + "px"; canvas.style.height = innerHeight + "px"; gl.viewport(0, 0, canvas.width, canvas.height); }
-    addEventListener("resize", resize); resize();
+    function resize() {
+        const dpr = devicePixelRatio || 1;
+        canvas.width = innerWidth * dpr;
+        canvas.height = innerHeight * dpr;
+        canvas.style.width = innerWidth + "px";
+        canvas.style.height = innerHeight + "px";
+        gl.viewport(0, 0, canvas.width, canvas.height);
+    }
+    addEventListener("resize", resize);
+    resize();
 
     function renderBg(time) {
-        gl.useProgram(program); gl.uniform2f(resolutionLocation, canvas.width, canvas.height); gl.uniform1f(timeLocation, time * 0.001);
-        gl.uniform2f(mouseLocation, mouseX, canvas.height - mouseY); gl.uniform1f(mouseRadiusLocation, 0.3); gl.uniform1i(enableMouseLocation, 1);
-        gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer); gl.enableVertexAttribArray(positionLocation); gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
-        gl.drawArrays(gl.TRIANGLES, 0, 6); requestAnimationFrame(renderBg);
+        gl.useProgram(program);
+        gl.uniform2f(resolutionLocation, canvas.width, canvas.height);
+        gl.uniform1f(timeLocation, time * 0.001);
+        gl.uniform2f(mouseLocation, mouseX, canvas.height - mouseY);
+        gl.uniform1f(mouseRadiusLocation, 0.3);
+        gl.uniform1i(enableMouseLocation, 1);
+        gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+        gl.enableVertexAttribArray(positionLocation);
+        gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
+        gl.drawArrays(gl.TRIANGLES, 0, 6);
+        requestAnimationFrame(renderBg);
     }
     requestAnimationFrame(renderBg);
 
-    // Charts
+    // ── Charts ───────────────────────────────────────────────────────
     const commonOptions = {
-        responsive: true, maintainAspectRatio: false, animation: { duration: 300 },
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: { duration: 300 },
         plugins: { legend: { display: false } },
-        scales: { x: { display: false }, y: { grid: { color: "rgba(168,85,247,0.1)" }, ticks: { color: "#9999aa" } } }
+        scales: {
+            x: { display: false },
+            y: { grid: { color: "rgba(168,85,247,0.1)" }, ticks: { color: "#9999aa" } }
+        }
     };
 
     const tokenChart = new Chart(document.getElementById("tokenChart"), {
         type: "scatter",
-        data: { datasets: [{ data: [], backgroundColor: "#c4b5fd", borderColor: "#a855f7" }] },
-        options: commonOptions
+        data: {
+            datasets: [{
+                data: [],
+                backgroundColor: "#c4b5fd",
+                borderColor: "#a855f7",
+                pointRadius: 4,
+                pointHoverRadius: 6,
+            }]
+        },
+        options: {
+            ...commonOptions,
+            scales: {
+                x: {
+                    grid: { color: "rgba(168,85,247,0.1)" },
+                    ticks: { color: "#9999aa" },
+                    title: { display: true, text: "Input Tokens", color: "#9999aa", font: { size: 10 } }
+                },
+                y: {
+                    grid: { color: "rgba(168,85,247,0.1)" },
+                    ticks: { color: "#9999aa" },
+                    title: { display: true, text: "Output Tokens", color: "#9999aa", font: { size: 10 } }
+                }
+            }
+        }
     });
 
     const driftChart = new Chart(document.getElementById("driftChart"), {
@@ -469,14 +528,30 @@
         data: {
             labels: [],
             datasets: [
-                { label: "Drift", data: [], borderColor: "#a855f7", backgroundColor: "rgba(168,85,247,0.1)", tension: 0.4, fill: true },
-                { label: "Baseline", data: [], borderColor: "#3a3d4a", borderDash: [5, 5], borderWidth: 1 }
+                {
+                    label: "Drift",
+                    data: [],
+                    borderColor: "#a855f7",
+                    backgroundColor: "rgba(168,85,247,0.1)",
+                    tension: 0.4,
+                    fill: true,
+                    pointRadius: 3,
+                    borderWidth: 2,
+                },
+                {
+                    label: "Baseline",
+                    data: [],
+                    borderColor: "#3a3d4a",
+                    borderDash: [5, 5],
+                    borderWidth: 1,
+                    pointRadius: 0,
+                }
             ]
         },
         options: commonOptions
     });
 
-    // Real-Time Subscriptions
+    // ── Real-Time Subscriptions ──────────────────────────────────────
     client.onUpdate("queries:getMetricsHistory", { limit: 30 }, (metrics) => {
         if (!metrics || metrics.length === 0) return;
 
@@ -487,44 +562,63 @@
         driftChart.update();
 
         // Update token scatter
-        tokenChart.data.datasets[0].data = metrics.map((m) => ({ x: m.inputTokens, y: m.outputTokens }));
+        tokenChart.data.datasets[0].data = metrics.map((m) => ({
+            x: m.inputTokens,
+            y: m.outputTokens
+        }));
         tokenChart.update();
 
-        // Update KPIs from latest
+        // Latest record for KPIs
         const latest = metrics[metrics.length - 1];
-        document.getElementById("tokenValue").innerText = latest.efficiencyRatio.toFixed(2);
 
+        // Token Efficiency
+        document.getElementById("tokenValue").innerText =
+            latest.efficiencyRatio.toFixed(2);
+
+        // Cognitive Waste
         const wastePct = Math.round(latest.wasteIndex * 100);
         document.getElementById("wasteValue").innerText = wastePct + "%";
-        document.getElementById("wasteCircle").style.transform = `rotate(${45 + wastePct * 1.8}deg)`;
+        document.getElementById("wasteCircle").style.transform =
+            `rotate(${45 + wastePct * 1.8}deg)`;
 
         const statusEl = document.getElementById("wasteStatus");
         const wasteCircle = document.getElementById("wasteCircle");
         if (wastePct > 70) {
-            statusEl.innerText = "CRITICAL"; statusEl.className = "gauge-status status-critical";
+            statusEl.innerText = "CRITICAL";
+            statusEl.className = "gauge-status status-critical";
             wasteCircle.style.borderColor = "#ff4466";
         } else if (wastePct > 40) {
-            statusEl.innerText = "SUB-OPTIMAL"; statusEl.className = "gauge-status status-warning";
+            statusEl.innerText = "SUB-OPTIMAL";
+            statusEl.className = "gauge-status status-warning";
             wasteCircle.style.borderColor = "#facc15";
         } else {
-            statusEl.innerText = "OPTIMAL"; statusEl.className = "gauge-status status-optimal";
+            statusEl.innerText = "OPTIMAL";
+            statusEl.className = "gauge-status status-optimal";
             wasteCircle.style.borderColor = "#4ade80";
         }
         wasteCircle.style.borderLeftColor = "transparent";
         wasteCircle.style.borderBottomColor = "transparent";
 
-        document.getElementById("hallucinationVal").innerText = latest.hallucinationProb.toFixed(3);
-        document.getElementById("hallucinationBar").style.width = (latest.hallucinationProb * 100) + "%";
+        // Hallucination Probability (safe access)
+        const halluc = latest.hallucinationProb ?? 0;
+        document.getElementById("hallucinationVal").innerText = halluc.toFixed(3);
+        document.getElementById("hallucinationBar").style.width =
+            (halluc * 100) + "%";
 
-        // Update uncensored AI metrics
-        document.getElementById("censorshipVal").innerText = latest.censorshipScore.toFixed(2);
-        document.getElementById("censorshipBar").style.width = (latest.censorshipScore * 100) + "%";
+        // Censorship Score (safe access)
+        const censor = latest.censorshipScore ?? 0;
+        document.getElementById("censorshipVal").innerText = censor.toFixed(2);
+        document.getElementById("censorshipBar").style.width =
+            (censor * 100) + "%";
 
-        document.getElementById("biasVal").innerText = latest.biasScore.toFixed(2);
-        document.getElementById("biasBar").style.width = (latest.biasScore * 100) + "%";
+        // Bias Score (safe access)
+        const bias = latest.biasScore ?? 0;
+        document.getElementById("biasVal").innerText = bias.toFixed(2);
+        document.getElementById("biasBar").style.width =
+            (bias * 100) + "%";
     });
 
-    // Subscribe to logs
+    // ── Subscribe to logs ────────────────────────────────────────────
     client.onUpdate("queries:getLogs", { limit: 15 }, (logs) => {
         if (!logs) return;
         const logConsole = document.getElementById("logConsole");
@@ -532,18 +626,25 @@
 
         for (const log of logs) {
             const div = document.createElement("div");
-            const cls = log.level === "ALERT" ? "log-alert" : log.level === "INFO" ? "log-info" : "log-default";
+            const cls =
+                log.level === "ALERT" ? "log-alert" :
+                log.level === "INFO" ? "log-info" :
+                "log-default";
             div.className = `log-entry ${cls}`;
             div.innerText = `[${new Date(log.timestamp).toLocaleTimeString()}] ${log.message}`;
             logConsole.appendChild(div);
         }
+
+        // Auto-scroll to bottom
+        logConsole.scrollTop = logConsole.scrollHeight;
     });
 
-    // Actions
+    // ── Stress Test Action ───────────────────────────────────────────
     window.triggerRedTeam = async () => {
         const btn = document.querySelector(".btn-danger");
         btn.innerText = "RUNNING...";
         btn.disabled = true;
+        btn.style.opacity = "0.6";
 
         try {
             await client.action("agent:runStressTest", {
@@ -558,12 +659,14 @@
 
         btn.innerText = "INITIATE_STRESS_TEST";
         btn.disabled = false;
+        btn.style.opacity = "1";
     };
 
-    // Time update
+    // ── Clock ────────────────────────────────────────────────────────
     setInterval(() => {
-        document.getElementById("current-time").textContent = new Date().toTimeString().split(" ")[0];
+        document.getElementById("current-time").textContent =
+            new Date().toTimeString().split(" ")[0];
     }, 1000);
-</script>
+    </script>
 </body>
 </html>
