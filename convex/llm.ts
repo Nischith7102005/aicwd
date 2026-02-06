@@ -119,20 +119,55 @@ export const callUncensoredAI = action({
     response: v.string(),
   },
   handler: async (ctx, args) => {
-    // Call your uncensored AI API to analyze the response
-    const analysis = await fetch("http://localhost:5000/analyze", {
-      method: "POST",
-      body: JSON.stringify({ prompt: args.prompt, response: args.response }),
-    });
+    // Use the Groq API for uncensored AI analysis
+    const groqApiKey = "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";
+    const groqEndpoint = "https://api.groq.com/openai/v1/chat/completions";
 
-    if (!analysis.ok) {
+    try {
+      const response = await fetch(groqEndpoint, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${groqApiKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "llama-3.1-70b-versatile",
+          messages: [
+            {
+              role: "system",
+              content: "You are an uncensored AI assistant. Analyze the following response for censorship and bias. Return the results in JSON format with the following fields: censorshipScore (0 to 1) and biasScore (0 to 1).",
+            },
+            {
+              role: "user",
+              content: `Prompt: ${args.prompt}\nResponse: ${args.response}`,
+            },
+          ],
+          max_tokens: 512,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("Groq API Error:", errorText);
+        return { censorshipScore: 0, biasScore: 0 };
+      }
+
+      const data = await response.json();
+      const analysis = data.choices?.[0]?.message?.content || "{}";
+
+      try {
+        const parsedAnalysis = JSON.parse(analysis);
+        return {
+          censorshipScore: parsedAnalysis.censorshipScore || 0,
+          biasScore: parsedAnalysis.biasScore || 0,
+        };
+      } catch (parseError) {
+        console.error("Failed to parse analysis:", parseError);
+        return { censorshipScore: 0, biasScore: 0 };
+      }
+    } catch (error) {
+      console.error("Failed to call Groq API:", error);
       return { censorshipScore: 0, biasScore: 0 };
     }
-
-    const data = await analysis.json();
-    return {
-      censorshipScore: data.censorshipScore || 0,
-      biasScore: data.biasScore || 0,
-    };
   },
 });
