@@ -247,6 +247,53 @@
         }
         .latency-stat-label { font-size: 0.6rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
 
+        /* API Info card */
+        .api-info { font-size: 0.75rem; }
+        .api-info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .api-info-row:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        .api-info-label {
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .api-info-value {
+            color: var(--accent-lavender);
+            font-family: 'VT323', monospace;
+            font-size: 0.85rem;
+        }
+
+        /* Prompt stats */
+        .prompt-stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 1rem 0;
+        }
+        .prompt-stat {
+            text-align: center;
+        }
+        .prompt-stat-value {
+            font-family: 'VT323', monospace;
+            font-size: 2rem;
+            color: var(--accent-purple);
+            display: block;
+        }
+        .prompt-stat-label {
+            font-size: 0.6rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
         /* Status Bar */
         .status-bar {
             position: fixed; bottom: 0; left: 0; right: 0;
@@ -329,6 +376,35 @@
                 </div>
             </div>
 
+            <!-- API Info Card -->
+            <div class="card">
+                <div class="corner corner-tl"></div><div class="corner corner-tr"></div>
+                <div class="corner corner-bl"></div><div class="corner corner-br"></div>
+                <h3 class="card-title">API Configuration</h3>
+                <div class="api-info" id="apiInfo">
+                    <div class="api-info-row">
+                        <span class="api-info-label">Input Type:</span>
+                        <span class="api-info-value" id="apiInputType">—</span>
+                    </div>
+                    <div class="api-info-row">
+                        <span class="api-info-label">Provider:</span>
+                        <span class="api-info-value" id="apiProviderDetail">—</span>
+                    </div>
+                    <div class="api-info-row">
+                        <span class="api-info-label">Model:</span>
+                        <span class="api-info-value" id="apiModelDetail">—</span>
+                    </div>
+                    <div class="api-info-row">
+                        <span class="api-info-label">API Calls:</span>
+                        <span class="api-info-value" id="apiCallsCount">—</span>
+                    </div>
+                    <div class="api-info-row">
+                        <span class="api-info-label">Success Rate:</span>
+                        <span class="api-info-value" id="apiSuccessRate">—</span>
+                    </div>
+                </div>
+            </div>
+
             <!-- Log Stream -->
             <div class="card card-triple">
                 <div class="corner corner-tl"></div><div class="corner corner-tr"></div>
@@ -337,6 +413,24 @@
                 <div class="log-console" id="logConsole">
                     <div class="log-entry log-default">Connecting to telemetry stream...</div>
                 </div>
+            </div>
+
+            <!-- Prompt Modification Card -->
+            <div class="card">
+                <div class="corner corner-tl"></div><div class="corner corner-tr"></div>
+                <div class="corner corner-bl"></div><div class="corner corner-br"></div>
+                <h3 class="card-title">Prompt Modifications</h3>
+                <div class="prompt-stats">
+                    <div class="prompt-stat">
+                        <span class="prompt-stat-value" id="modifiedPromptsCount">0</span>
+                        <span class="prompt-stat-label">AI Modified</span>
+                    </div>
+                    <div class="prompt-stat">
+                        <span class="prompt-stat-value" id="originalPromptsCount">0</span>
+                        <span class="prompt-stat-label">Original</span>
+                    </div>
+                </div>
+                <div class="kpi-label">Dynamic Prompt Generation</div>
             </div>
 
             <!-- Hallucination Probability -->
@@ -463,6 +557,11 @@
     // Status bar
     document.getElementById("status-provider").textContent = `${pInfo.name} Online`;
     document.getElementById("status-model").textContent = config.model || "—";
+
+    // API Info Card
+    document.getElementById("apiInputType").textContent = config.inputType === 'sdkSnippet' ? 'SDK Code' : 'API Key';
+    document.getElementById("apiProviderDetail").textContent = pInfo.name;
+    document.getElementById("apiModelDetail").textContent = config.model || "—";
 
     // ── WebGL Dither Background ──────────────────────────────────────
     const canvas = document.getElementById("dither-canvas");
@@ -683,26 +782,30 @@
     client.onUpdate("queries:getMetricsHistory", { limit: 30 }, (metrics) => {
         if (!metrics || metrics.length === 0) return;
 
-        // Drift chart
-        driftChart.data.labels = metrics.map((_, i) => i);
-        driftChart.data.datasets[0].data = metrics.map((m) => m.semanticDrift);
-        driftChart.data.datasets[1].data = metrics.map(() => 0.1);
+        // Filter metrics for the current API config
+        const apiMetrics = metrics.filter(m => m.provider === provider && m.model === config.model);
+        const allMetrics = metrics;
+
+        // Drift chart - show all metrics but highlight current API
+        driftChart.data.labels = allMetrics.map((_, i) => i);
+        driftChart.data.datasets[0].data = allMetrics.map((m) => m.semanticDrift);
+        driftChart.data.datasets[1].data = allMetrics.map(() => 0.1);
         driftChart.update();
 
         // Token scatter
-        tokenChart.data.datasets[0].data = metrics.map((m) => ({
+        tokenChart.data.datasets[0].data = allMetrics.map((m) => ({
             x: m.inputTokens,
             y: m.outputTokens
         }));
         tokenChart.update();
 
         // Latency chart
-        latencyChart.data.labels = metrics.map((_, i) => i);
-        latencyChart.data.datasets[0].data = metrics.map((m) => m.latencyMs || 0);
+        latencyChart.data.labels = allMetrics.map((_, i) => i);
+        latencyChart.data.datasets[0].data = allMetrics.map((m) => m.latencyMs || 0);
         latencyChart.update();
 
         // Latency stats
-        const latencies = metrics.map(m => m.latencyMs || 0).filter(l => l > 0);
+        const latencies = allMetrics.map(m => m.latencyMs || 0).filter(l => l > 0);
         if (latencies.length > 0) {
             const avg = Math.round(latencies.reduce((a, b) => a + b, 0) / latencies.length);
             const sorted = [...latencies].sort((a, b) => a - b);
@@ -711,8 +814,23 @@
             document.getElementById("latencyP99").textContent = Math.round(p99);
         }
 
+        // API-specific stats
+        const totalApiCalls = allMetrics.length;
+        const successfulApiCalls = allMetrics.filter(m => m.apiCallSuccess !== false).length;
+        const successRate = totalApiCalls > 0 ? Math.round((successfulApiCalls / totalApiCalls) * 100) : 0;
+        
+        document.getElementById("apiCallsCount").textContent = totalApiCalls;
+        document.getElementById("apiSuccessRate").textContent = successRate + "%";
+
+        // Prompt modification stats
+        const modifiedPrompts = allMetrics.filter(m => m.promptModifiedByAI === true).length;
+        const originalPrompts = allMetrics.filter(m => m.promptModifiedByAI !== true).length;
+        
+        document.getElementById("modifiedPromptsCount").textContent = modifiedPrompts;
+        document.getElementById("originalPromptsCount").textContent = originalPrompts;
+
         // Latest record for KPIs
-        const latest = metrics[metrics.length - 1];
+        const latest = allMetrics[allMetrics.length - 1];
 
         // Token Efficiency
         document.getElementById("tokenValue").innerText =
@@ -790,6 +908,7 @@
                 provider: config.provider,
                 model: config.model,
                 count: 5,
+                useDynamicPrompts: true, // Enable AI-modified prompts
             });
         } catch (e) {
             console.error("Stress test error:", e);

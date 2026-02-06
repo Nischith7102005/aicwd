@@ -24,3 +24,26 @@ export const getLogs = query({
       .then((rows) => rows.reverse());
   },
 });
+
+export const getPrompts = query({
+  args: { limit: v.optional(v.number()) },
+  handler: async (ctx, args) => {
+    const limit = args.limit || 20;
+    return await ctx.db
+      .query("prompts")
+      .withIndex("by_timestamp")
+      .order("desc")
+      .take(limit)
+      .then((rows) => rows.reverse());
+  },
+});
+
+export const getLatestPrompt = query({
+  handler: async (ctx) => {
+    return await ctx.db
+      .query("prompts")
+      .withIndex("by_timestamp")
+      .order("desc")
+      .first();
+  },
+});

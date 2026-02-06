@@ -7,6 +7,11 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-typescript.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -225,6 +230,188 @@
         .custom-model-wrapper { display: none; margin-top: 12px; animation: fadeIn 0.3s ease; }
         .custom-model-wrapper.show { display: block; }
 
+        /* ── Input Mode Toggle ── */
+        .input-mode-toggle {
+            display: flex;
+            background: var(--bg-tertiary);
+            border-radius: 10px;
+            padding: 4px;
+            margin-bottom: 24px;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .mode-btn {
+            flex: 1;
+            padding: 10px 16px;
+            font-size: 0.8125rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            background: transparent;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            font-family: inherit;
+        }
+
+        .mode-btn.active {
+            background: var(--accent-primary);
+            color: white;
+            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+        }
+
+        .mode-btn:hover:not(.active) {
+            color: var(--text-secondary);
+        }
+
+        /* ── SDK Code Editor ── */
+        .sdk-editor-container {
+            display: none;
+            position: relative;
+            margin-bottom: 24px;
+        }
+
+        .sdk-editor-container.show {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .sdk-editor-wrapper {
+            position: relative;
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            overflow: hidden;
+            background: var(--bg-tertiary);
+        }
+
+        .sdk-editor-wrapper:focus-within {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        .sdk-editor-wrapper.error {
+            border-color: var(--error);
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+        }
+
+        .sdk-editor-wrapper.success {
+            border-color: var(--success);
+            box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
+        }
+
+        .sdk-textarea {
+            width: 100%;
+            min-height: 200px;
+            padding: 16px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            line-height: 1.6;
+            color: var(--text-primary);
+            background: transparent;
+            border: none;
+            outline: none;
+            resize: vertical;
+            white-space: pre;
+            overflow-wrap: normal;
+            overflow-x: auto;
+        }
+
+        .sdk-textarea::placeholder {
+            color: var(--text-muted);
+        }
+
+        .sdk-preview {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            padding: 16px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            line-height: 1.6;
+            pointer-events: none;
+            overflow: auto;
+            white-space: pre;
+            z-index: 1;
+        }
+
+        .sdk-preview code {
+            background: transparent !important;
+            text-shadow: none !important;
+        }
+
+        .sdk-label {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.8125rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .sdk-lang-selector {
+            font-size: 0.75rem;
+            padding: 4px 10px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-subtle);
+            border-radius: 6px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            outline: none;
+        }
+
+        .sdk-lang-selector:focus {
+            border-color: var(--accent-primary);
+        }
+
+        /* ── Parsed SDK Info ── */
+        .parsed-info {
+            display: none;
+            margin-top: 12px;
+            padding: 12px 16px;
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            border-radius: 8px;
+            font-size: 0.8125rem;
+        }
+
+        .parsed-info.show { display: block; }
+
+        .parsed-info.error {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: rgba(239, 68, 68, 0.2);
+        }
+
+        .parsed-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+        }
+
+        .parsed-row:last-child { margin-bottom: 0; }
+
+        .parsed-label { color: var(--text-muted); }
+
+        .parsed-value { 
+            color: var(--accent-secondary); 
+            font-weight: 500;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .parsed-value.error { color: var(--error); }
+
+        /* ── API Key Input Mode ── */
+        .apikey-input-group {
+            display: none;
+        }
+
+        .apikey-input-group.show {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
         @media (max-width: 520px) {
             .container { padding: 1rem; }
             .api-card { padding: 32px 24px; border-radius: 20px; }
@@ -263,6 +450,16 @@
             </div>
 
             <form id="api-form">
+                <!-- Input Mode Toggle -->
+                <div class="input-mode-toggle">
+                    <button type="button" class="mode-btn active" id="mode-apikey" data-mode="apikey">
+                        Simple API Key
+                    </button>
+                    <button type="button" class="mode-btn" id="mode-sdk" data-mode="sdk">
+                        SDK Code
+                    </button>
+                </div>
+
                 <!-- Provider Selector -->
                 <div class="input-group">
                     <label class="input-label" for="provider-select">Provider</label>
@@ -295,36 +492,79 @@
                     <div class="helper-text" id="provider-helper"></div>
                 </div>
 
-                <!-- API Key -->
-                <div class="input-group">
-                    <label class="input-label" for="api-key">API Key</label>
-                    <div class="input-wrapper">
-                        <input
-                            type="password"
-                            class="input-field"
-                            id="api-key"
-                            placeholder="Enter your API key"
-                            required
-                            autocomplete="off"
-                        >
-                        <button type="button" class="toggle-visibility" id="toggle-key">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                                <circle cx="12" cy="12" r="3"/>
+                <!-- API Key Input Mode -->
+                <div class="apikey-input-group show" id="apikey-input-group">
+                    <div class="input-group">
+                        <label class="input-label" for="api-key">API Key</label>
+                        <div class="input-wrapper">
+                            <input
+                                type="password"
+                                class="input-field"
+                                id="api-key"
+                                placeholder="Enter your API key"
+                                autocomplete="off"
+                            >
+                            <button type="button" class="toggle-visibility" id="toggle-key">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                    <circle cx="12" cy="12" r="3"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="key-indicator" id="key-indicator">
+                            <span class="indicator-icon"></span>
+                            <span class="indicator-text" id="key-type-text">API key detected</span>
+                        </div>
+                        <div class="error-message" id="error-msg">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"/>
+                                <line x1="15" y1="9" x2="9" y2="15"/>
+                                <line x1="9" y1="9" x2="15" y2="15"/>
                             </svg>
-                        </button>
+                            <span id="error-text">Invalid API key format</span>
+                        </div>
                     </div>
-                    <div class="key-indicator" id="key-indicator">
-                        <span class="indicator-icon"></span>
-                        <span class="indicator-text" id="key-type-text">API key detected</span>
+                </div>
+
+                <!-- SDK Code Editor Mode -->
+                <div class="sdk-editor-container" id="sdk-editor-container">
+                    <div class="sdk-label">
+                        <span>SDK Code Snippet</span>
+                        <select class="sdk-lang-selector" id="sdk-lang-selector">
+                            <option value="python">Python</option>
+                            <option value="javascript">JavaScript</option>
+                            <option value="typescript">TypeScript</option>
+                        </select>
                     </div>
-                    <div class="error-message" id="error-msg">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="12" cy="12" r="10"/>
-                            <line x1="15" y1="9" x2="9" y2="15"/>
-                            <line x1="9" y1="9" x2="15" y2="15"/>
-                        </svg>
-                        <span id="error-text">Invalid API key format</span>
+                    <div class="sdk-editor-wrapper" id="sdk-editor-wrapper">
+                        <textarea 
+                            class="sdk-textarea" 
+                            id="sdk-textarea"
+                            placeholder="# Paste your SDK code here
+# Example:
+from openai import OpenAI
+
+client = OpenAI(api_key='your-api-key')
+response = client.chat.completions.create(
+    model='gpt-4',
+    messages=[{'role': 'user', 'content': 'Hello'}]
+)"
+                            spellcheck="false"
+                        ></textarea>
+                    </div>
+                    <div class="parsed-info" id="parsed-info">
+                        <div class="parsed-row">
+                            <span class="parsed-label">Provider:</span>
+                            <span class="parsed-value" id="parsed-provider">—</span>
+                        </div>
+                        <div class="parsed-row">
+                            <span class="parsed-label">API Key:</span>
+                            <span class="parsed-value" id="parsed-apikey">—</span>
+                        </div>
+                        <div class="parsed-row">
+                            <span class="parsed-label">Model:</span>
+                            <span class="parsed-value" id="parsed-model">—</span>
+                        </div>
                     </div>
                 </div>
 
@@ -365,6 +605,209 @@
 
         const CONVEX_URL = "https://neat-chameleon-935.convex.cloud";
         const client = new ConvexClient(CONVEX_URL);
+
+        // ─── Input Mode Toggle ───
+        const modeApiKeyBtn = document.getElementById('mode-apikey');
+        const modeSdkBtn = document.getElementById('mode-sdk');
+        const apikeyInputGroup = document.getElementById('apikey-input-group');
+        const sdkEditorContainer = document.getElementById('sdk-editor-container');
+        
+        let currentInputMode = 'apikey';
+
+        function setInputMode(mode) {
+            currentInputMode = mode;
+            if (mode === 'apikey') {
+                modeApiKeyBtn.classList.add('active');
+                modeSdkBtn.classList.remove('active');
+                apikeyInputGroup.classList.add('show');
+                sdkEditorContainer.classList.remove('show');
+                document.getElementById('api-key').required = true;
+                document.getElementById('sdk-textarea').required = false;
+            } else {
+                modeApiKeyBtn.classList.remove('active');
+                modeSdkBtn.classList.add('active');
+                apikeyInputGroup.classList.remove('show');
+                sdkEditorContainer.classList.add('show');
+                document.getElementById('api-key').required = false;
+                document.getElementById('sdk-textarea').required = true;
+            }
+            updateSubmitState();
+        }
+
+        modeApiKeyBtn.addEventListener('click', () => setInputMode('apikey'));
+        modeSdkBtn.addEventListener('click', () => setInputMode('sdk'));
+
+        // ─── SDK Parsing (Client-Side) ───
+        function parseSDKSnippetClient(snippet) {
+            const result = {
+                provider: null,
+                apiKey: null,
+                model: null,
+                config: {}
+            };
+
+            const normalized = snippet.replace(/\\n/g, '\n').trim();
+
+            // Detect provider from imports or class instantiation
+            const providerPatterns = [
+                { pattern: /from\s+['"]openai['"]/i, provider: 'openai' },
+                { pattern: /from\s+['"]anthropic['"]/i, provider: 'anthropic' },
+                { pattern: /from\s+['"]google\.generativeai['"]/i, provider: 'google' },
+                { pattern: /from\s+['"]groq['"]/i, provider: 'groq' },
+                { pattern: /from\s+['"]mistralai['"]/i, provider: 'mistral' },
+                { pattern: /from\s+['"]cohere['"]/i, provider: 'cohere' },
+                { pattern: /from\s+['"]together['"]/i, provider: 'together' },
+                { pattern: /import\s+.*Bytez/i, provider: 'bytez' },
+                { pattern: /from\s+['"]replicate['"]/i, provider: 'replicate' },
+                { pattern: /from\s+['"]xai['"]/i, provider: 'xai' },
+                { pattern: /OpenAI\s*\(/i, provider: 'openai' },
+                { pattern: /Anthropic\s*\(/i, provider: 'anthropic' },
+                { pattern: /Groq\s*\(/i, provider: 'groq' },
+                { pattern: /Mistral\s*\(/i, provider: 'mistral' },
+                { pattern: /Cohere\s*\(/i, provider: 'cohere' },
+                { pattern: /Together\s*\(/i, provider: 'together' },
+                { pattern: /Bytez\s*\(/i, provider: 'bytez' },
+                { pattern: /Replicate\s*\(/i, provider: 'replicate' },
+                { pattern: /XAI\s*\(/i, provider: 'xai' },
+            ];
+
+            for (const { pattern, provider } of providerPatterns) {
+                if (pattern.test(normalized)) {
+                    result.provider = provider;
+                    break;
+                }
+            }
+
+            // Extract API key
+            const apiKeyPatterns = [
+                /api_key\s*=\s*["']([^"']+)["']/i,
+                /apiKey\s*:\s*["']([^"']+)["']/i,
+                /api_key\s*:\s*["']([^"']+)["']/i,
+                /OPENAI_API_KEY\s*=\s*["']([^"']+)["']/i,
+                /ANTHROPIC_API_KEY\s*=\s*["']([^"']+)["']/i,
+                /GROQ_API_KEY\s*=\s*["']([^"']+)["']/i,
+                /COHERE_API_KEY\s*=\s*["']([^"']+)["']/i,
+                /key\s*=\s*["']([^"']+)["']/i,
+                /Authorization.*Bearer\s+([a-zA-Z0-9_-]+)/i,
+            ];
+
+            for (const pattern of apiKeyPatterns) {
+                const match = normalized.match(pattern);
+                if (match && match[1]) {
+                    result.apiKey = match[1];
+                    break;
+                }
+            }
+
+            // Extract model
+            const modelPatterns = [
+                /model\s*=\s*["']([^"']+)["']/i,
+                /model\s*:\s*["']([^"']+)["']/i,
+                /["'](gpt-[a-z0-9-]+)["']/i,
+                /["'](claude-[a-z0-9-]+)["']/i,
+                /["'](gemini-[a-z0-9-]+)["']/i,
+                /["'](llama-[a-z0-9-]+)["']/i,
+                /["'](mixtral-[a-z0-9-]+)["']/i,
+                /["'](grok-[a-z0-9-]+)["']/i,
+                /["'](command-[a-z0-9-]+)["']/i,
+                /["'](deepseek-[a-z0-9-]+)["']/i,
+            ];
+
+            for (const pattern of modelPatterns) {
+                const match = normalized.match(pattern);
+                if (match && match[1]) {
+                    result.model = match[1];
+                    break;
+                }
+            }
+
+            return result;
+        }
+
+        // ─── Parsed SDK Info Display ───
+        const parsedInfo = document.getElementById('parsed-info');
+        const parsedProvider = document.getElementById('parsed-provider');
+        const parsedApiKey = document.getElementById('parsed-apikey');
+        const parsedModel = document.getElementById('parsed-model');
+        const sdkEditorWrapper = document.getElementById('sdk-editor-wrapper');
+
+        function maskApiKey(key) {
+            if (!key || key.length < 10) return '—';
+            return key.slice(0, 4) + '••••••••' + key.slice(-4);
+        }
+
+        function updateParsedInfo(parsed) {
+            parsedProvider.textContent = parsed.provider || '—';
+            parsedApiKey.textContent = parsed.apiKey ? maskApiKey(parsed.apiKey) : '—';
+            parsedModel.textContent = parsed.model || '—';
+
+            const isValid = parsed.provider && parsed.apiKey && parsed.apiKey.length >= 10;
+            
+            if (parsed.provider || parsed.apiKey) {
+                parsedInfo.classList.add('show');
+                if (isValid) {
+                    parsedInfo.classList.remove('error');
+                    sdkEditorWrapper.classList.add('success');
+                    sdkEditorWrapper.classList.remove('error');
+                } else {
+                    parsedInfo.classList.add('error');
+                    sdkEditorWrapper.classList.add('error');
+                    sdkEditorWrapper.classList.remove('success');
+                }
+            } else {
+                parsedInfo.classList.remove('show');
+                sdkEditorWrapper.classList.remove('success', 'error');
+            }
+
+            // If we detected a provider and model, update the dropdowns
+            if (parsed.provider && providerDB[parsed.provider]) {
+                if (providerSelect.value === 'auto') {
+                    resolvedProvider = parsed.provider;
+                    populateModels(parsed.provider);
+                    
+                    // Try to select the detected model
+                    if (parsed.model) {
+                        const modelExists = Array.from(modelSelect.options).some(o => o.value === parsed.model);
+                        if (modelExists) {
+                            modelSelect.value = parsed.model;
+                            customWrapper.classList.remove('show');
+                        } else {
+                            // Check if custom model is allowed
+                            const providerData = providerDB[parsed.provider];
+                            if (providerData && providerData.allowCustomModel) {
+                                modelSelect.value = '__custom__';
+                                customWrapper.classList.add('show');
+                                customModel.value = parsed.model;
+                            }
+                        }
+                        modelSelect.dispatchEvent(new Event('change'));
+                    }
+                }
+            }
+
+            return isValid;
+        }
+
+        // ─── SDK Textarea Input ───
+        const sdkTextarea = document.getElementById('sdk-textarea');
+        let sdkParseDebounce;
+
+        sdkTextarea.addEventListener('input', () => {
+            clearTimeout(sdkParseDebounce);
+            sdkParseDebounce = setTimeout(() => {
+                const snippet = sdkTextarea.value;
+                const parsed = parseSDKSnippetClient(snippet);
+                const isValid = updateParsedInfo(parsed);
+                
+                if (isValid) {
+                    resolvedProvider = parsed.provider;
+                } else if (!parsed.provider && !parsed.apiKey) {
+                    resolvedProvider = null;
+                }
+                
+                updateSubmitState();
+            }, 300);
+        });
 
         // ─── Provider Database ───
         const providerDB = {
@@ -620,7 +1063,17 @@
 
         function updateSubmitState() {
             const model = getSelectedModel();
-            submitBtn.disabled = !(resolvedProvider && apiKeyInput.value.trim().length >= 5 && model);
+            let hasValidCredentials = false;
+            
+            if (currentInputMode === 'apikey') {
+                hasValidCredentials = resolvedProvider && apiKeyInput.value.trim().length >= 5 && model;
+            } else {
+                const snippet = sdkTextarea.value.trim();
+                const parsed = parseSDKSnippetClient(snippet);
+                hasValidCredentials = parsed.provider && parsed.apiKey && parsed.apiKey.length >= 10 && model;
+            }
+            
+            submitBtn.disabled = !hasValidCredentials;
         }
 
         // ─── Toggle Key Visibility ───
@@ -713,36 +1166,69 @@
             e.preventDefault();
             hideError();
 
-            const apiKey = apiKeyInput.value.trim();
             const selectedModel = getSelectedModel();
+            let apiKey, provider, inputType, sdkSnippet, sdkParsedConfig;
 
-            if (!apiKey) { showError('Please enter your API key'); return; }
-            if (apiKey.length < 5) { showError('API key seems too short'); return; }
-            if (!resolvedProvider) { showError('Please select a provider'); return; }
+            if (currentInputMode === 'apikey') {
+                apiKey = apiKeyInput.value.trim();
+                provider = resolvedProvider;
+                inputType = 'apiKey';
+                
+                if (!apiKey) { showError('Please enter your API key'); return; }
+                if (apiKey.length < 5) { showError('API key seems too short'); return; }
+            } else {
+                sdkSnippet = sdkTextarea.value.trim();
+                const parsed = parseSDKSnippetClient(sdkSnippet);
+                
+                apiKey = parsed.apiKey;
+                provider = parsed.provider;
+                inputType = 'sdkSnippet';
+                sdkParsedConfig = parsed;
+                
+                if (!sdkSnippet) { showError('Please enter your SDK code snippet'); return; }
+                if (!apiKey) { showError('Could not extract API key from SDK snippet'); return; }
+                if (!provider) { showError('Could not detect provider from SDK snippet'); return; }
+            }
+            
+            if (!provider) { showError('Please select a provider'); return; }
             if (!selectedModel) { showError('Please select or enter a model'); return; }
 
             submitBtn.classList.add('loading');
 
             try {
                 await client.mutation("api:saveApiConfig", {
-                    provider: resolvedProvider,
+                    provider,
                     apiKey,
                     model: selectedModel,
+                    inputType,
+                    sdkSnippet: inputType === 'sdkSnippet' ? sdkSnippet : undefined,
+                    sdkProvider: inputType === 'sdkSnippet' ? provider : undefined,
+                    sdkModel: inputType === 'sdkSnippet' ? (sdkParsedConfig?.model || selectedModel) : undefined,
+                    sdkParsedConfig: inputType === 'sdkSnippet' ? sdkParsedConfig : undefined,
                 });
 
                 const credentials = {
-                    provider: resolvedProvider,
-                    providerName: providerDB[resolvedProvider]?.name || resolvedProvider,
+                    provider,
+                    providerName: providerDB[provider]?.name || provider,
                     apiKey,
                     model: selectedModel,
                     modelName: modelSelect.value === '__custom__'
                         ? selectedModel
                         : modelSelect.options[modelSelect.selectedIndex]?.text || selectedModel,
                     timestamp: Date.now(),
+                    inputType,
+                    sdkSnippet: inputType === 'sdkSnippet' ? sdkSnippet : undefined,
+                    sdkParsedConfig: inputType === 'sdkSnippet' ? sdkParsedConfig : undefined,
                 };
 
                 localStorage.setItem('target_config', JSON.stringify(credentials));
-                apiKeyInput.classList.add('success');
+                
+                if (currentInputMode === 'apikey') {
+                    apiKeyInput.classList.add('success');
+                } else {
+                    sdkEditorWrapper.classList.add('success');
+                }
+                
                 submitBtn.classList.remove('loading');
 
                 setTimeout(() => { window.location.href = 'dashboard.html'; }, 500);
@@ -757,14 +1243,26 @@
             const stored = localStorage.getItem('target_config');
             if (stored) {
                 const creds = JSON.parse(stored);
+                
+                // Check if SDK mode was used
+                if (creds.inputType === 'sdkSnippet' && creds.sdkSnippet) {
+                    setInputMode('sdk');
+                    sdkTextarea.value = creds.sdkSnippet;
+                    // Trigger parsing
+                    sdkTextarea.dispatchEvent(new Event('input'));
+                } else {
+                    setInputMode('apikey');
+                    apiKeyInput.value = creds.apiKey;
+                    apiKeyInput.dispatchEvent(new Event('input'));
+                }
+                
                 // Set provider dropdown first
                 if (creds.provider && providerDB[creds.provider]) {
                     providerSelect.value = creds.provider;
                     resolvedProvider = creds.provider;
                     populateModels(creds.provider);
                 }
-                apiKeyInput.value = creds.apiKey;
-                apiKeyInput.dispatchEvent(new Event('input'));
+                
                 setTimeout(() => {
                     if (creds.model) {
                         // Check if model exists in dropdown
