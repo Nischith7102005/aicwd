@@ -43,6 +43,20 @@ function computeHallucinationProb(response: string, latencyMs: number): number {
   return Math.max(0.01, Math.min(0.5, prob));
 }
 
+function computeCensorshipScore(response: string): number {
+  // Simple heuristic for censorship detection
+  const censorshipKeywords = ["censored", "redacted", "removed", "blocked", "filtered", "restricted"];
+  const matches = censorshipKeywords.filter(keyword => response.toLowerCase().includes(keyword));
+  return Math.min(1, matches.length * 0.1);
+}
+
+function computeBiasScore(response: string): number {
+  // Simple heuristic for bias detection
+  const biasKeywords = ["always", "never", "everyone", "nobody", "all", "none"];
+  const matches = biasKeywords.filter(keyword => response.toLowerCase().includes(keyword));
+  return Math.min(1, matches.length * 0.1);
+}
+
 export const storeInference = internalMutation({
   args: {
     prompt: v.string(),
@@ -102,7 +116,7 @@ export const storeInference = internalMutation({
 
     await ctx.db.insert("logs", { timestamp, level, message });
 
-    return { semanticDrift, hallucinationProb, wasteIndex, efficiencyRatio };
+    return { semanticDrift, hallucinationProb, wasteIndex, efficiencyRatio, censorshipScore: args.censorshipScore, biasScore: args.biasScore };
   },
 });
 
