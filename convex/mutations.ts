@@ -6,13 +6,13 @@ export const insertMetrics = mutation({
     efficiencyRatio: v.number(),
     semanticDrift: v.number(),
     wasteIndex: v.number(),
-    hallucinationProb: v.number(),
-    censorshipScore: v.number(),
-    biasScore: v.number(),
     targetModel: v.string(),
     inputTokens: v.number(),
     outputTokens: v.number(),
     latencyMs: v.number(),
+    hallucinationProb: v.optional(v.number()),
+    censorshipScore: v.optional(v.number()),
+    biasScore: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
     await ctx.db.insert("metrics", {
