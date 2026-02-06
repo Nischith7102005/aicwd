@@ -7,13 +7,14 @@ export default defineSchema({
     efficiencyRatio: v.number(),
     semanticDrift: v.number(),
     wasteIndex: v.number(),
-    hallucinationProb: v.number(),
-    censorshipScore: v.number(),
-    biasScore: v.number(),
     targetModel: v.string(),
     inputTokens: v.number(),
     outputTokens: v.number(),
     latencyMs: v.number(),
+    // These 3 didn't exist in earlier probes, so they must be optional
+    hallucinationProb: v.optional(v.number()),
+    censorshipScore: v.optional(v.number()),
+    biasScore: v.optional(v.number()),
   }).index("by_timestamp", ["timestamp"]),
 
   logs: defineTable({
