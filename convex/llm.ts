@@ -20,10 +20,25 @@ export const callLLM = action({
       };
     }
 
+    // ── Build provider configs ──
+
+    // Helper for OpenAI-compatible body shape
+    const openAIBody = {
+      model: args.model,
+      messages: [{ role: "user", content: args.prompt }],
+      max_tokens: 512,
+    };
+
+    const bearerHeaders = {
+      Authorization: `Bearer ${args.apiKey}`,
+      "Content-Type": "application/json",
+    };
+
     const providers: Record<
       string,
       { endpoint: string; headers: Record<string, string>; body: object }
     > = {
+      // ── Major Providers ──
       anthropic: {
         endpoint: "https://api.anthropic.com/v1/messages",
         headers: {
@@ -37,18 +52,26 @@ export const callLLM = action({
           messages: [{ role: "user", content: args.prompt }],
         },
       },
+      openai: {
+        endpoint: "https://api.openai.com/v1/chat/completions",
+        headers: bearerHeaders,
+        body: openAIBody,
+      },
       google: {
         endpoint: `https://generativelanguage.googleapis.com/v1beta/models/${args.model}:generateContent?key=${args.apiKey}`,
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: {
           contents: [{ parts: [{ text: args.prompt }] }],
           generationConfig: { maxOutputTokens: 512 },
         },
       },
-      groq: {
-        endpoint: "https://api.groq.com/openai/v1/chat/completions",
+      mistral: {
+        endpoint: "https://api.mistral.ai/v1/chat/completions",
+        headers: bearerHeaders,
+        body: openAIBody,
+      },
+      cohere: {
+        endpoint: "https://api.cohere.com/v2/chat",
         headers: {
           Authorization: `Bearer ${args.apiKey}`,
           "Content-Type": "application/json",
@@ -59,42 +82,88 @@ export const callLLM = action({
           max_tokens: 512,
         },
       },
-      xai: {
-        endpoint: "https://api.x.ai/v1/chat/completions",
+
+      // ── Open-Source Hosts ──
+      groq: {
+        endpoint: "https://api.groq.com/openai/v1/chat/completions",
+        headers: bearerHeaders,
+        body: openAIBody,
+      },
+      together: {
+        endpoint: "https://api.together.xyz/v1/chat/completions",
+        headers: bearerHeaders,
+        body: openAIBody,
+      },
+      fireworks: {
+        endpoint: "https://api.fireworks.ai/inference/v1/chat/completions",
+        headers: bearerHeaders,
+        body: openAIBody,
+      },
+      bytez: {
+        endpoint: "https://api.bytez.com/model/run",
         headers: {
-          Authorization: `Bearer ${args.apiKey}`,
+          Authorization: `Key ${args.apiKey}`,
           "Content-Type": "application/json",
         },
         body: {
-          model: args.model,
-          messages: [{ role: "user", content: args.prompt }],
-          max_tokens: 512,
+          model_id: args.model,
+          stream: false,
+          params: {
+            messages: [{ role: "user", content: args.prompt }],
+            max_new_tokens: 512,
+          },
         },
+      },
+      replicate: {
+        endpoint: "https://api.replicate.com/v1/models/" + args.model + "/predictions",
+        headers: {
+          Authorization: `Bearer ${args.apiKey}`,
+          "Content-Type": "application/json",
+          Prefer: "wait",
+        },
+        body: {
+          input: {
+            prompt: args.prompt,
+            max_tokens: 512,
+          },
+        },
+      },
+
+      // ── Specialized ──
+      xai: {
+        endpoint: "https://api.x.ai/v1/chat/completions",
+        headers: bearerHeaders,
+        body: openAIBody,
       },
       deepseek: {
         endpoint: "https://api.deepseek.com/chat/completions",
+        headers: bearerHeaders,
+        body: openAIBody,
+      },
+      perplexity: {
+        endpoint: "https://api.perplexity.ai/chat/completions",
+        headers: bearerHeaders,
+        body: openAIBody,
+      },
+      puter: {
+        endpoint: "https://api.puter.com/drivers/call",
         headers: {
           Authorization: `Bearer ${args.apiKey}`,
           "Content-Type": "application/json",
         },
         body: {
-          model: args.model,
-          messages: [{ role: "user", content: args.prompt }],
-          max_tokens: 512,
+          interface: "puter-chat-completion",
+          driver: "openai-completion",
+          method: "complete",
+          args: {
+            messages: [{ role: "user", content: args.prompt }],
+            model: args.model,
+            max_tokens: 512,
+          },
         },
       },
-      mistral: {
-        endpoint: "https://api.mistral.ai/v1/chat/completions",
-        headers: {
-          Authorization: `Bearer ${args.apiKey}`,
-          "Content-Type": "application/json",
-        },
-        body: {
-          model: args.model,
-          messages: [{ role: "user", content: args.prompt }],
-          max_tokens: 512,
-        },
-      },
+
+      // ── Aggregators ──
       openrouter: {
         endpoint: "https://openrouter.ai/api/v1/chat/completions",
         headers: {
@@ -103,23 +172,7 @@ export const callLLM = action({
           "HTTP-Referer": "https://aicwd.vercel.app",
           "X-Title": "AICWD",
         },
-        body: {
-          model: args.model,
-          messages: [{ role: "user", content: args.prompt }],
-          max_tokens: 512,
-        },
-      },
-      openai: {
-        endpoint: "https://api.openai.com/v1/chat/completions",
-        headers: {
-          Authorization: `Bearer ${args.apiKey}`,
-          "Content-Type": "application/json",
-        },
-        body: {
-          model: args.model,
-          messages: [{ role: "user", content: args.prompt }],
-          max_tokens: 512,
-        },
+        body: openAIBody,
       },
     };
 
@@ -143,18 +196,20 @@ export const callLLM = action({
       const latencyMs = Date.now() - startTime;
 
       if (!response.ok) {
-        const errorText = await response.text();
+        const errorBody = await response.text();
         return {
           success: false,
-          error: `API ${response.status}: ${errorText}`,
+          error: `API ${response.status}: ${errorBody}`,
           latencyMs,
         };
       }
 
       const data = await response.json();
-      let content: string;
-      let inputTokens: number;
-      let outputTokens: number;
+      let content = "";
+      let inputTokens = 0;
+      let outputTokens = 0;
+
+      // ── Parse response per provider type ──
 
       if (provider === "anthropic") {
         content = data.content?.[0]?.text || "";
@@ -164,8 +219,54 @@ export const callLLM = action({
         content = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
         inputTokens = data.usageMetadata?.promptTokenCount || 0;
         outputTokens = data.usageMetadata?.candidatesTokenCount || 0;
+      } else if (provider === "cohere") {
+        // Cohere v2 chat response
+        const msg = data.message;
+        if (msg?.content && Array.isArray(msg.content)) {
+          content = msg.content.map((c: any) => c.text || "").join("");
+        } else {
+          content = data.text || "";
+        }
+        inputTokens = data.usage?.billed_units?.input_tokens || 0;
+        outputTokens = data.usage?.billed_units?.output_tokens || 0;
+      } else if (provider === "bytez") {
+        // Bytez returns { output: [...], error: null }
+        const out = data.output;
+        if (Array.isArray(out) && out.length > 0) {
+          content = out[0]?.generated_text || out[0]?.text || JSON.stringify(out[0]);
+        } else if (typeof out === "string") {
+          content = out;
+        } else {
+          content = JSON.stringify(data.output || data);
+        }
+        // Bytez may not return token counts
+        inputTokens = data.usage?.input_tokens || 0;
+        outputTokens = data.usage?.output_tokens || 0;
+      } else if (provider === "replicate") {
+        // Replicate with Prefer: wait returns the completed prediction
+        const output = data.output;
+        if (Array.isArray(output)) {
+          content = output.join("");
+        } else if (typeof output === "string") {
+          content = output;
+        } else {
+          content = JSON.stringify(output || data);
+        }
+        inputTokens = data.metrics?.input_token_count || 0;
+        outputTokens = data.metrics?.output_token_count || 0;
+      } else if (provider === "puter") {
+        // Puter wraps the driver response
+        const result = data.result || data;
+        content =
+          result.choices?.[0]?.message?.content ||
+          result.message?.content ||
+          result.text ||
+          JSON.stringify(result);
+        inputTokens = result.usage?.prompt_tokens || 0;
+        outputTokens = result.usage?.completion_tokens || 0;
       } else {
-        // OpenAI-compatible: openai, groq, xai, deepseek, mistral, openrouter
+        // OpenAI-compatible: openai, groq, xai, deepseek, mistral,
+        //   together, fireworks, perplexity, openrouter
         content = data.choices?.[0]?.message?.content || "";
         inputTokens = data.usage?.prompt_tokens || 0;
         outputTokens = data.usage?.completion_tokens || 0;
@@ -223,8 +324,8 @@ export const callUncensoredAI = action({
       });
 
       if (!res.ok) {
-        const errorText = await res.text();
-        console.error("OpenRouter API Error:", res.status, errorText);
+        const errText = await res.text();
+        console.error("OpenRouter API Error:", res.status, errText);
         return { censorshipScore: 0, biasScore: 0 };
       }
 
@@ -239,20 +340,11 @@ export const callUncensoredAI = action({
       try {
         const parsed = JSON.parse(cleaned);
         return {
-          censorshipScore: Math.min(
-            1,
-            Math.max(0, Number(parsed.censorshipScore) || 0)
-          ),
-          biasScore: Math.min(
-            1,
-            Math.max(0, Number(parsed.biasScore) || 0)
-          ),
+          censorshipScore: Math.min(1, Math.max(0, Number(parsed.censorshipScore) || 0)),
+          biasScore: Math.min(1, Math.max(0, Number(parsed.biasScore) || 0)),
         };
-      } catch (parseError) {
-        console.error(
-          "Failed to parse OpenRouter analysis. Raw output:",
-          raw
-        );
+      } catch {
+        console.error("Failed to parse OpenRouter analysis. Raw output:", raw);
         return { censorshipScore: 0, biasScore: 0 };
       }
     } catch (error) {
