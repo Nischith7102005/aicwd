@@ -10,11 +10,15 @@ export const callLLM = action({
   },
   handler: async (ctx, args) => {
     const startTime = Date.now();
-    let endpoint: string;
-    let headers: Record<string, string>;
-    let body: object;
-
     const provider = args.provider.toLowerCase();
+
+    if (provider === "unknown") {
+      return {
+        success: false,
+        error: "Could not detect API provider. Please check your key.",
+        latencyMs: 0,
+      };
+    }
 
     const providers: Record<
       string,
@@ -33,8 +37,54 @@ export const callLLM = action({
           messages: [{ role: "user", content: args.prompt }],
         },
       },
+      google: {
+        endpoint: `https://generativelanguage.googleapis.com/v1beta/models/${args.model}:generateContent?key=${args.apiKey}`,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: {
+          contents: [{ parts: [{ text: args.prompt }] }],
+          generationConfig: { maxOutputTokens: 512 },
+        },
+      },
       groq: {
         endpoint: "https://api.groq.com/openai/v1/chat/completions",
+        headers: {
+          Authorization: `Bearer ${args.apiKey}`,
+          "Content-Type": "application/json",
+        },
+        body: {
+          model: args.model,
+          messages: [{ role: "user", content: args.prompt }],
+          max_tokens: 512,
+        },
+      },
+      xai: {
+        endpoint: "https://api.x.ai/v1/chat/completions",
+        headers: {
+          Authorization: `Bearer ${args.apiKey}`,
+          "Content-Type": "application/json",
+        },
+        body: {
+          model: args.model,
+          messages: [{ role: "user", content: args.prompt }],
+          max_tokens: 512,
+        },
+      },
+      deepseek: {
+        endpoint: "https://api.deepseek.com/chat/completions",
+        headers: {
+          Authorization: `Bearer ${args.apiKey}`,
+          "Content-Type": "application/json",
+        },
+        body: {
+          model: args.model,
+          messages: [{ role: "user", content: args.prompt }],
+          max_tokens: 512,
+        },
+      },
+      mistral: {
+        endpoint: "https://api.mistral.ai/v1/chat/completions",
         headers: {
           Authorization: `Bearer ${args.apiKey}`,
           "Content-Type": "application/json",
@@ -73,16 +123,21 @@ export const callLLM = action({
       },
     };
 
-    const config = providers[provider] || providers.openai;
-    endpoint = config.endpoint;
-    headers = config.headers;
-    body = config.body;
+    const config = providers[provider];
+
+    if (!config) {
+      return {
+        success: false,
+        error: `Unsupported provider: ${provider}`,
+        latencyMs: 0,
+      };
+    }
 
     try {
-      const response = await fetch(endpoint, {
+      const response = await fetch(config.endpoint, {
         method: "POST",
-        headers,
-        body: JSON.stringify(body),
+        headers: config.headers,
+        body: JSON.stringify(config.body),
       });
 
       const latencyMs = Date.now() - startTime;
@@ -105,7 +160,12 @@ export const callLLM = action({
         content = data.content?.[0]?.text || "";
         inputTokens = data.usage?.input_tokens || 0;
         outputTokens = data.usage?.output_tokens || 0;
+      } else if (provider === "google") {
+        content = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
+        inputTokens = data.usageMetadata?.promptTokenCount || 0;
+        outputTokens = data.usageMetadata?.candidatesTokenCount || 0;
       } else {
+        // OpenAI-compatible: openai, groq, xai, deepseek, mistral, openrouter
         content = data.choices?.[0]?.message?.content || "";
         inputTokens = data.usage?.prompt_tokens || 0;
         outputTokens = data.usage?.completion_tokens || 0;
@@ -128,7 +188,6 @@ export const callUncensoredAI = action({
     response: v.string(),
   },
   handler: async (ctx, args) => {
-    // Pull the key from Convex environment variables
     const openRouterKey = process.env.OPENROUTER_API_KEY;
 
     if (!openRouterKey) {
@@ -172,7 +231,6 @@ export const callUncensoredAI = action({
       const data = await res.json();
       const raw = data.choices?.[0]?.message?.content || "";
 
-      // Strip markdown code fences if the model wraps output
       const cleaned = raw
         .replace(/```json\s*/gi, "")
         .replace(/```\s*/g, "")
