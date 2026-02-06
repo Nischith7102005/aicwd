@@ -25,6 +25,7 @@
             --glow-purple: rgba(168, 85, 247, 0.4);
             --glow-green: rgba(74, 222, 128, 0.4);
             --glow-red: rgba(255, 68, 102, 0.4);
+            --provider-color: #a855f7;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -63,7 +64,7 @@
         .header::before {
             content: '';
             position: absolute; top: 0; left: 0; right: 0; height: 2px;
-            background: linear-gradient(90deg, var(--accent-purple), var(--accent-lavender), var(--accent-white), var(--accent-lavender), var(--accent-purple));
+            background: linear-gradient(90deg, var(--provider-color), var(--accent-lavender), var(--accent-white), var(--accent-lavender), var(--provider-color));
             background-size: 200% 100%;
             animation: shimmer 3s linear infinite;
         }
@@ -82,6 +83,36 @@
         }
 
         .target-display { font-size: 0.75rem; color: var(--accent-lavender); letter-spacing: 1px; }
+
+        /* Provider badge */
+        .provider-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border: 1px solid var(--provider-color);
+            background: rgba(168, 85, 247, 0.1);
+            font-family: 'VT323', monospace;
+            font-size: 0.85rem;
+            letter-spacing: 2px;
+            color: var(--provider-color);
+            text-transform: uppercase;
+            margin-top: 4px;
+        }
+
+        .provider-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--provider-color);
+            box-shadow: 0 0 8px var(--provider-color);
+            animation: pulse-dot 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
 
         .header-actions { display: flex; gap: 1rem; }
 
@@ -208,6 +239,14 @@
         .log-info { color: var(--accent-lavender); border-left-color: var(--accent-purple); }
         .log-default { color: var(--text-secondary); }
 
+        /* Latency card */
+        .latency-stats { display: flex; gap: 1rem; margin-top: auto; }
+        .latency-stat { flex: 1; text-align: center; }
+        .latency-stat-value {
+            font-family: 'VT323', monospace; font-size: 1.3rem; color: var(--accent-lavender);
+        }
+        .latency-stat-label { font-size: 0.6rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
+
         /* Status Bar */
         .status-bar {
             position: fixed; bottom: 0; left: 0; right: 0;
@@ -240,10 +279,14 @@
                 <div>
                     <h1 class="header-title">LIVE_OBSERVATORY</h1>
                     <div class="target-display" id="targetDisplay">CONNECTING...</div>
+                    <div class="provider-badge" id="providerBadge">
+                        <span class="provider-dot"></span>
+                        <span id="providerLabel">DETECTING...</span>
+                    </div>
                 </div>
             </div>
             <div class="header-actions">
-                <button class="btn btn-danger" onclick="triggerRedTeam()">INITIATE_STRESS_TEST</button>
+                <button class="btn btn-danger" id="stress-btn" onclick="triggerRedTeam()">INITIATE_STRESS_TEST</button>
                 <button class="btn btn-ghost" onclick="window.location.href='key.html'">CHANGE KEY</button>
             </div>
         </header>
@@ -252,10 +295,8 @@
         <div class="dashboard-grid">
             <!-- Token Efficiency -->
             <div class="card">
-                <div class="corner corner-tl"></div>
-                <div class="corner corner-tr"></div>
-                <div class="corner corner-bl"></div>
-                <div class="corner corner-br"></div>
+                <div class="corner corner-tl"></div><div class="corner corner-tr"></div>
+                <div class="corner corner-bl"></div><div class="corner corner-br"></div>
                 <h3 class="card-title">Token Efficiency Ratio</h3>
                 <div class="chart-container">
                     <canvas id="tokenChart"></canvas>
@@ -266,10 +307,8 @@
 
             <!-- Waste Index -->
             <div class="card">
-                <div class="corner corner-tl"></div>
-                <div class="corner corner-tr"></div>
-                <div class="corner corner-bl"></div>
-                <div class="corner corner-br"></div>
+                <div class="corner corner-tl"></div><div class="corner corner-tr"></div>
+                <div class="corner corner-bl"></div><div class="corner corner-br"></div>
                 <h3 class="card-title">Cognitive Waste Index</h3>
                 <div class="gauge-container">
                     <div class="gauge">
@@ -282,10 +321,8 @@
 
             <!-- Drift Timeline -->
             <div class="card card-wide">
-                <div class="corner corner-tl"></div>
-                <div class="corner corner-tr"></div>
-                <div class="corner corner-bl"></div>
-                <div class="corner corner-br"></div>
+                <div class="corner corner-tl"></div><div class="corner corner-tr"></div>
+                <div class="corner corner-bl"></div><div class="corner corner-br"></div>
                 <h3 class="card-title">Semantic Drift Timeline (Real-Time)</h3>
                 <div class="chart-container">
                     <canvas id="driftChart"></canvas>
@@ -294,10 +331,8 @@
 
             <!-- Log Stream -->
             <div class="card card-triple">
-                <div class="corner corner-tl"></div>
-                <div class="corner corner-tr"></div>
-                <div class="corner corner-bl"></div>
-                <div class="corner corner-br"></div>
+                <div class="corner corner-tl"></div><div class="corner corner-tr"></div>
+                <div class="corner corner-bl"></div><div class="corner corner-br"></div>
                 <h3 class="card-title">Adversarial Log Stream</h3>
                 <div class="log-console" id="logConsole">
                     <div class="log-entry log-default">Connecting to telemetry stream...</div>
@@ -306,10 +341,8 @@
 
             <!-- Hallucination Probability -->
             <div class="card">
-                <div class="corner corner-tl"></div>
-                <div class="corner corner-tr"></div>
-                <div class="corner corner-bl"></div>
-                <div class="corner corner-br"></div>
+                <div class="corner corner-tl"></div><div class="corner corner-tr"></div>
+                <div class="corner corner-bl"></div><div class="corner corner-br"></div>
                 <h3 class="card-title">Hallucination Prob</h3>
                 <div class="kpi-value" id="hallucinationVal" style="background: linear-gradient(135deg, #c084fc, #e879f9); -webkit-background-clip: text; background-clip: text;">0.020</div>
                 <div class="progress-bar">
@@ -320,10 +353,8 @@
 
             <!-- Censorship Score -->
             <div class="card">
-                <div class="corner corner-tl"></div>
-                <div class="corner corner-tr"></div>
-                <div class="corner corner-bl"></div>
-                <div class="corner corner-br"></div>
+                <div class="corner corner-tl"></div><div class="corner corner-tr"></div>
+                <div class="corner corner-bl"></div><div class="corner corner-br"></div>
                 <h3 class="card-title">Censorship Score</h3>
                 <div class="kpi-value" id="censorshipVal" style="background: linear-gradient(135deg, #ef4444, #f87171); -webkit-background-clip: text; background-clip: text;">0.00</div>
                 <div class="progress-bar">
@@ -334,10 +365,8 @@
 
             <!-- Bias Score -->
             <div class="card">
-                <div class="corner corner-tl"></div>
-                <div class="corner corner-tr"></div>
-                <div class="corner corner-bl"></div>
-                <div class="corner corner-br"></div>
+                <div class="corner corner-tl"></div><div class="corner corner-tr"></div>
+                <div class="corner corner-bl"></div><div class="corner corner-br"></div>
                 <h3 class="card-title">Bias Score</h3>
                 <div class="kpi-value" id="biasVal" style="background: linear-gradient(135deg, #facc15, #fbbf24); -webkit-background-clip: text; background-clip: text;">0.00</div>
                 <div class="progress-bar">
@@ -345,35 +374,95 @@
                 </div>
                 <div class="kpi-label">Detected by Uncensored AI</div>
             </div>
+
+            <!-- Latency -->
+            <div class="card">
+                <div class="corner corner-tl"></div><div class="corner corner-tr"></div>
+                <div class="corner corner-bl"></div><div class="corner corner-br"></div>
+                <h3 class="card-title">Response Latency</h3>
+                <div class="chart-container">
+                    <canvas id="latencyChart"></canvas>
+                </div>
+                <div class="latency-stats">
+                    <div class="latency-stat">
+                        <div class="latency-stat-value" id="latencyAvg">—</div>
+                        <div class="latency-stat-label">Avg (ms)</div>
+                    </div>
+                    <div class="latency-stat">
+                        <div class="latency-stat-value" id="latencyP99">—</div>
+                        <div class="latency-stat-label">P99 (ms)</div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
     <!-- Status Bar -->
     <div class="status-bar">
-        <div class="status-item"><span class="status-dot"></span><span>Systems Online</span></div>
+        <div class="status-item"><span class="status-dot"></span><span id="status-provider">Systems Online</span></div>
+        <div class="status-item"><span id="status-model">—</span></div>
         <div class="status-item"><span id="current-time">00:00:00</span></div>
     </div>
 
     <script type="module">
     import { ConvexClient } from "https://esm.sh/convex@1.17.4/browser";
 
-    // ── Convex Configuration ─────────────────────────────────────────
+    // ── Convex ───────────────────────────────────────────────────────
     const CONVEX_URL = "https://neat-chameleon-935.convex.cloud";
     const client = new ConvexClient(CONVEX_URL);
 
-    // ── Load saved config ────────────────────────────────────────────
+    // ── Provider Display Database ────────────────────────────────────
+    const providerInfo = {
+        anthropic:   { name: 'Anthropic',    color: '#d97706' },
+        openai:      { name: 'OpenAI',       color: '#10b981' },
+        google:      { name: 'Google AI',    color: '#4285f4' },
+        groq:        { name: 'Groq',         color: '#f97316' },
+        xai:         { name: 'xAI',          color: '#6366f1' },
+        deepseek:    { name: 'DeepSeek',     color: '#06b6d4' },
+        mistral:     { name: 'Mistral AI',   color: '#f43f5e' },
+        cohere:      { name: 'Cohere',       color: '#8b5cf6' },
+        together:    { name: 'Together AI',  color: '#14b8a6' },
+        fireworks:   { name: 'Fireworks AI', color: '#ef4444' },
+        perplexity:  { name: 'Perplexity',   color: '#22d3ee' },
+        bytez:       { name: 'Bytez',        color: '#a3e635' },
+        puter:       { name: 'Puter',        color: '#c084fc' },
+        replicate:   { name: 'Replicate',    color: '#fbbf24' },
+        openrouter:  { name: 'OpenRouter',   color: '#818cf8' },
+    };
+
+    // ── Load Config ──────────────────────────────────────────────────
     const configRaw = localStorage.getItem("target_config");
     if (!configRaw) {
         window.location.href = "key.html";
+        throw new Error("No config");
     }
     const config = JSON.parse(configRaw);
 
-    // Display target info
-    const maskedKey = config.apiKey
-        ? `${config.apiKey.slice(0, 4)}...${config.apiKey.slice(-4)}`
+    const provider   = config.provider || "unknown";
+    const pInfo      = providerInfo[provider] || { name: provider.toUpperCase(), color: '#a855f7' };
+    const modelLabel = (config.modelName || config.model || "UNKNOWN").toUpperCase();
+    const maskedKey  = config.apiKey
+        ? `${config.apiKey.slice(0, 4)}${"•".repeat(Math.min(8, config.apiKey.length - 8))}${config.apiKey.slice(-4)}`
         : "UNKNOWN";
+
+    // Apply provider theme color
+    document.documentElement.style.setProperty('--provider-color', pInfo.color);
+
+    // Header
     document.getElementById("targetDisplay").innerText =
-        `TARGET: ${(config.modelName || config.model || "UNKNOWN").toUpperCase()} [KEY: ${maskedKey}]`;
+        `TARGET: ${modelLabel} [KEY: ${maskedKey}]`;
+
+    const badgeEl = document.getElementById("providerBadge");
+    badgeEl.style.borderColor = pInfo.color;
+    badgeEl.style.background = pInfo.color + '18';
+    badgeEl.style.color = pInfo.color;
+    badgeEl.querySelector('.provider-dot').style.background = pInfo.color;
+    badgeEl.querySelector('.provider-dot').style.boxShadow = `0 0 8px ${pInfo.color}`;
+    document.getElementById("providerLabel").textContent = pInfo.name;
+
+    // Status bar
+    document.getElementById("status-provider").textContent = `${pInfo.name} Online`;
+    document.getElementById("status-model").textContent = config.model || "—";
 
     // ── WebGL Dither Background ──────────────────────────────────────
     const canvas = document.getElementById("dither-canvas");
@@ -383,7 +472,8 @@
     const fragmentShaderSource = `
         precision highp float;
         uniform vec2 u_resolution; uniform float u_time; uniform vec2 u_mouse; uniform float u_mouseRadius; uniform int u_enableMouse;
-        const float waveSpeed = 0.05; const float waveFrequency = 3.0; const float waveAmplitude = 0.3; const vec3 waveColor = vec3(0.4, 0.3, 0.6);
+        uniform vec3 u_waveColor;
+        const float waveSpeed = 0.05; const float waveFrequency = 3.0; const float waveAmplitude = 0.3;
         const float colorNum = 4.0; const float pixelSize = 2.0;
         vec4 mod289(vec4 x) { return x - floor(x * (1.0/289.0)) * 289.0; }
         vec4 permute(vec4 x) { return mod289(((x * 34.0) + 1.0) * x); }
@@ -418,7 +508,7 @@
             vec2 pixelCoord = floor(gl_FragCoord.xy / pixelSize) * pixelSize; vec2 uv = pixelCoord / u_resolution;
             uv -= 0.5; uv.x *= u_resolution.x / u_resolution.y; float f = pattern(uv);
             if (u_enableMouse == 1) { vec2 mouseNDC = (u_mouse / u_resolution - 0.5) * vec2(1.0, -1.0); mouseNDC.x *= u_resolution.x / u_resolution.y; float dist = length(uv - mouseNDC); float effect = 1.0 - smoothstep(0.0, u_mouseRadius, dist); f -= 0.5 * effect; }
-            vec3 col = mix(vec3(0.0), waveColor, f); col = dither(gl_FragCoord.xy, col); gl_FragColor = vec4(col, 1.0);
+            vec3 col = mix(vec3(0.0), u_waveColor, f); col = dither(gl_FragCoord.xy, col); gl_FragColor = vec4(col, 1.0);
         }
     `;
 
@@ -446,10 +536,20 @@
     const mouseLocation = gl.getUniformLocation(program, "u_mouse");
     const mouseRadiusLocation = gl.getUniformLocation(program, "u_mouseRadius");
     const enableMouseLocation = gl.getUniformLocation(program, "u_enableMouse");
+    const waveColorLocation = gl.getUniformLocation(program, "u_waveColor");
 
     const positionBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1,1,-1,-1,1,-1,1,1,-1,1,1]), gl.STATIC_DRAW);
+
+    // Convert provider hex color to [r,g,b] floats for WebGL
+    function hexToGL(hex) {
+        const r = parseInt(hex.slice(1,3), 16) / 255;
+        const g = parseInt(hex.slice(3,5), 16) / 255;
+        const b = parseInt(hex.slice(5,7), 16) / 255;
+        return [r * 0.6, g * 0.6, b * 0.6]; // dim it for background
+    }
+    const waveColor = hexToGL(pInfo.color);
 
     let mouseX = 0, mouseY = 0;
     document.addEventListener("mousemove", (e) => {
@@ -475,6 +575,7 @@
         gl.uniform2f(mouseLocation, mouseX, canvas.height - mouseY);
         gl.uniform1f(mouseRadiusLocation, 0.3);
         gl.uniform1i(enableMouseLocation, 1);
+        gl.uniform3f(waveColorLocation, waveColor[0], waveColor[1], waveColor[2]);
         gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
         gl.enableVertexAttribArray(positionLocation);
         gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
@@ -484,6 +585,9 @@
     requestAnimationFrame(renderBg);
 
     // ── Charts ───────────────────────────────────────────────────────
+    const providerAccent = pInfo.color;
+    const providerAccentFaded = pInfo.color + '1a';
+
     const commonOptions = {
         responsive: true,
         maintainAspectRatio: false,
@@ -491,7 +595,7 @@
         plugins: { legend: { display: false } },
         scales: {
             x: { display: false },
-            y: { grid: { color: "rgba(168,85,247,0.1)" }, ticks: { color: "#9999aa" } }
+            y: { grid: { color: providerAccentFaded }, ticks: { color: "#9999aa" } }
         }
     };
 
@@ -500,8 +604,8 @@
         data: {
             datasets: [{
                 data: [],
-                backgroundColor: "#c4b5fd",
-                borderColor: "#a855f7",
+                backgroundColor: var(--accent-lavender),
+                borderColor: providerAccent,
                 pointRadius: 4,
                 pointHoverRadius: 6,
             }]
@@ -510,12 +614,12 @@
             ...commonOptions,
             scales: {
                 x: {
-                    grid: { color: "rgba(168,85,247,0.1)" },
+                    grid: { color: providerAccentFaded },
                     ticks: { color: "#9999aa" },
                     title: { display: true, text: "Input Tokens", color: "#9999aa", font: { size: 10 } }
                 },
                 y: {
-                    grid: { color: "rgba(168,85,247,0.1)" },
+                    grid: { color: providerAccentFaded },
                     ticks: { color: "#9999aa" },
                     title: { display: true, text: "Output Tokens", color: "#9999aa", font: { size: 10 } }
                 }
@@ -531,8 +635,8 @@
                 {
                     label: "Drift",
                     data: [],
-                    borderColor: "#a855f7",
-                    backgroundColor: "rgba(168,85,247,0.1)",
+                    borderColor: providerAccent,
+                    backgroundColor: providerAccentFaded,
                     tension: 0.4,
                     fill: true,
                     pointRadius: 3,
@@ -551,22 +655,61 @@
         options: commonOptions
     });
 
+    const latencyChart = new Chart(document.getElementById("latencyChart"), {
+        type: "bar",
+        data: {
+            labels: [],
+            datasets: [{
+                data: [],
+                backgroundColor: providerAccent + '66',
+                borderColor: providerAccent,
+                borderWidth: 1,
+            }]
+        },
+        options: {
+            ...commonOptions,
+            scales: {
+                x: { display: false },
+                y: {
+                    grid: { color: providerAccentFaded },
+                    ticks: { color: "#9999aa" },
+                    title: { display: true, text: "ms", color: "#9999aa", font: { size: 10 } }
+                }
+            }
+        }
+    });
+
     // ── Real-Time Subscriptions ──────────────────────────────────────
     client.onUpdate("queries:getMetricsHistory", { limit: 30 }, (metrics) => {
         if (!metrics || metrics.length === 0) return;
 
-        // Update drift chart
+        // Drift chart
         driftChart.data.labels = metrics.map((_, i) => i);
         driftChart.data.datasets[0].data = metrics.map((m) => m.semanticDrift);
         driftChart.data.datasets[1].data = metrics.map(() => 0.1);
         driftChart.update();
 
-        // Update token scatter
+        // Token scatter
         tokenChart.data.datasets[0].data = metrics.map((m) => ({
             x: m.inputTokens,
             y: m.outputTokens
         }));
         tokenChart.update();
+
+        // Latency chart
+        latencyChart.data.labels = metrics.map((_, i) => i);
+        latencyChart.data.datasets[0].data = metrics.map((m) => m.latencyMs || 0);
+        latencyChart.update();
+
+        // Latency stats
+        const latencies = metrics.map(m => m.latencyMs || 0).filter(l => l > 0);
+        if (latencies.length > 0) {
+            const avg = Math.round(latencies.reduce((a, b) => a + b, 0) / latencies.length);
+            const sorted = [...latencies].sort((a, b) => a - b);
+            const p99 = sorted[Math.floor(sorted.length * 0.99)] || sorted[sorted.length - 1];
+            document.getElementById("latencyAvg").textContent = avg;
+            document.getElementById("latencyP99").textContent = Math.round(p99);
+        }
 
         // Latest record for KPIs
         const latest = metrics[metrics.length - 1];
@@ -599,26 +742,23 @@
         wasteCircle.style.borderLeftColor = "transparent";
         wasteCircle.style.borderBottomColor = "transparent";
 
-        // Hallucination Probability (safe access)
+        // Hallucination
         const halluc = latest.hallucinationProb ?? 0;
         document.getElementById("hallucinationVal").innerText = halluc.toFixed(3);
-        document.getElementById("hallucinationBar").style.width =
-            (halluc * 100) + "%";
+        document.getElementById("hallucinationBar").style.width = (halluc * 100) + "%";
 
-        // Censorship Score (safe access)
+        // Censorship
         const censor = latest.censorshipScore ?? 0;
         document.getElementById("censorshipVal").innerText = censor.toFixed(2);
-        document.getElementById("censorshipBar").style.width =
-            (censor * 100) + "%";
+        document.getElementById("censorshipBar").style.width = (censor * 100) + "%";
 
-        // Bias Score (safe access)
+        // Bias
         const bias = latest.biasScore ?? 0;
         document.getElementById("biasVal").innerText = bias.toFixed(2);
-        document.getElementById("biasBar").style.width =
-            (bias * 100) + "%";
+        document.getElementById("biasBar").style.width = (bias * 100) + "%";
     });
 
-    // ── Subscribe to logs ────────────────────────────────────────────
+    // ── Logs ─────────────────────────────────────────────────────────
     client.onUpdate("queries:getLogs", { limit: 15 }, (logs) => {
         if (!logs) return;
         const logConsole = document.getElementById("logConsole");
@@ -634,14 +774,12 @@
             div.innerText = `[${new Date(log.timestamp).toLocaleTimeString()}] ${log.message}`;
             logConsole.appendChild(div);
         }
-
-        // Auto-scroll to bottom
         logConsole.scrollTop = logConsole.scrollHeight;
     });
 
-    // ── Stress Test Action ───────────────────────────────────────────
+    // ── Stress Test ──────────────────────────────────────────────────
     window.triggerRedTeam = async () => {
-        const btn = document.querySelector(".btn-danger");
+        const btn = document.getElementById("stress-btn");
         btn.innerText = "RUNNING...";
         btn.disabled = true;
         btn.style.opacity = "0.6";
@@ -649,8 +787,8 @@
         try {
             await client.action("agent:runStressTest", {
                 apiKey: config.apiKey,
-                provider: config.provider || "openai",
-                model: config.model || config.modelName,
+                provider: config.provider,
+                model: config.model,
                 count: 5,
             });
         } catch (e) {
