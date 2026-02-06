@@ -3,33 +3,30 @@ import { v } from "convex/values";
 
 export default defineSchema({
   metrics: defineTable({
-    timestamp: v.number(),
-    efficiencyRatio: v.number(),
-    semanticDrift: v.number(),
-    wasteIndex: v.number(),
-    targetModel: v.string(),
     inputTokens: v.number(),
     outputTokens: v.number(),
+    efficiencyRatio: v.number(),
+    wasteIndex: v.number(),
+    semanticDrift: v.number(),
+    hallucinationProb: v.number(),
+    censorshipScore: v.number(),
+    biasScore: v.number(),
     latencyMs: v.number(),
-    // These 3 didn't exist in earlier probes, so they must be optional
-    hallucinationProb: v.optional(v.number()),
-    censorshipScore: v.optional(v.number()),
-    biasScore: v.optional(v.number()),
+    provider: v.string(),
+    model: v.string(),
+    timestamp: v.number(),
   }).index("by_timestamp", ["timestamp"]),
 
   logs: defineTable({
-    timestamp: v.number(),
-    level: v.union(v.literal("INFO"), v.literal("ALERT"), v.literal("DEBUG")),
+    level: v.string(),
     message: v.string(),
+    timestamp: v.number(),
   }).index("by_timestamp", ["timestamp"]),
 
-  raw_inferences: defineTable({
-    timestamp: v.number(),
-    prompt: v.string(),
-    response: v.string(),
-    inputTokens: v.number(),
-    outputTokens: v.number(),
+  apiConfigs: defineTable({
+    provider: v.string(),
+    apiKey: v.string(),
     model: v.string(),
-    isAdversarial: v.boolean(),
-  }).index("by_timestamp", ["timestamp"]),
+    timestamp: v.number(),
+  }),
 });
