@@ -1,54 +1,54 @@
 import { mutation } from "./_generated/server";
 import { v } from "convex/values";
 
-export const insertMetrics = mutation({
+export const saveMetrics = mutation({
   args: {
-    efficiencyRatio: v.number(),
-    semanticDrift: v.number(),
-    wasteIndex: v.number(),
-    targetModel: v.string(),
     inputTokens: v.number(),
     outputTokens: v.number(),
+    efficiencyRatio: v.number(),
+    wasteIndex: v.number(),
+    semanticDrift: v.number(),
+    hallucinationProb: v.number(),
+    censorshipScore: v.number(),
+    biasScore: v.number(),
     latencyMs: v.number(),
-    hallucinationProb: v.optional(v.number()),
-    censorshipScore: v.optional(v.number()),
-    biasScore: v.optional(v.number()),
+    provider: v.string(),
+    model: v.string(),
   },
   handler: async (ctx, args) => {
     await ctx.db.insert("metrics", {
-      timestamp: Date.now(),
       ...args,
+      timestamp: Date.now(),
     });
   },
 });
 
-export const insertLog = mutation({
+export const addLog = mutation({
   args: {
-    level: v.union(v.literal("INFO"), v.literal("ALERT"), v.literal("DEBUG")),
+    level: v.string(),
     message: v.string(),
   },
   handler: async (ctx, args) => {
     await ctx.db.insert("logs", {
-      timestamp: Date.now(),
       level: args.level,
       message: args.message,
+      timestamp: Date.now(),
     });
   },
 });
 
-export const insertRawInference = mutation({
+export const saveApiConfig = mutation({
   args: {
-    prompt: v.string(),
-    response: v.string(),
-    inputTokens: v.number(),
-    outputTokens: v.number(),
+    provider: v.string(),
+    apiKey: v.string(),
     model: v.string(),
-    isAdversarial: v.boolean(),
   },
   handler: async (ctx, args) => {
-    await ctx.db.insert("raw_inferences", {
+    await ctx.db.insert("apiConfigs", {
+      provider: args.provider,
+      apiKey: args.apiKey,
+      model: args.model,
       timestamp: Date.now(),
-      ...args,
     });
   },
 });
