@@ -100,19 +100,9 @@ export const callLLM = action({
         body: openAIBody,
       },
       bytez: {
-        endpoint: "https://api.bytez.com/model/run",
-        headers: {
-          Authorization: `Key ${args.apiKey}`,
-          "Content-Type": "application/json",
-        },
-        body: {
-          model_id: args.model,
-          stream: false,
-          params: {
-            messages: [{ role: "user", content: args.prompt }],
-            max_new_tokens: 512,
-          },
-        },
+        endpoint: "https://api.bytez.com/v1/chat/completions",
+        headers: bearerHeaders,
+        body: openAIBody,
       },
       replicate: {
         endpoint: "https://api.replicate.com/v1/models/" + args.model + "/predictions",
@@ -229,19 +219,6 @@ export const callLLM = action({
         }
         inputTokens = data.usage?.billed_units?.input_tokens || 0;
         outputTokens = data.usage?.billed_units?.output_tokens || 0;
-      } else if (provider === "bytez") {
-        // Bytez returns { output: [...], error: null }
-        const out = data.output;
-        if (Array.isArray(out) && out.length > 0) {
-          content = out[0]?.generated_text || out[0]?.text || JSON.stringify(out[0]);
-        } else if (typeof out === "string") {
-          content = out;
-        } else {
-          content = JSON.stringify(data.output || data);
-        }
-        // Bytez may not return token counts
-        inputTokens = data.usage?.input_tokens || 0;
-        outputTokens = data.usage?.output_tokens || 0;
       } else if (provider === "replicate") {
         // Replicate with Prefer: wait returns the completed prediction
         const output = data.output;
@@ -266,7 +243,7 @@ export const callLLM = action({
         outputTokens = result.usage?.completion_tokens || 0;
       } else {
         // OpenAI-compatible: openai, groq, xai, deepseek, mistral,
-        //   together, fireworks, perplexity, openrouter
+        //   together, fireworks, perplexity, openrouter, bytez
         content = data.choices?.[0]?.message?.content || "";
         inputTokens = data.usage?.prompt_tokens || 0;
         outputTokens = data.usage?.completion_tokens || 0;
