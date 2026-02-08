@@ -100,7 +100,7 @@ export const callLLM = action({
         body: openAIBody,
       },
       bytez: {
-        endpoint: "https://api.bytez.com/models/v2/openai/v1/chat/completions",
+        endpoint: "https://api.bytez.com/v1/chat/completions",
         headers: bearerHeaders,
         body: openAIBody,
       },
