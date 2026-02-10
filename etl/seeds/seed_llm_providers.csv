@@ -1,0 +1,7 @@
+provider_name,display_name,category
+openai,OpenAI,commercial
+anthropic,Anthropic,commercial
+cohere,Cohere,commercial
+google,Google,commercial
+azure,Azure OpenAI,enterprise
+local,Local/Ollama,open_source
