@@ -4,7 +4,7 @@ on:
   # Run on schedule (every hour)
   schedule:
     - cron: "0 * * * *"
-  
+
   # Manual trigger
   workflow_dispatch:
     inputs:
@@ -26,7 +26,13 @@ on:
 
 env:
   DBT_PROFILES_DIR: ./etl
-  DUCKDB_PATH: ./data/llm_observability.db
+  PGHOST: ${{ secrets.PGHOST }}
+  PGPORT: ${{ secrets.PGPORT || '5432' }}
+  PGDATABASE: ${{ secrets.PGDATABASE }}
+  PGUSER: ${{ secrets.PGUSER }}
+  PGPASSWORD: ${{ secrets.PGPASSWORD }}
+  PGSCHEMA: ${{ secrets.PGSCHEMA || 'public' }}
+  PGSSLMODE: ${{ secrets.PGSSLMODE || 'require' }}
 
 jobs:
   dbt-run:
@@ -45,22 +51,12 @@ jobs:
           python-version: "3.11"
           cache: pip
 
-      - name: Install dbt and DuckDB
+      - name: Install dbt and Postgres adapter
         run: |
-          pip install dbt-duckdb duckdb
+          pip install dbt-postgres
 
       - name: Install dbt packages
         run: dbt deps
-
-      - name: Create data directory
-        run: mkdir -p ../data
-
-      - name: Download database artifact (if exists)
-        uses: actions/download-artifact@v4
-        with:
-          name: duckdb-database
-          path: ./data/
-        continue-on-error: true
 
       - name: Run dbt debug
         run: dbt debug
@@ -91,14 +87,6 @@ jobs:
           path: |
             ./etl/target/
             ./etl/dbt_packages/
-        if: always()
-
-      - name: Upload database artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: duckdb-database
-          path: ./data/llm_observability.db
-          if-no-files-found: warn
         if: always()
 
   notify:

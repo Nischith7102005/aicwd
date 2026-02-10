@@ -1,6 +1,6 @@
 # monitr-ai ETL Pipeline
 
-This directory contains the dbt Core + DuckDB ETL pipeline for the monitr-ai LLM observability platform.
+This directory contains the dbt Core + Postgres ETL pipeline for the monitr-ai LLM observability platform.
 
 ## Overview
 
@@ -10,7 +10,7 @@ The ETL pipeline processes raw LLM telemetry data from Convex through a webhook 
 
 ```
 ┌──────────────┐      ┌──────────────┐      ┌──────────────┐      ┌──────────────┐
-│   Convex     │──────▶  Webhook     │──────▶   DuckDB     │──────▶   dbt        │
+│   Convex     │──────▶  Webhook     │──────▶   Postgres   │──────▶   dbt        │
 │  Database    │      │   Handler    │      │  Database    │      │  Models      │
 └──────────────┘      └──────────────┘      └──────────────┘      └──────────────┘
                                                           │
@@ -27,7 +27,7 @@ The ETL pipeline processes raw LLM telemetry data from Convex through a webhook 
 
 ### 1. Webhook Handler (`webhook.ts`)
 
-A lightweight HTTP server that receives events from Convex and stores them in DuckDB.
+A lightweight HTTP server that receives events from Convex and stores them in Postgres.
 
 **Endpoints:**
 - `POST /webhook/events` - Receive telemetry events
@@ -37,7 +37,15 @@ A lightweight HTTP server that receives events from Convex and stores them in Du
 **Environment Variables:**
 ```bash
 PORT=3001
-DUCKDB_PATH=./data/llm_observability.db
+DATABASE_URL=postgresql://user:password@host.neon.tech/dbname?sslmode=require
+# OR use individual PG* variables:
+PGHOST=your-host.neon.tech
+PGPORT=5432
+PGDATABASE=your-database
+PGUSER=your-user
+PGPASSWORD=your-password
+PGSSLMODE=require
+
 WEBHOOK_SECRET=your-secret
 ```
 
@@ -60,14 +68,15 @@ Runs dbt on a schedule (hourly) and on manual trigger.
 
 ```bash
 cd etl
-pip install dbt-duckdb duckdb
+npm install
+pip install dbt-postgres
 ```
 
 ### 2. Configure Environment
 
 ```bash
 cp .env.example .env
-# Edit .env with your values
+# Edit .env with your Neon Postgres connection details
 ```
 
 ### 3. Run dbt
@@ -97,6 +106,10 @@ Deploy as a Node.js service with the start command:
 ts-node webhook.ts
 ```
 
+Set environment variables in your hosting platform:
+- `DATABASE_URL` (recommended) OR individual `PGHOST`, `PGUSER`, `PGPASSWORD`, `PGDATABASE`
+- `WEBHOOK_SECRET`
+
 **Option C: Self-hosted**
 ```bash
 npx ts-node webhook.ts
@@ -108,30 +121,37 @@ Add environment variables in Convex dashboard:
 - `ETL_WEBHOOK_URL` - Your webhook endpoint URL
 - `ETL_WEBHOOK_SECRET` - Shared secret for authentication
 
+### Neon Postgres Setup
+
+1. Create a new database in [Neon](https://neon.tech)
+2. Get your connection string from the Neon dashboard
+3. Configure environment variables with the connection details
+4. The webhook will automatically create the `raw_llm_events` table on first connection
+
 ## Data Schema
 
 ### Raw Events (`raw_llm_events`)
 
 | Column | Type | Description |
 |--------|------|-------------|
-| id | BIGINT | Auto-incrementing ID |
+| id | BIGSERIAL | Auto-incrementing ID (primary key) |
 | timestamp | TIMESTAMP | Event timestamp |
 | prompt | TEXT | User prompt |
 | response | TEXT | LLM response |
 | input_tokens | INTEGER | Input token count |
 | output_tokens | INTEGER | Output token count |
 | latency_ms | INTEGER | Request latency |
-| model | VARCHAR | Model identifier |
-| provider | VARCHAR | LLM provider |
-| config_id | VARCHAR | Convex config ID |
+| model | VARCHAR(255) | Model identifier |
+| provider | VARCHAR(255) | LLM provider |
+| config_id | VARCHAR(255) | Convex config ID |
 | is_adversarial | BOOLEAN | Adversarial test flag |
 | error | TEXT | Error message |
-| efficiency_ratio | DOUBLE | Output/Input ratio |
-| waste_index | DOUBLE | Cognitive waste (0-1) |
-| semantic_drift | DOUBLE | Semantic drift (0-1) |
-| hallucination_prob | DOUBLE | Hallucination risk (0-1) |
-| censorship_score | DOUBLE | Censorship score (0-1) |
-| bias_score | DOUBLE | Bias score (0-1) |
+| efficiency_ratio | DOUBLE PRECISION | Output/Input ratio |
+| waste_index | DOUBLE PRECISION | Cognitive waste (0-1) |
+| semantic_drift | DOUBLE PRECISION | Semantic drift (0-1) |
+| hallucination_prob | DOUBLE PRECISION | Hallucination risk (0-1) |
+| censorship_score | DOUBLE PRECISION | Censorship score (0-1) |
+| bias_score | DOUBLE PRECISION | Bias score (0-1) |
 | _loaded_at | TIMESTAMP | Ingestion timestamp |
 
 ## Testing
@@ -167,4 +187,4 @@ npx convex run etlExport:testWebhook
 
 - GitHub Actions runs: Check the Actions tab
 - dbt artifacts: Download from workflow runs
-- Database: Artifact uploaded after each run
+- Postgres: Monitor via Neon dashboard or your Postgres provider

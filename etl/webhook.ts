@@ -1,19 +1,32 @@
 /**
- * Convex Webhook Handler for DuckDB ETL Pipeline
- * 
+ * Convex Webhook Handler for Postgres ETL Pipeline
+ *
  * This serverless function receives raw telemetry events from Convex
- * and appends them to a DuckDB database for downstream dbt processing.
- * 
+ * and appends them to a Postgres database for downstream dbt processing.
+ *
  * Deployment: Can be deployed to Vercel, Render, or run as a simple Node.js server.
  */
 
-import { Database } from "duckdb-async";
+import { Pool, PoolClient } from "pg";
 import http from "http";
 import url from "url";
 
 const PORT = process.env.PORT || 3001;
-const DB_PATH = process.env.DUCKDB_PATH || "./data/llm_observability.db";
 const WEBHOOK_SECRET = process.env.WEBHOOK_SECRET;
+
+// Postgres connection - uses DATABASE_URL or individual PG* vars
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  host: process.env.PGHOST,
+  port: process.env.PGPORT ? parseInt(process.env.PGPORT, 10) : 5432,
+  database: process.env.PGDATABASE,
+  user: process.env.PGUSER,
+  password: process.env.PGPASSWORD,
+  ssl:
+    process.env.PGSSLMODE === "require" || process.env.DATABASE_URL?.includes("sslmode=require")
+      ? { rejectUnauthorized: false }
+      : undefined,
+});
 
 interface LLMEventPayload {
   timestamp: number;
@@ -39,64 +52,77 @@ interface LLMEventPayload {
   success?: boolean;
 }
 
-let db: Database | null = null;
+let isInitialized = false;
 
-async function initDatabase(): Promise<Database> {
-  if (db) return db;
+async function initDatabase(): Promise<void> {
+  if (isInitialized) return;
 
-  db = await Database.create(DB_PATH);
+  const client = await pool.connect();
+  try {
+    // Create raw events table if not exists
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS raw_llm_events (
+        id BIGSERIAL PRIMARY KEY,
+        timestamp TIMESTAMP,
+        prompt TEXT,
+        response TEXT,
+        input_tokens INTEGER,
+        output_tokens INTEGER,
+        latency_ms INTEGER,
+        model VARCHAR(255),
+        provider VARCHAR(255),
+        config_id VARCHAR(255),
+        is_adversarial BOOLEAN,
+        error TEXT,
+        efficiency_ratio DOUBLE PRECISION,
+        waste_index DOUBLE PRECISION,
+        semantic_drift DOUBLE PRECISION,
+        hallucination_prob DOUBLE PRECISION,
+        censorship_score DOUBLE PRECISION,
+        bias_score DOUBLE PRECISION,
+        tokens_per_second DOUBLE PRECISION,
+        cost_usd DOUBLE PRECISION,
+        success BOOLEAN,
+        _loaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
 
-  // Create raw events table if not exists
-  await db.exec(`
-    CREATE TABLE IF NOT EXISTS raw_llm_events (
-      id BIGINT PRIMARY KEY,
-      timestamp TIMESTAMP,
-      prompt TEXT,
-      response TEXT,
-      input_tokens INTEGER,
-      output_tokens INTEGER,
-      latency_ms INTEGER,
-      model VARCHAR,
-      provider VARCHAR,
-      config_id VARCHAR,
-      is_adversarial BOOLEAN,
-      error TEXT,
-      efficiency_ratio DOUBLE,
-      waste_index DOUBLE,
-      semantic_drift DOUBLE,
-      hallucination_prob DOUBLE,
-      censorship_score DOUBLE,
-      bias_score DOUBLE,
-      tokens_per_second DOUBLE,
-      cost_usd DOUBLE,
-      success BOOLEAN,
-      _loaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    );
+    // Create index on timestamp for better query performance
+    await client.query(`
+      CREATE INDEX IF NOT EXISTS idx_raw_llm_events_timestamp 
+      ON raw_llm_events(timestamp)
+    `);
 
-    CREATE SEQUENCE IF NOT EXISTS seq_event_id START 1;
-  `);
+    // Create index on _loaded_at for incremental processing
+    await client.query(`
+      CREATE INDEX IF NOT EXISTS idx_raw_llm_events_loaded_at 
+      ON raw_llm_events(_loaded_at)
+    `);
 
-  console.log("DuckDB initialized at:", DB_PATH);
-  return db;
+    isInitialized = true;
+    console.log("Postgres initialized successfully");
+  } finally {
+    client.release();
+  }
 }
 
 async function insertEvent(event: LLMEventPayload): Promise<void> {
-  const database = await initDatabase();
+  await initDatabase();
 
-  const stmt = await database.prepare(`
+  const query = `
     INSERT INTO raw_llm_events (
-      id, timestamp, prompt, response, input_tokens, output_tokens,
+      timestamp, prompt, response, input_tokens, output_tokens,
       latency_ms, model, provider, config_id, is_adversarial, error,
       efficiency_ratio, waste_index, semantic_drift, hallucination_prob,
       censorship_score, bias_score, tokens_per_second, cost_usd, success
     ) VALUES (
-      nextval('seq_event_id'),
-      to_timestamp(${event.timestamp / 1000.0}),
-      ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+      to_timestamp($1 / 1000.0),
+      $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20
     )
-  `);
+  `;
 
-  await stmt.run(
+  const values = [
+    event.timestamp,
     event.prompt,
     event.response || null,
     event.inputTokens,
@@ -115,10 +141,10 @@ async function insertEvent(event: LLMEventPayload): Promise<void> {
     event.biasScore || null,
     event.tokensPerSecond || null,
     event.costUsd || null,
-    event.success ?? true
-  );
+    event.success ?? true,
+  ];
 
-  await stmt.finalize();
+  await pool.query(query, values);
 }
 
 function verifyAuth(req: http.IncomingMessage): boolean {
@@ -181,10 +207,12 @@ async function handleRequest(req: http.IncomingMessage, res: http.ServerResponse
         }
 
         res.writeHead(200, { "Content-Type": "application/json" });
-        res.end(JSON.stringify({ 
-          success: true, 
-          eventsReceived: events.length 
-        }));
+        res.end(
+          JSON.stringify({
+            success: true,
+            eventsReceived: events.length,
+          })
+        );
       } catch (error: any) {
         console.error("Error processing webhook:", error);
         res.writeHead(400, { "Content-Type": "application/json" });
@@ -197,9 +225,9 @@ async function handleRequest(req: http.IncomingMessage, res: http.ServerResponse
   // Stats endpoint (for debugging)
   if (path === "/stats" && req.method === "GET") {
     try {
-      const database = await initDatabase();
-      const result = await database.all("SELECT COUNT(*) as count FROM raw_llm_events");
-      const count = result[0]?.count || 0;
+      await initDatabase();
+      const result = await pool.query("SELECT COUNT(*) as count FROM raw_llm_events");
+      const count = parseInt(result.rows[0]?.count || "0", 10);
 
       res.writeHead(200, { "Content-Type": "application/json" });
       res.end(JSON.stringify({ totalEvents: count }));
@@ -220,7 +248,6 @@ const server = http.createServer(handleRequest);
 
 server.listen(PORT, () => {
   console.log(`ETL Webhook server running on port ${PORT}`);
-  console.log(`Database path: ${DB_PATH}`);
   console.log(`Health check: http://localhost:${PORT}/health`);
   console.log(`Webhook endpoint: http://localhost:${PORT}/webhook/events`);
   console.log(`Stats endpoint: http://localhost:${PORT}/stats`);
@@ -229,9 +256,16 @@ server.listen(PORT, () => {
 // Graceful shutdown
 process.on("SIGTERM", async () => {
   console.log("SIGTERM received, shutting down gracefully");
-  if (db) {
-    await db.close();
-  }
+  await pool.end();
+  server.close(() => {
+    console.log("Server closed");
+    process.exit(0);
+  });
+});
+
+process.on("SIGINT", async () => {
+  console.log("SIGINT received, shutting down gracefully");
+  await pool.end();
   server.close(() => {
     console.log("Server closed");
     process.exit(0);
