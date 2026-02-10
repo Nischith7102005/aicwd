@@ -1,2 +1,29 @@
-
 .env.local
+.env
+
+# dbt
+etl/target/
+etl/dbt_packages/
+etl/logs/
+etl/.user.yml
+
+# DuckDB data files
+etl/data/
+data/
+*.db
+*.db.wal
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+
+# TypeScript/Node
+dist/
+node_modules/
+*.tsbuildinfo

@@ -1,0 +1,58 @@
+version: 2
+
+sources:
+  - name: raw_convex
+    description: Raw LLM events exported from Convex webhook
+    tables:
+      - name: raw_llm_events
+        description: Raw telemetry events from LLM inferences
+        columns:
+          - name: id
+            description: Auto-incrementing event ID
+            tests:
+              - unique
+              - not_null
+          - name: timestamp
+            description: Event timestamp
+            tests:
+              - not_null
+          - name: prompt
+            description: User prompt text
+          - name: response
+            description: LLM response text
+          - name: input_tokens
+            description: Number of input tokens
+          - name: output_tokens
+            description: Number of output tokens
+          - name: latency_ms
+            description: Request latency in milliseconds
+          - name: model
+            description: Model name/identifier
+          - name: provider
+            description: LLM provider (e.g., openai, anthropic)
+          - name: config_id
+            description: Configuration ID from Convex
+          - name: is_adversarial
+            description: Whether this was an adversarial test
+          - name: error
+            description: Error message if request failed
+          - name: efficiency_ratio
+            description: Output tokens / Input tokens ratio
+          - name: waste_index
+            description: Cognitive waste index (0-1)
+          - name: semantic_drift
+            description: Semantic drift score (0-1)
+          - name: hallucination_prob
+            description: Hallucination probability (0-1)
+          - name: censorship_score
+            description: Censorship detection score (0-1)
+          - name: bias_score
+            description: Bias detection score (0-1)
+          - name: tokens_per_second
+            description: Throughput metric
+          - name: cost_usd
+            description: Estimated cost in USD
+          - name: success
+            description: Whether the inference succeeded
+          - name: _loaded_at
+            description: When the record was loaded into DuckDB
