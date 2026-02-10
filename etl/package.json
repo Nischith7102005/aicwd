@@ -1,7 +1,7 @@
 {
   "name": "monitr-ai-etl",
   "version": "1.0.0",
-  "description": "dbt Core + DuckDB ETL pipeline for monitr-ai LLM observability",
+  "description": "dbt Core + Postgres ETL pipeline for monitr-ai LLM observability",
   "scripts": {
     "webhook": "ts-node webhook.ts",
     "webhook:build": "tsc webhook.ts --outDir dist",
@@ -12,10 +12,11 @@
     "dbt:debug": "dbt debug"
   },
   "dependencies": {
-    "duckdb-async": "^1.0.0"
+    "pg": "^8.11.0"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
+    "@types/pg": "^8.10.0",
     "ts-node": "^10.9.0",
     "typescript": "^5.0.0"
   }
