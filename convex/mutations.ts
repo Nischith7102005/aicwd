@@ -36,19 +36,3 @@ export const addLog = mutation({
     });
   },
 });
-
-export const saveApiConfig = mutation({
-  args: {
-    provider: v.string(),
-    apiKey: v.string(),
-    model: v.string(),
-  },
-  handler: async (ctx, args) => {
-    await ctx.db.insert("apiConfigs", {
-      provider: args.provider,
-      apiKey: args.apiKey,
-      model: args.model,
-      timestamp: Date.now(),
-    });
-  },
-});

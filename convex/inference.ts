@@ -1,5 +1,5 @@
 import { action } from "./_generated/server";
-import { internal } from "./_generated/api";
+import { api, internal } from "./_generated/api";
 import { v } from "convex/values";
 
 export const runInference = action({
@@ -12,7 +12,7 @@ export const runInference = action({
   },
   handler: async (ctx, args) => {
     // Call the LLM
-    const result = await ctx.runAction(internal.llm.callLLM, {
+    const result = await ctx.runAction(api.llm.callLLM, {
       apiKey: args.apiKey,
       provider: args.provider,
       model: args.model,
@@ -28,7 +28,7 @@ export const runInference = action({
     }
 
     // Call the uncensored AI to analyze the response
-    const analysis = await ctx.runAction(internal.llm.callUncensoredAI, {
+    const analysis = await ctx.runAction(api.llm.callUncensoredAI, {
       prompt: args.prompt,
       response: result.content,
     });

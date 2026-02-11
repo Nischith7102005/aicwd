@@ -1,5 +1,6 @@
 import { mutation } from "./_generated/server";
 import { v } from "convex/values";
+import { api } from "./_generated/api";
 
 export const saveApiConfig = mutation({
   args: {
@@ -33,14 +34,14 @@ export const validateApiKey = mutation({
   handler: async (ctx, args) => {
     // Make a test call to validate the API key
     try {
-      const result = await ctx.runAction("llm:callLLM", {
+      const result = await ctx.runAction(api.llm.callLLM, {
         apiKey: args.apiKey,
         provider: args.provider,
         model: "test-model",
         prompt: "Test prompt",
       });
       return { valid: result.success };
-    } catch (error) {
+    } catch (error: any) {
       return { valid: false, error: error.message };
     }
   },

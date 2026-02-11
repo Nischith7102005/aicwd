@@ -7,7 +7,7 @@ A static-first LLM observability platform with real-time dashboards, adversarial
 - **Real-time Metrics**: Track token efficiency, latency, costs, and success rates
 - **Adversarial Testing**: Probe models with uncensored local LLMs for bias and censorship detection
 - **Cognitive Waste Index**: Proprietary metric combining semantic drift, efficiency, and quality indicators
-- **Automated ETL**: dbt Core + DuckDB pipeline with GitHub Actions scheduling
+- **Automated ETL**: dbt Core + Postgres pipeline with GitHub Actions scheduling
 
 ## Quick Start
 
@@ -32,13 +32,13 @@ npm run dev
 
 ## ETL Pipeline
 
-The ETL pipeline exports telemetry data from Convex to DuckDB for advanced analytics.
+The ETL pipeline exports telemetry data from Convex to Postgres for advanced analytics.
 
 ### Architecture
 
 ```
 ┌─────────────┐     ┌─────────────┐     ┌─────────────┐     ┌─────────────┐
-│   Convex    │────▶│   Webhook   │────▶│   DuckDB    │────▶│   dbt       │
+│   Convex    │────▶│   Webhook   │────▶│   Postgres  │────▶│   dbt       │
 │  Database   │     │   Handler   │     │  Database   │     │  Models     │
 └─────────────┘     └─────────────┘     └─────────────┘     └─────────────┘
 ```
@@ -59,7 +59,7 @@ The ETL pipeline exports telemetry data from Convex to DuckDB for advanced analy
 3. **Run dbt manually**:
    ```bash
    cd etl
-   pip install dbt-duckdb
+   pip install dbt-postgres
    dbt deps
    dbt run
    ```
@@ -81,7 +81,7 @@ The dbt pipeline runs automatically:
 │   ├── metrics.ts       # Metrics computation
 │   └── schema.ts        # Database schema
 ├── frontend/            # Static HTML/CSS/JS dashboard
-├── etl/                 # dbt + DuckDB ETL pipeline
+├── etl/                 # dbt + Postgres ETL pipeline
 │   ├── models/          # dbt models
 │   ├── webhook.ts       # Webhook handler
 │   └── README.md        # ETL documentation
@@ -100,7 +100,7 @@ ETL_WEBHOOK_SECRET=      # Webhook authentication secret
 ### ETL Webhook
 ```bash
 PORT=3001                # Webhook server port
-DUCKDB_PATH=             # Path to DuckDB file
+DATABASE_URL=            # Postgres connection string
 WEBHOOK_SECRET=          # Shared secret
 ```
 
