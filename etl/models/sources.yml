@@ -55,4 +55,4 @@ sources:
           - name: success
             description: Whether the inference succeeded
           - name: _loaded_at
-            description: When the record was loaded into DuckDB
+            description: When the record was loaded into Postgres

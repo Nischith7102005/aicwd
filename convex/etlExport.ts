@@ -6,7 +6,7 @@ import { v } from "convex/values";
  * ETL Export Actions
  * 
  * These actions export telemetry data from Convex to an external webhook
- * for ingestion into the dbt + DuckDB ETL pipeline.
+ * for ingestion into the dbt + Postgres ETL pipeline.
  */
 
 interface WebhookPayload {

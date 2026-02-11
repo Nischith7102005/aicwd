@@ -5,7 +5,7 @@ import { api } from "./_generated/api";
 export const logInference = mutation({
   args: { 
     prompt: v.string(), 
-    configId: v.id("api_configs"),
+    configId: v.id("apiConfigs"),
     systemPrompt: v.optional(v.string()),
     temperature: v.optional(v.number()),
   },
@@ -19,14 +19,11 @@ export const logInference = mutation({
 
     try {
       // Call the actual LLM via the action
-      const llmResponse = await ctx.scheduler.runAfter(0, api.actions.callLLM, {
+      const llmResponse = await ctx.scheduler.runAfter(0, api.llm.callLLM, {
         apiKey: config.apiKey,
         provider: config.provider,
-        model: config.modelName,
+        model: config.modelName || config.model,
         prompt: args.prompt,
-        baseUrl: config.baseUrl,
-        systemPrompt: args.systemPrompt,
-        temperature: args.temperature,
       });
 
       if (!llmResponse.success) {
@@ -38,7 +35,7 @@ export const logInference = mutation({
           inputTokens: llmResponse.inputTokens || 0,
           outputTokens: 0,
           latency: llmResponse.latencyMs,
-          model: config.modelName,
+          model: config.modelName || config.model,
           provider: config.provider,
           configId: args.configId,
           isAdversarial: false,
@@ -51,7 +48,7 @@ export const logInference = mutation({
           configId: args.configId,
           inputTokens: llmResponse.inputTokens || 0,
           outputTokens: 0,
-          latency: llmResponse.latencyMs,
+          latencyMs: llmResponse.latencyMs,
           tokensPerSecond: 0,
           costUsd: 0,
           success: false,
@@ -81,7 +78,7 @@ export const logInference = mutation({
         inputTokens: llmResponse.inputTokens || 0,
         outputTokens: llmResponse.outputTokens || 0,
         latency: llmResponse.latencyMs,
-        model: config.modelName,
+        model: config.modelName || config.model,
         provider: config.provider,
         configId: args.configId,
         isAdversarial: false,
@@ -94,14 +91,13 @@ export const logInference = mutation({
         configId: args.configId,
         inputTokens: llmResponse.inputTokens || 0,
         outputTokens: llmResponse.outputTokens || 0,
-        latency: llmResponse.latencyMs,
+        latencyMs: llmResponse.latencyMs,
         tokensPerSecond,
         costUsd,
-        outputRatio,
         success: true,
         // Placeholder for future semantic analysis
-        semanticDrift: null,
-        hallucinationScore: null,
+        semanticDrift: 0,
+        hallucinationProb: null,
       });
 
       return { 
@@ -126,7 +122,7 @@ export const logInference = mutation({
 export const logBatchInference = mutation({
   args: {
     prompt: v.string(),
-    configIds: v.array(v.id("api_configs")),
+    configIds: v.array(v.id("apiConfigs")),
     systemPrompt: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
@@ -135,10 +131,17 @@ export const logBatchInference = mutation({
 
     const results = await Promise.allSettled(
       args.configIds.map(async (configId) => {
-        return ctx.scheduler.runAfter(0, api.mutations.logInference, {
+        const config = await ctx.db.get(configId);
+        if (!config) {
+          return { success: false, error: "Config not found" };
+        }
+
+        // Call LLM action directly
+        return ctx.scheduler.runAfter(0, api.llm.callLLM, {
+          apiKey: config.apiKey,
+          provider: config.provider,
+          model: config.modelName || config.model,
           prompt: args.prompt,
-          configId,
-          systemPrompt: args.systemPrompt,
         });
       })
     );
@@ -149,14 +152,14 @@ export const logBatchInference = mutation({
       batchId,
       prompt: args.prompt,
       configIds: args.configIds,
-      resultCount: results.filter(r => r.status === "fulfilled").length,
+      resultCount: results.filter(r => r.status === "fulfilled" && (r.value as any).success).length,
     });
 
     return {
       batchId,
       results: results.map((result, index) => ({
         configId: args.configIds[index],
-        success: result.status === "fulfilled",
+        success: result.status === "fulfilled" && (result.value as any).success,
         data: result.status === "fulfilled" ? result.value : null,
         error: result.status === "rejected" ? result.reason : null,
       })),
@@ -166,7 +169,7 @@ export const logBatchInference = mutation({
 
 // Get latest metrics for a specific config
 export const getLatestMetric = query({
-  args: { configId: v.id("api_configs") },
+  args: { configId: v.id("apiConfigs") },
   handler: async (ctx, args) => {
     const metric = await ctx.db
       .query("metrics")
@@ -182,7 +185,7 @@ export const getLatestMetric = query({
       ...metric,
       config: config ? {
         provider: config.provider,
-        model: config.modelName,
+        model: config.modelName || config.model,
       } : null,
     };
   }
@@ -204,7 +207,7 @@ export const getRecentLogs = query({
         const config = log.configId ? await ctx.db.get(log.configId) : null;
         return {
           ...log,
-          configName: config?.name || "Unknown",
+          configName: config?.name || config?.model || "Unknown",
           provider: log.provider || config?.provider || "Unknown",
         };
       })
@@ -217,20 +220,20 @@ export const getRecentLogs = query({
 // Get metrics for a time range
 export const getMetricsInRange = query({
   args: {
-    configId: v.optional(v.id("api_configs")),
+    configId: v.optional(v.id("apiConfigs")),
     startTime: v.number(),
     endTime: v.number(),
   },
   handler: async (ctx, args) => {
-    let query = ctx.db.query("metrics");
+    let queryBuilder = ctx.db.query("metrics");
 
     if (args.configId) {
-      query = query.withIndex("by_config", (q) => 
+      queryBuilder = queryBuilder.withIndex("by_config", (q) => 
         q.eq("configId", args.configId)
       );
     }
 
-    const allMetrics = await query.collect();
+    const allMetrics = await queryBuilder.collect();
     
     // Filter by time range
     const filteredMetrics = allMetrics.filter(
@@ -243,7 +246,7 @@ export const getMetricsInRange = query({
 
 // Aggregate statistics for a config
 export const getConfigStats = query({
-  args: { configId: v.id("api_configs") },
+  args: { configId: v.id("apiConfigs") },
   handler: async (ctx, args) => {
     const metrics = await ctx.db
       .query("metrics")
@@ -258,6 +261,9 @@ export const getConfigStats = query({
         avgTokensPerSecond: 0,
         totalCost: 0,
         totalTokens: 0,
+        p50Latency: 0,
+        p95Latency: 0,
+        p99Latency: 0,
       };
     }
 
@@ -266,17 +272,17 @@ export const getConfigStats = query({
     const stats = {
       totalInferences: metrics.length,
       successRate: (successful.length / metrics.length) * 100,
-      avgLatency: successful.reduce((sum, m) => sum + m.latency, 0) / successful.length,
-      avgTokensPerSecond: successful.reduce((sum, m) => sum + m.tokensPerSecond, 0) / successful.length,
+      avgLatency: successful.reduce((sum, m) => sum + (m.latencyMs || 0), 0) / successful.length,
+      avgTokensPerSecond: successful.reduce((sum, m) => sum + (m.tokensPerSecond || 0), 0) / successful.length,
       totalCost: metrics.reduce((sum, m) => sum + (m.costUsd || 0), 0),
       totalTokens: metrics.reduce((sum, m) => sum + m.inputTokens + m.outputTokens, 0),
-      p50Latency: 0, // Calculate percentiles
+      p50Latency: 0,
       p95Latency: 0,
       p99Latency: 0,
     };
 
     // Calculate latency percentiles
-    const latencies = successful.map(m => m.latency).sort((a, b) => a - b);
+    const latencies = successful.map(m => m.latencyMs || 0).sort((a, b) => a - b);
     if (latencies.length > 0) {
       stats.p50Latency = latencies[Math.floor(latencies.length * 0.5)];
       stats.p95Latency = latencies[Math.floor(latencies.length * 0.95)];
@@ -290,7 +296,7 @@ export const getConfigStats = query({
 // Compare multiple configs side-by-side
 export const compareConfigs = query({
   args: { 
-    configIds: v.array(v.id("api_configs")),
+    configIds: v.array(v.id("apiConfigs")),
     hours: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
@@ -300,18 +306,32 @@ export const compareConfigs = query({
     const comparisons = await Promise.all(
       args.configIds.map(async (configId) => {
         const config = await ctx.db.get(configId);
-        const stats = await ctx.runQuery(api.queries.getConfigStats, { configId });
         const recentMetrics = await ctx.db
           .query("metrics")
           .withIndex("by_config", (q) => q.eq("configId", configId))
           .filter((q) => q.gte(q.field("timestamp"), startTime))
           .collect();
 
+        // Calculate stats inline since we can't call queries from queries
+        const metrics = await ctx.db
+          .query("metrics")
+          .withIndex("by_config", (q) => q.eq("configId", configId))
+          .collect();
+        
+        const successful = metrics.filter(m => m.success);
+        const stats = {
+          totalInferences: metrics.length,
+          successRate: metrics.length > 0 ? (successful.length / metrics.length) * 100 : 0,
+          avgLatency: successful.length > 0 
+            ? successful.reduce((sum, m) => sum + (m.latencyMs || 0), 0) / successful.length 
+            : 0,
+        };
+
         return {
           configId,
           name: config?.name,
           provider: config?.provider,
-          model: config?.modelName,
+          model: config?.modelName || config?.model,
           stats,
           recentInferences: recentMetrics.length,
         };
@@ -337,10 +357,11 @@ export const getDashboardLive = query({
       .collect();
 
     const totalInferences = allMetrics.length;
-    const successfulInferences = allMetrics.filter(m => m.success).length;
+    const successfulMetrics = allMetrics.filter(m => m.success);
+    const successfulInferences = successfulMetrics.length;
     const totalCost = allMetrics.reduce((sum, m) => sum + (m.costUsd || 0), 0);
     const avgLatency = successfulInferences > 0
-      ? allMetrics.filter(m => m.success).reduce((sum, m) => sum + m.latency, 0) / successfulInferences
+      ? successfulMetrics.reduce((sum, m) => sum + (m.latencyMs || 0), 0) / successfulInferences
       : 0;
 
     return {
