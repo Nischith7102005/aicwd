@@ -58,6 +58,9 @@ WEBHOOK_SECRET=your-secret
 - `marts/cognitive_waste_index` - Comprehensive waste scoring
 - `marts/provider_comparison` - Cross-provider analysis
 
+**Metric lineage:**
+- `metrics_lineage.md` - Raw vs transformed table inventory and metric-to-source mapping
+
 ### 3. GitHub Actions Workflow (`.github/workflows/dbt.yml`)
 
 Runs dbt on a schedule (hourly) and on manual trigger.
