@@ -52,6 +52,12 @@ interface LLMEventPayload {
   success?: boolean;
 }
 
+interface LogPayload {
+  level: string;
+  message: string;
+  timestamp: number;
+}
+
 let isInitialized = false;
 
 async function initDatabase(): Promise<void> {
@@ -99,6 +105,29 @@ async function initDatabase(): Promise<void> {
       ON raw_llm_events(_loaded_at)
     `);
 
+    // Create logs table
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS logs (
+        id BIGSERIAL PRIMARY KEY,
+        level VARCHAR(50) NOT NULL,
+        message TEXT NOT NULL,
+        timestamp TIMESTAMP NOT NULL,
+        _loaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    // Create index on logs timestamp
+    await client.query(`
+      CREATE INDEX IF NOT EXISTS idx_logs_timestamp 
+      ON logs(timestamp)
+    `);
+
+    // Create index on logs level
+    await client.query(`
+      CREATE INDEX IF NOT EXISTS idx_logs_level 
+      ON logs(level)
+    `);
+
     isInitialized = true;
     console.log("Postgres initialized successfully");
   } finally {
@@ -142,6 +171,26 @@ async function insertEvent(event: LLMEventPayload): Promise<void> {
     event.tokensPerSecond || null,
     event.costUsd || null,
     event.success ?? true,
+  ];
+
+  await pool.query(query, values);
+}
+
+async function insertLog(log: LogPayload): Promise<void> {
+  await initDatabase();
+
+  const query = `
+    INSERT INTO logs (
+      level, message, timestamp
+    ) VALUES (
+      $1, $2, to_timestamp($3 / 1000.0)
+    )
+  `;
+
+  const values = [
+    log.level,
+    log.message,
+    log.timestamp,
   ];
 
   await pool.query(query, values);
@@ -222,6 +271,41 @@ async function handleRequest(req: http.IncomingMessage, res: http.ServerResponse
     return;
   }
 
+  // Logs webhook endpoint
+  if (path === "/webhook/logs" && req.method === "POST") {
+    if (!verifyAuth(req)) {
+      res.writeHead(401, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ error: "Unauthorized" }));
+      return;
+    }
+
+    let body = "";
+    req.on("data", (chunk) => (body += chunk));
+    req.on("end", async () => {
+      try {
+        const payload: LogPayload | LogPayload[] = JSON.parse(body);
+        const logs = Array.isArray(payload) ? payload : [payload];
+
+        for (const log of logs) {
+          await insertLog(log);
+        }
+
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(
+          JSON.stringify({
+            success: true,
+            logsReceived: logs.length,
+          })
+        );
+      } catch (error: any) {
+        console.error("Error processing logs webhook:", error);
+        res.writeHead(400, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ error: error.message }));
+      }
+    });
+    return;
+  }
+
   // Stats endpoint (for debugging)
   if (path === "/stats" && req.method === "GET") {
     try {
@@ -250,6 +334,7 @@ server.listen(PORT, () => {
   console.log(`ETL Webhook server running on port ${PORT}`);
   console.log(`Health check: http://localhost:${PORT}/health`);
   console.log(`Webhook endpoint: http://localhost:${PORT}/webhook/events`);
+  console.log(`Logs webhook endpoint: http://localhost:${PORT}/webhook/logs`);
   console.log(`Stats endpoint: http://localhost:${PORT}/stats`);
 });
 

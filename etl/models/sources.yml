@@ -56,3 +56,25 @@ sources:
             description: Whether the inference succeeded
           - name: _loaded_at
             description: When the record was loaded into Postgres
+      - name: logs
+        description: Application logs exported from Convex logs table
+        columns:
+          - name: id
+            description: Auto-incrementing log ID
+            tests:
+              - unique
+              - not_null
+          - name: level
+            description: Log level (e.g., info, warn, error)
+            tests:
+              - not_null
+          - name: message
+            description: Log message
+            tests:
+              - not_null
+          - name: timestamp
+            description: Log timestamp
+            tests:
+              - not_null
+          - name: _loaded_at
+            description: When the record was loaded into Postgres
