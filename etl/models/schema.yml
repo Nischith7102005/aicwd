@@ -18,6 +18,31 @@ models:
         tests:
           - not_null
 
+  - name: stg_logs
+    description: Staged application logs with enriched fields
+    columns:
+      - name: id
+        description: Primary key
+        tests:
+          - unique
+          - not_null
+      - name: log_timestamp
+        description: Log timestamp
+        tests:
+          - not_null
+      - name: log_level
+        description: Log level (e.g., info, warn, error)
+        tests:
+          - not_null
+      - name: message
+        description: Log message
+        tests:
+          - not_null
+      - name: log_level_category
+        description: Normalized log level category
+      - name: log_level_severity
+        description: Numeric severity level (1-5)
+
   - name: daily_metrics
     description: Daily aggregated metrics by provider and model
     columns:

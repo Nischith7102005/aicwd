@@ -32,6 +32,12 @@ interface WebhookPayload {
   success: boolean;
 }
 
+interface LogPayload {
+  level: string;
+  message: string;
+  timestamp: number;
+}
+
 async function sendToWebhook(payload: WebhookPayload | WebhookPayload[]): Promise<{ success: boolean; error?: string }> {
   const webhookUrl = process.env.ETL_WEBHOOK_URL;
   const webhookSecret = process.env.ETL_WEBHOOK_SECRET;
@@ -63,6 +69,43 @@ async function sendToWebhook(payload: WebhookPayload | WebhookPayload[]): Promis
     return { success: true };
   } catch (error: any) {
     console.error("Failed to send to webhook:", error);
+    return { success: false, error: error.message };
+  }
+}
+
+async function sendLogsToWebhook(payload: LogPayload | LogPayload[]): Promise<{ success: boolean; error?: string }> {
+  const webhookUrl = process.env.ETL_WEBHOOK_URL;
+  const webhookSecret = process.env.ETL_WEBHOOK_SECRET;
+
+  if (!webhookUrl) {
+    return { success: false, error: "ETL_WEBHOOK_URL not configured" };
+  }
+
+  const logsWebhookUrl = webhookUrl.replace(/\/?$/, '/logs');
+
+  try {
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+    };
+
+    if (webhookSecret) {
+      headers["X-Webhook-Secret"] = webhookSecret;
+    }
+
+    const response = await fetch(logsWebhookUrl, {
+      method: "POST",
+      headers,
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Webhook returned ${response.status}: ${errorText}`);
+    }
+
+    return { success: true };
+  } catch (error: any) {
+    console.error("Failed to send logs to webhook:", error);
     return { success: false, error: error.message };
   }
 }
@@ -197,5 +240,65 @@ export const testWebhook = action({
     };
 
     return await sendToWebhook(testPayload);
+  },
+});
+
+/**
+ * Export a single log entry to the ETL webhook.
+ * Call this after logging to export it to the dbt pipeline.
+ */
+export const exportLog = action({
+  args: {
+    level: v.string(),
+    message: v.string(),
+    timestamp: v.number(),
+  },
+  handler: async (_ctx, args) => {
+    const payload: LogPayload = {
+      level: args.level,
+      message: args.message,
+      timestamp: args.timestamp,
+    };
+
+    return await sendLogsToWebhook(payload);
+  },
+});
+
+/**
+ * Export a batch of recent logs to the webhook.
+ * Useful for backfilling or scheduled exports.
+ */
+export const exportRecentLogs = action({
+  args: {
+    hoursBack: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    const hoursBack = args.hoursBack || 1;
+    const cutoffTime = Date.now() - hoursBack * 60 * 60 * 1000;
+
+    // Fetch recent logs from the logs table
+    const recentLogs = await ctx.db
+      .query("logs")
+      .withIndex("by_timestamp")
+      .filter((q) => q.gte(q.field("timestamp"), cutoffTime))
+      .collect();
+
+    if (recentLogs.length === 0) {
+      return { success: true, exportedCount: 0, message: "No logs to export" };
+    }
+
+    // Transform to log payload format
+    const payloads: LogPayload[] = recentLogs.map((log: any) => ({
+      level: log.level,
+      message: log.message,
+      timestamp: log.timestamp,
+    }));
+
+    const result = await sendLogsToWebhook(payloads);
+
+    return {
+      ...result,
+      exportedCount: payloads.length,
+    };
   },
 });
