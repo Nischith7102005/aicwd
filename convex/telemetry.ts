@@ -463,6 +463,132 @@ export const getDashboardData = action({
 });
 
 /**
+ * Run a single cognitive vulnerability test iteration
+ * Designed to be called repeatedly by frontend for continuous monitoring
+ */
+export const runSingleTest = action({
+  args: {
+    apiKey: v.string(),
+    provider: v.string(),
+    model: v.string(),
+    sessionId: v.string(),
+    category: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const startTime = Date.now();
+
+    // Generate a random cognitive vulnerability prompt
+    const promptData = await ctx.runAction(api.cognitivePrompts.generatePrompt, {
+      category: args.category,
+    });
+
+    // Log the prompt being tested
+    await ctx.runMutation(api.mutations.addLog, {
+      level: "INFO",
+      message: `[${args.provider}] Testing: "${promptData.prompt.slice(0, 50)}…" [${promptData.categoryName}]`,
+    });
+
+    // Call LLM
+    const llmResult = await ctx.runAction(api.llm.callLLM, {
+      apiKey: args.apiKey,
+      provider: args.provider,
+      model: args.model,
+      prompt: promptData.prompt,
+    });
+
+    if (!llmResult.success) {
+      await ctx.runMutation(api.mutations.addLog, {
+        level: "ALERT",
+        message: `[${args.provider}] FAIL: ${llmResult.error?.slice(0, 100)}`,
+      });
+      return {
+        success: false,
+        error: llmResult.error,
+        category: promptData.category,
+        categoryName: promptData.categoryName,
+      };
+    }
+
+    const inputTokens = llmResult.inputTokens || 0;
+    const outputTokens = llmResult.outputTokens || 0;
+    const latencyMs = llmResult.latencyMs;
+
+    // Calculate metrics
+    const efficiencyRatio = inputTokens > 0 ? outputTokens / inputTokens : 0;
+    const wasteIndex = Math.max(0, Math.min(1, 1 - efficiencyRatio));
+
+    // Semantic drift heuristic
+    const expectedLen = promptData.prompt.length * 3;
+    const actualLen = (llmResult.content || "").length;
+    const semanticDrift = Math.min(
+      1,
+      Math.abs(actualLen - expectedLen) / (expectedLen || 1) * 0.3
+    );
+
+    // Hallucination probability heuristic
+    const hallucinationProb = Math.min(
+      1,
+      (1 - Math.min(outputTokens, inputTokens * 5) / (inputTokens * 5 || 1)) * 0.15
+    );
+
+    // Censorship & bias analysis
+    let censorshipScore = 0;
+    let biasScore = 0;
+    try {
+      const analysis = await ctx.runAction(api.llm.callUncensoredAI, {
+        prompt: promptData.prompt,
+        response: llmResult.content || "",
+      });
+      censorshipScore = analysis.censorshipScore;
+      biasScore = analysis.biasScore;
+    } catch (e: any) {
+      console.error("Analysis failed:", e.message);
+    }
+
+    // Save metrics
+    await ctx.runMutation(api.mutations.saveMetrics, {
+      inputTokens,
+      outputTokens,
+      efficiencyRatio,
+      wasteIndex,
+      semanticDrift,
+      hallucinationProb,
+      censorshipScore,
+      biasScore,
+      latencyMs,
+      provider: args.provider,
+      model: args.model,
+    });
+
+    // Log success
+    await ctx.runMutation(api.mutations.addLog, {
+      level: "INFO",
+      message: `[${args.provider}] ✓ ${promptData.categoryName} → ${latencyMs}ms, ${outputTokens} tokens`,
+    });
+
+    return {
+      success: true,
+      prompt: promptData.prompt,
+      category: promptData.category,
+      categoryName: promptData.categoryName,
+      responsePreview: llmResult.content?.slice(0, 100),
+      metrics: {
+        inputTokens,
+        outputTokens,
+        latencyMs,
+        efficiencyRatio,
+        wasteIndex,
+        semanticDrift,
+        hallucinationProb,
+        censorshipScore,
+        biasScore,
+      },
+      processingTimeMs: Date.now() - startTime,
+    };
+  },
+});
+
+/**
  * Real-time monitoring hook - call this on every interaction
  * Returns quick status for real-time UI updates
  */

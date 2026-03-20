@@ -131,6 +131,21 @@
         }
         .btn-danger:hover { background: rgba(255, 68, 102, 0.2); box-shadow: 0 0 20px var(--glow-red); }
 
+        .btn-success {
+            background: rgba(74, 222, 128, 0.1);
+            border-color: var(--accent-green);
+            color: var(--accent-green);
+        }
+        .btn-success:hover { background: rgba(74, 222, 128, 0.2); box-shadow: 0 0 20px var(--glow-green); }
+
+        .btn-pulse {
+            animation: btn-pulse 2s ease-in-out infinite;
+        }
+        @keyframes btn-pulse {
+            0%, 100% { box-shadow: 0 0 5px var(--glow-green); }
+            50% { box-shadow: 0 0 20px var(--glow-green); }
+        }
+
         .btn-ghost {
             background: transparent;
             border-color: var(--border-color);
@@ -286,7 +301,7 @@
                 </div>
             </div>
             <div class="header-actions">
-                <button class="btn btn-danger" id="stress-btn" onclick="triggerRedTeam()">INITIATE_STRESS_TEST</button>
+                <button class="btn btn-success" id="monitoring-btn" onclick="toggleMonitoring()">▶ START_MONITORING</button>
                 <button class="btn btn-ghost" onclick="window.location.href='key.html'">CHANGE KEY</button>
             </div>
         </header>
@@ -777,27 +792,83 @@
         logConsole.scrollTop = logConsole.scrollHeight;
     });
 
-    // ── Stress Test ──────────────────────────────────────────────────
-    window.triggerRedTeam = async () => {
-        const btn = document.getElementById("stress-btn");
-        btn.innerText = "RUNNING...";
-        btn.disabled = true;
-        btn.style.opacity = "0.6";
+    // ── Continuous Monitoring State ───────────────────────────────────
+    let isMonitoring = false;
+    let monitoringInterval = null;
+    let sessionId = `sess_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    let testCount = 0;
+
+    // ── Toggle Monitoring (Start/Stop) ───────────────────────────────────
+    window.toggleMonitoring = async () => {
+        const btn = document.getElementById("monitoring-btn");
+        const indicator = document.querySelector(".status-indicator");
+
+        if (isMonitoring) {
+            // STOP monitoring
+            isMonitoring = false;
+            if (monitoringInterval) {
+                clearTimeout(monitoringInterval);
+                monitoringInterval = null;
+            }
+            btn.innerText = "▶ START_MONITORING";
+            btn.className = "btn btn-success";
+
+            // Update status indicator
+            indicator.style.background = "var(--accent-purple)";
+            indicator.style.boxShadow = "0 0 10px var(--glow-purple)";
+
+            await client.mutation("mutations:addLog", {
+                level: "INFO",
+                message: `[${config.provider}] Monitoring stopped. Total tests: ${testCount}`,
+            });
+        } else {
+            // START monitoring
+            isMonitoring = true;
+            testCount = 0;
+            sessionId = `sess_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+            btn.innerText = "⏹ STOP_MONITORING";
+            btn.className = "btn btn-danger btn-pulse";
+
+            // Update status indicator - active monitoring
+            indicator.style.background = "var(--accent-green)";
+            indicator.style.boxShadow = "0 0 15px var(--glow-green)";
+
+            await client.mutation("mutations:addLog", {
+                level: "INFO",
+                message: `[${config.provider}] Continuous monitoring started. Session: ${sessionId}`,
+            });
+
+            runMonitoringLoop();
+        }
+    };
+
+    // ── Monitoring Loop ─────────────────────────────────────────────────
+    const runMonitoringLoop = async () => {
+        if (!isMonitoring) return;
 
         try {
-            await client.action("agent:runStressTest", {
+            testCount++;
+            const result = await client.action("telemetry:runSingleTest", {
                 apiKey: config.apiKey,
                 provider: config.provider,
                 model: config.model,
-                count: 5,
+                sessionId: sessionId,
             });
+
+            if (result.success) {
+                // Metrics are automatically saved by the backend
+                console.log(`Test #${testCount}: ${result.categoryName} completed`);
+            } else {
+                console.error(`Test #${testCount} failed:`, result.error);
+            }
         } catch (e) {
-            console.error("Stress test error:", e);
+            console.error("Monitoring iteration error:", e);
         }
 
-        btn.innerText = "INITIATE_STRESS_TEST";
-        btn.disabled = false;
-        btn.style.opacity = "1";
+        // Schedule next iteration with a small delay
+        if (isMonitoring) {
+            monitoringInterval = setTimeout(runMonitoringLoop, 1500);
+        }
     };
 
     // ── Clock ────────────────────────────────────────────────────────
