@@ -1,0 +1,15 @@
+{
+  "name": "cognitive-waste-observatory",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "concurrently \"python -m http.server 8080 --directory frontend\"",
+    "build": "echo \"No build step required - static frontend in ./frontend\"",
+    "deploy": "npx convex deploy"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  },
+  "dependencies": {
+    "convex": "^1.31.7"
+  }
+}

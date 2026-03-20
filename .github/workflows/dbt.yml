@@ -1,0 +1,94 @@
+name: dbt ETL Pipeline
+on:
+  # Run on schedule (every hour)
+  schedule:
+    - cron: "0 * * * *"
+  # Manual trigger
+  workflow_dispatch:
+    inputs:
+      full_refresh:
+        description: "Run with full refresh"
+        type: boolean
+        default: false
+      target:
+        description: "dbt target environment"
+        type: choice
+        options:
+          - dev
+          - ci
+        default: dev
+  # Trigger on webhook data changes (optional - can be set up via external trigger)
+  repository_dispatch:
+    types: [new-telemetry-data]
+env:
+  DBT_PROFILES_DIR: ./etl
+  PGHOST: ${{ secrets.PGHOST }}
+  PGPORT: ${{ secrets.PGPORT || '5432' }}
+  PGDATABASE: ${{ secrets.PGDATABASE }}
+  PGUSER: ${{ secrets.PGUSER }}
+  PGPASSWORD: ${{ secrets.PGPASSWORD }}
+  PGSCHEMA: ${{ secrets.PGSCHEMA || 'public' }}
+  PGSSLMODE: ${{ secrets.PGSSLMODE || 'require' }}
+jobs:
+  dbt-run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dbt and Postgres adapter
+        run: |
+          pip install dbt-postgres
+        working-directory: ./etl
+      - name: Install dbt packages
+        run: dbt deps --debug
+        working-directory: ./etl
+      - name: Run dbt debug
+        run: dbt debug --target ${{ github.event.inputs.target || 'dev' }}
+        working-directory: ./etl
+      - name: Run dbt seed
+        run: dbt seed --target ${{ github.event.inputs.target || 'dev' }}
+        working-directory: ./etl
+        continue-on-error: true
+      - name: Run dbt models
+        run: |
+          if [ "${{ github.event.inputs.full_refresh }}" == "true" ]; then
+            dbt run --full-refresh --target ${{ github.event.inputs.target || 'dev' }}
+          else
+            dbt run --target ${{ github.event.inputs.target || 'dev' }}
+          fi
+        working-directory: ./etl
+      - name: Run dbt tests
+        run: dbt test --target ${{ github.event.inputs.target || 'dev' }}
+        working-directory: ./etl
+        continue-on-error: true
+      - name: Generate dbt docs
+        run: dbt docs generate --target ${{ github.event.inputs.target || 'dev' }}
+        working-directory: ./etl
+      - name: Upload dbt artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dbt-artifacts
+          path: |
+            ./etl/target/
+            ./etl/dbt_packages/
+        if: always()
+  notify:
+    needs: dbt-run
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Notify on failure
+        if: needs.dbt-run.result == 'failure'
+        run: |
+          echo "::error::dbt ETL pipeline failed. Check the logs for details."
+      - name: Summary
+        run: |
+          echo "### dbt ETL Pipeline Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Target**: ${{ github.event.inputs.target || 'dev' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Full Refresh**: ${{ github.event.inputs.full_refresh || 'false' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Status**: ${{ needs.dbt-run.result }}" >> $GITHUB_STEP_SUMMARY

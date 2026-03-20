@@ -1,0 +1,23 @@
+monitr_ai:
+  target: dev
+  outputs:
+    dev:
+      type: postgres
+      host: "{{ env_var('PGHOST') }}"
+      port: "{{ env_var('PGPORT', '5432') | int }}"
+      user: "{{ env_var('PGUSER') }}"
+      password: "{{ env_var('PGPASSWORD') }}"
+      dbname: "{{ env_var('PGDATABASE') }}"
+      schema: "{{ env_var('PGSCHEMA', 'public') }}"
+      threads: 4
+      sslmode: "{{ env_var('PGSSLMODE', 'prefer') }}"
+    ci:
+      type: postgres
+      host: "{{ env_var('PGHOST') }}"
+      port: "{{ env_var('PGPORT', '5432') | int }}"
+      user: "{{ env_var('PGUSER') }}"
+      password: "{{ env_var('PGPASSWORD') }}"
+      dbname: "{{ env_var('PGDATABASE') }}"
+      schema: "{{ env_var('PGSCHEMA', 'public') }}"
+      threads: 2
+      sslmode: "{{ env_var('PGSSLMODE', 'require') }}"

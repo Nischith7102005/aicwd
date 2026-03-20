@@ -1,0 +1,72 @@
+version: 2
+
+models:
+  - name: stg_llm_events
+    description: Staged LLM events with enriched fields
+    columns:
+      - name: id
+        description: Primary key
+        tests:
+          - unique
+          - not_null
+      - name: event_timestamp
+        description: Event timestamp
+        tests:
+          - not_null
+      - name: total_tokens
+        description: Sum of input and output tokens
+        tests:
+          - not_null
+
+  - name: stg_logs
+    description: Staged application logs with enriched fields
+    columns:
+      - name: id
+        description: Primary key
+        tests:
+          - unique
+          - not_null
+      - name: log_timestamp
+        description: Log timestamp
+        tests:
+          - not_null
+      - name: log_level
+        description: Log level (e.g., info, warn, error)
+        tests:
+          - not_null
+      - name: message
+        description: Log message
+        tests:
+          - not_null
+      - name: log_level_category
+        description: Normalized log level category
+      - name: log_level_severity
+        description: Numeric severity level (1-5)
+
+  - name: daily_metrics
+    description: Daily aggregated metrics by provider and model
+    columns:
+      - name: event_date
+        description: Date of aggregation
+        tests:
+          - not_null
+      - name: provider
+        description: LLM provider
+        tests:
+          - not_null
+      - name: total_requests
+        description: Total number of requests
+        tests:
+          - not_null
+
+  - name: cognitive_waste_index
+    description: Comprehensive cognitive waste scoring
+    columns:
+      - name: event_date
+        description: Date of aggregation
+        tests:
+          - not_null
+      - name: cognitive_waste_index
+        description: Weighted waste index (0-1)
+        tests:
+          - not_null

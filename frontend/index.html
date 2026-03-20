@@ -1,0 +1,1888 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>monitr-ai | Cognitive Efficiency Observatory for LLMs</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <style>
+        @layer base, background, components, kinetic, sections, navigation, responsive;
+
+        @layer base {
+            :root {
+                --color-bg: #050508;
+                --color-white: #ffffff;
+                --color-white-90: rgba(255, 255, 255, 0.9);
+                --color-white-70: rgba(255, 255, 255, 0.7);
+                --color-white-50: rgba(255, 255, 255, 0.5);
+                --color-white-30: rgba(255, 255, 255, 0.3);
+                --color-white-20: rgba(255, 255, 255, 0.2);
+                --color-white-10: rgba(255, 255, 255, 0.1);
+                --color-white-05: rgba(255, 255, 255, 0.05);
+                --font-main: 'Geist', system-ui, sans-serif;
+                --font-mono: 'Geist Mono', monospace;
+                
+                --gradient-primary: linear-gradient(135deg, #10b981 0%, #059669 50%, #34d399 100%);
+                --gradient-secondary: linear-gradient(135deg, #06b6d4 0%, #22d3ee 100%);
+                --gradient-warm: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
+                --gradient-cool: linear-gradient(135deg, #a7f3d0 0%, #6ee7b7 100%);
+                --gradient-text: linear-gradient(135deg, #ffffff 0%, #6ee7b7 50%, #34d399 100%);
+                --gradient-text-warm: linear-gradient(135deg, #ffffff 0%, #fbbf24 50%, #f59e0b 100%);
+                
+                --text-xs: 0.75rem;
+                --text-sm: 0.875rem;
+                --text-base: 1rem;
+                --text-lg: 1.125rem;
+                --text-xl: 1.25rem;
+                --text-2xl: 1.5rem;
+                --text-3xl: 1.875rem;
+                --text-4xl: 2.25rem;
+                --text-5xl: 3rem;
+                --text-6xl: 3.75rem;
+                --text-7xl: 4.5rem;
+            }
+
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            html.lenis, html.lenis body {
+                height: auto;
+            }
+
+            .lenis.lenis-smooth {
+                scroll-behavior: auto !important;
+            }
+
+            .lenis.lenis-smooth [data-lenis-prevent] {
+                overscroll-behavior: contain;
+            }
+
+            .lenis.lenis-stopped {
+                overflow: hidden;
+            }
+
+            .lenis.lenis-smooth iframe {
+                pointer-events: none;
+            }
+
+            html, body {
+                min-height: 100vh;
+            }
+
+            body {
+                font-family: var(--font-main);
+                background-color: var(--color-bg);
+                color: var(--color-white);
+                overflow-x: hidden;
+                line-height: 1.6;
+                font-size: var(--text-base);
+            }
+
+            .page-loader {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: var(--color-bg);
+                z-index: 9999;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .page-loader-spinner {
+                width: 40px;
+                height: 40px;
+                border: 2px solid var(--color-white-10);
+                border-top-color: #34d399;
+                border-radius: 50%;
+                animation: spin 0.8s linear infinite;
+            }
+
+            @keyframes spin {
+                to { transform: rotate(360deg); }
+            }
+
+            [data-animate] {
+                opacity: 0;
+            }
+
+            [data-animate="fade-up"] {
+                transform: translateY(40px);
+            }
+
+            [data-animate="fade-down"] {
+                transform: translateY(-40px);
+            }
+
+            [data-animate="fade-left"] {
+                transform: translateX(-40px);
+            }
+
+            [data-animate="fade-right"] {
+                transform: translateX(40px);
+            }
+
+            [data-animate="fade-scale"] {
+                transform: scale(0.95);
+            }
+        }
+
+        @layer background {
+            .bg-columns {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                display: flex;
+                justify-content: center;
+                gap: 1rem;
+                z-index: 1;
+                overflow: hidden;
+                padding: 0 1rem;
+                opacity: 0;
+            }
+
+            .bg-columns__overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(5, 5, 8, 0.75);
+                z-index: 2;
+                pointer-events: none;
+            }
+
+            .bg-columns__box {
+                display: flex;
+                flex-direction: column;
+                padding: 5vh 0 15vh;
+                flex: 1;
+                max-width: 20vw;
+            }
+
+            .bg-columns__box:nth-child(odd) {
+                flex-direction: column-reverse;
+                height: 100vh;
+            }
+
+            .bg-columns__list {
+                display: flex;
+                flex-direction: column;
+                gap: 1rem;
+                will-change: transform;
+            }
+
+            .bg-columns__box:nth-child(odd) .bg-columns__list {
+                flex-direction: column-reverse;
+            }
+
+            .bg-columns__item {
+                position: relative;
+                overflow: hidden;
+                border-radius: 12px;
+            }
+
+            .bg-columns__img {
+                aspect-ratio: 3/4;
+                height: auto;
+                object-fit: cover;
+                width: 100%;
+                filter: brightness(0.7) saturate(0.8);
+                transition: filter 0.3s ease;
+            }
+        }
+
+        @layer components {
+            .content {
+                position: relative;
+                z-index: 10;
+            }
+
+            .section {
+                padding: 8rem 4rem;
+                max-width: 1200px;
+                margin: 0 auto;
+            }
+
+            .section-content-card {
+                background: rgba(5, 5, 8, 0.85);
+                backdrop-filter: blur(40px) saturate(180%);
+                -webkit-backdrop-filter: blur(40px) saturate(180%);
+                border: 1px solid var(--color-white-10);
+                border-radius: 24px;
+                padding: 3.5rem;
+                position: relative;
+            }
+
+            .section-content-card::before {
+                content: '';
+                position: absolute;
+                inset: 0;
+                border-radius: 24px;
+                padding: 1px;
+                background: linear-gradient(
+                    135deg,
+                    rgba(52, 211, 153, 0.15) 0%,
+                    rgba(255, 255, 255, 0.02) 50%,
+                    rgba(110, 231, 183, 0.08) 100%
+                );
+                -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+                mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+                -webkit-mask-composite: xor;
+                mask-composite: exclude;
+                pointer-events: none;
+            }
+
+            .gradient-text {
+                background: var(--gradient-text);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+
+            .gradient-text-warm {
+                background: var(--gradient-text-warm);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+
+            .gradient-text-cool {
+                background: linear-gradient(135deg, #ffffff 0%, #22d3ee 50%, #06b6d4 100%);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+
+            .gradient-text-emerald {
+                background: linear-gradient(135deg, #ffffff 0%, #6ee7b7 50%, #10b981 100%);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+        }
+
+        @layer kinetic {
+            .hero-section {
+                height: 100vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                position: relative;
+            }
+
+            .hero-content {
+                text-align: center;
+                position: relative;
+                padding: 3.5rem 5rem;
+                border-radius: 28px;
+                overflow: hidden;
+                max-width: 720px;
+            }
+
+            .hero-content::before {
+                content: '';
+                position: absolute;
+                inset: 0;
+                background: rgba(5, 5, 8, 0.88);
+                backdrop-filter: blur(60px) saturate(200%);
+                -webkit-backdrop-filter: blur(60px) saturate(200%);
+                z-index: -2;
+            }
+
+            .hero-content::after {
+                content: '';
+                position: absolute;
+                inset: 0;
+                border-radius: 28px;
+                padding: 1px;
+                background: linear-gradient(
+                    135deg,
+                    rgba(52, 211, 153, 0.3) 0%,
+                    rgba(255, 255, 255, 0.05) 50%,
+                    rgba(110, 231, 183, 0.2) 100%
+                );
+                -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+                mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+                -webkit-mask-composite: xor;
+                mask-composite: exclude;
+                z-index: -1;
+            }
+
+            .hero-label {
+                font-size: var(--text-xs);
+                text-transform: uppercase;
+                letter-spacing: 0.2em;
+                color: var(--color-white-50);
+                margin-bottom: 1.25rem;
+                font-weight: 500;
+            }
+
+            .hero-title {
+                font-size: clamp(2.75rem, 7vw, 4rem);
+                font-weight: 700;
+                letter-spacing: -0.035em;
+                line-height: 1.1;
+                background: linear-gradient(
+                    180deg,
+                    var(--color-white) 0%,
+                    #6ee7b7 60%,
+                    #34d399 100%
+                );
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+
+            .hero-tagline {
+                font-size: var(--text-base);
+                font-weight: 400;
+                color: var(--color-white-50);
+                margin-top: 1.5rem;
+                max-width: 480px;
+                line-height: 1.75;
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            .hero-button {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                gap: 0.5rem;
+                margin-top: 2rem;
+                padding: 0.875rem 2.5rem;
+                background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+                color: var(--color-bg);
+                text-decoration: none;
+                font-size: var(--text-sm);
+                font-weight: 600;
+                letter-spacing: 0.04em;
+                text-transform: uppercase;
+                border-radius: 100px;
+                border: none;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                position: relative;
+                overflow: hidden;
+            }
+
+            .hero-button::before {
+                content: '';
+                position: absolute;
+                inset: 0;
+                background: linear-gradient(135deg, #6ee7b7 0%, #34d399 100%);
+                opacity: 0;
+                transition: opacity 0.3s ease;
+            }
+
+            .hero-button:hover {
+                transform: scale(1.05);
+                box-shadow: 0 20px 40px rgba(52, 211, 153, 0.4);
+            }
+
+            .hero-button:hover::before {
+                opacity: 1;
+            }
+
+            .hero-button span {
+                position: relative;
+                z-index: 1;
+            }
+
+            .scroll-indicator {
+                position: absolute;
+                bottom: 2.5rem;
+                left: 50%;
+                transform: translateX(-50%);
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 0.5rem;
+            }
+
+            .scroll-indicator .scroll-icon {
+                width: 22px;
+                height: 36px;
+                border: 2px solid var(--color-white-30);
+                border-radius: 11px;
+                position: relative;
+            }
+
+            .scroll-indicator .scroll-icon::before {
+                content: '';
+                position: absolute;
+                top: 5px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 3px;
+                height: 6px;
+                background: var(--color-white-50);
+                border-radius: 2px;
+                animation: scrollPulse 2s ease-in-out infinite;
+            }
+
+            @keyframes scrollPulse {
+                0%, 100% { opacity: 1; transform: translateX(-50%) translateY(0); }
+                50% { opacity: 0.3; transform: translateX(-50%) translateY(5px); }
+            }
+
+            .kinetic-hero {
+                min-height: 100vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 0 2rem;
+            }
+
+            .kinetic-hero-content {
+                text-align: center;
+                background: rgba(5, 5, 8, 0.85);
+                backdrop-filter: blur(40px);
+                -webkit-backdrop-filter: blur(40px);
+                padding: 3.5rem 5rem;
+                border-radius: 28px;
+                border: 1px solid var(--color-white-10);
+            }
+
+            .kinetic-hero-text {
+                font-size: clamp(2.5rem, 9vw, 6rem);
+                font-weight: 800;
+                margin: 0;
+                background: linear-gradient(
+                    135deg,
+                    var(--color-white) 0%,
+                    #6ee7b7 40%,
+                    #34d399 100%
+                );
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                line-height: 1.05;
+                letter-spacing: -0.03em;
+            }
+
+            .kinetic-hero-text.gradient-cyan {
+                background: linear-gradient(
+                    135deg,
+                    var(--color-white) 0%,
+                    #22d3ee 40%,
+                    #06b6d4 100%
+                );
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+
+            .kinetic-hero-text.gradient-amber {
+                background: linear-gradient(
+                    135deg,
+                    var(--color-white) 0%,
+                    #fbbf24 40%,
+                    #f59e0b 100%
+                );
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+
+            .kinetic-hero-description {
+                font-size: var(--text-lg);
+                font-weight: 400;
+                margin-top: 1.25rem;
+                color: var(--color-white-50);
+            }
+        }
+
+        @layer sections {
+            .section-header {
+                margin-bottom: 3rem;
+                padding-bottom: 2.5rem;
+                border-bottom: 1px solid var(--color-white-10);
+            }
+
+            .section-label {
+                display: flex;
+                align-items: center;
+                gap: 0.875rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .section-number {
+                font-size: var(--text-xs);
+                color: var(--color-white-50);
+                letter-spacing: 0.12em;
+                font-weight: 600;
+                font-variant-numeric: tabular-nums;
+                font-family: var(--font-mono);
+            }
+
+            .section-divider {
+                width: 32px;
+                height: 1px;
+                background: linear-gradient(90deg, var(--color-white-30), transparent);
+            }
+
+            .section-name {
+                font-size: var(--text-xs);
+                background: linear-gradient(90deg, #34d399, #10b981);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                letter-spacing: 0.12em;
+                font-weight: 500;
+                text-transform: uppercase;
+            }
+
+            .section-title {
+                font-size: clamp(var(--text-3xl), 3.5vw, var(--text-4xl));
+                font-weight: 600;
+                letter-spacing: -0.025em;
+                line-height: 1.2;
+                margin-bottom: 1.25rem;
+                background: linear-gradient(
+                    180deg,
+                    var(--color-white) 0%,
+                    var(--color-white-90) 50%,
+                    #6ee7b7 100%
+                );
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+
+            .section-description {
+                font-size: var(--text-base);
+                color: var(--color-white-50);
+                line-height: 1.8;
+                max-width: 540px;
+            }
+
+            .feature-grid {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1.5rem;
+            }
+
+            .feature-card {
+                background: rgba(255, 255, 255, 0.03);
+                border: 1px solid var(--color-white-10);
+                border-radius: 18px;
+                padding: 2rem;
+                transition: all 0.4s ease;
+                position: relative;
+                overflow: hidden;
+            }
+
+            .feature-card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(135deg, rgba(52, 211, 153, 0.1) 0%, transparent 50%);
+                opacity: 0;
+                transition: opacity 0.4s ease;
+            }
+
+            .feature-card:hover {
+                border-color: rgba(52, 211, 153, 0.3);
+                transform: translateY(-3px);
+                background: rgba(255, 255, 255, 0.05);
+            }
+
+            .feature-card:hover::before {
+                opacity: 1;
+            }
+
+            .feature-icon {
+                width: 44px;
+                height: 44px;
+                border-radius: 12px;
+                background: linear-gradient(135deg, rgba(52, 211, 153, 0.2), rgba(110, 231, 183, 0.1));
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-bottom: 1.25rem;
+                font-size: var(--text-lg);
+            }
+
+            .feature-card h3 {
+                font-size: var(--text-lg);
+                font-weight: 600;
+                margin-bottom: 0.625rem;
+                letter-spacing: -0.01em;
+                background: linear-gradient(135deg, var(--color-white) 0%, #6ee7b7 100%);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+
+            .feature-card p {
+                font-size: var(--text-sm);
+                color: var(--color-white-50);
+                line-height: 1.7;
+            }
+
+            .process-list {
+                display: flex;
+                flex-direction: column;
+                gap: 0;
+            }
+
+            .process-item {
+                display: grid;
+                grid-template-columns: 64px 1fr;
+                gap: 1.5rem;
+                padding: 2rem 0;
+                border-top: 1px solid var(--color-white-10);
+                align-items: start;
+            }
+
+            .process-item:last-child {
+                border-bottom: 1px solid var(--color-white-10);
+            }
+
+            .process-number {
+                font-size: var(--text-xs);
+                background: linear-gradient(135deg, #22d3ee, #06b6d4);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                letter-spacing: 0.08em;
+                font-weight: 600;
+                font-family: var(--font-mono);
+            }
+
+            .process-content h3 {
+                font-size: var(--text-xl);
+                font-weight: 600;
+                letter-spacing: -0.015em;
+                margin-bottom: 0.5rem;
+                background: linear-gradient(135deg, var(--color-white) 0%, #22d3ee 100%);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+
+            .process-content p {
+                font-size: var(--text-sm);
+                color: var(--color-white-50);
+                line-height: 1.75;
+            }
+
+            .metrics-grid {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 1.5rem;
+                margin-top: 2rem;
+            }
+
+            .metric-card {
+                background: rgba(255, 255, 255, 0.03);
+                border: 1px solid var(--color-white-10);
+                border-radius: 16px;
+                padding: 1.5rem;
+                text-align: center;
+                transition: all 0.3s ease;
+            }
+
+            .metric-card:hover {
+                border-color: rgba(52, 211, 153, 0.3);
+                background: rgba(255, 255, 255, 0.05);
+            }
+
+            .metric-value {
+                font-size: var(--text-4xl);
+                font-weight: 700;
+                background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                font-family: var(--font-mono);
+            }
+
+            .metric-label {
+                font-size: var(--text-sm);
+                color: var(--color-white-50);
+                margin-top: 0.5rem;
+            }
+
+            .cta-section {
+                min-height: 80vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 6rem 2rem;
+            }
+
+            .cta-card {
+                text-align: center;
+                background: rgba(5, 5, 8, 0.9);
+                backdrop-filter: blur(60px);
+                -webkit-backdrop-filter: blur(60px);
+                padding: 5rem 6rem;
+                border-radius: 32px;
+                border: 1px solid var(--color-white-10);
+                max-width: 700px;
+            }
+
+            .cta-card h2 {
+                font-size: clamp(var(--text-3xl), 5vw, var(--text-5xl));
+                font-weight: 600;
+                letter-spacing: -0.03em;
+                margin-bottom: 1.5rem;
+                line-height: 1.1;
+                background: linear-gradient(
+                    180deg,
+                    var(--color-white) 0%,
+                    #6ee7b7 50%,
+                    #34d399 100%
+                );
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+
+            .cta-card p {
+                font-size: 1.15rem;
+                color: var(--color-white-50);
+                margin-bottom: 3rem;
+                line-height: 1.8;
+            }
+
+            .cta-buttons {
+                display: flex;
+                gap: 1rem;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+
+            .cta-button {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.75rem;
+                padding: 1.1rem 2.75rem;
+                background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+                color: var(--color-bg);
+                text-decoration: none;
+                font-size: 0.9rem;
+                font-weight: 600;
+                letter-spacing: 0.02em;
+                border-radius: 100px;
+                transition: all 0.3s ease;
+            }
+
+            .cta-button:hover {
+                transform: scale(1.05);
+                box-shadow: 0 20px 40px rgba(52, 211, 153, 0.3);
+            }
+
+            .cta-button-secondary {
+                background: transparent;
+                color: var(--color-white);
+                border: 1px solid var(--color-white-20);
+            }
+
+            .cta-button-secondary:hover {
+                background: var(--color-white-10);
+                box-shadow: none;
+                border-color: rgba(52, 211, 153, 0.3);
+            }
+
+            footer {
+                border-top: 1px solid var(--color-white-10);
+                padding: 3rem 2rem;
+                background: var(--color-bg);
+                position: relative;
+                z-index: 10;
+            }
+
+            .footer-content {
+                max-width: 1200px;
+                margin: 0 auto;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .footer-links {
+                display: flex;
+                gap: 2rem;
+                list-style: none;
+            }
+
+            .footer-links a {
+                color: var(--color-white-50);
+                text-decoration: none;
+                font-size: var(--text-sm);
+                font-weight: 500;
+                transition: all 0.3s ease;
+            }
+
+            .footer-links a:hover {
+                background: linear-gradient(135deg, #34d399, #10b981);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+
+            .copyright {
+                font-size: var(--text-xs);
+                color: var(--color-white-30);
+            }
+        }
+
+        @layer navigation {
+            .header {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                z-index: 1000;
+                padding: 1.25rem 2.5rem;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                background: linear-gradient(180deg, rgba(5, 5, 8, 0.9) 0%, rgba(5, 5, 8, 0) 100%);
+            }
+
+            .header-left {
+                display: flex;
+                align-items: center;
+                gap: 2rem;
+            }
+
+            .menu-toggle {
+                width: 28px;
+                height: 20px;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                cursor: pointer;
+                z-index: 1001;
+                background: none;
+                border: none;
+                padding: 0;
+                outline: none;
+            }
+
+            .menu-toggle span {
+                width: 100%;
+                height: 2px;
+                background: var(--color-white);
+                transition: all 0.3s ease;
+                display: block;
+            }
+
+            .menu-toggle.active span:nth-child(1) {
+                transform: translateY(9px) rotate(45deg);
+            }
+
+            .menu-toggle.active span:nth-child(2) {
+                opacity: 0;
+            }
+
+            .menu-toggle.active span:nth-child(3) {
+                transform: translateY(-9px) rotate(-45deg);
+            }
+
+            .logo {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                text-decoration: none;
+            }
+
+            .logo-text {
+                font-size: var(--text-xl);
+                font-weight: 700;
+                letter-spacing: -0.02em;
+                background: linear-gradient(135deg, var(--color-white) 0%, #34d399 100%);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+
+            .logo-badge {
+                font-size: 0.625rem;
+                font-weight: 600;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+                padding: 0.25rem 0.5rem;
+                background: linear-gradient(135deg, rgba(52, 211, 153, 0.2), rgba(110, 231, 183, 0.1));
+                border: 1px solid rgba(52, 211, 153, 0.3);
+                border-radius: 4px;
+                color: #34d399;
+            }
+
+            .header-right {
+                display: flex;
+                align-items: center;
+                gap: 1.5rem;
+            }
+
+            .header-nav {
+                display: flex;
+                gap: 2rem;
+            }
+
+            .header-nav a {
+                font-size: var(--text-sm);
+                font-weight: 500;
+                color: var(--color-white-70);
+                text-decoration: none;
+                transition: all 0.3s ease;
+                letter-spacing: 0.01em;
+            }
+
+            .header-nav a:hover {
+                color: var(--color-white);
+            }
+
+            .header-cta {
+                font-size: var(--text-sm);
+                font-weight: 600;
+                padding: 0.625rem 1.5rem;
+                background: var(--color-white);
+                color: var(--color-bg);
+                text-decoration: none;
+                border-radius: 100px;
+                transition: all 0.3s ease;
+            }
+
+            .header-cta:hover {
+                transform: scale(1.05);
+                box-shadow: 0 10px 30px rgba(255, 255, 255, 0.2);
+            }
+
+            .menu-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(5, 5, 8, 0.98);
+                backdrop-filter: blur(30px);
+                z-index: 999;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                gap: 2rem;
+                opacity: 0;
+                visibility: hidden;
+                transition: opacity 0.4s ease, visibility 0.4s ease;
+            }
+
+            .menu-overlay.active {
+                opacity: 1;
+                visibility: visible;
+            }
+
+            .menu-overlay a {
+                color: var(--color-white);
+                text-decoration: none;
+                font-size: clamp(var(--text-2xl), 4vw, var(--text-3xl));
+                font-weight: 600;
+                letter-spacing: -0.01em;
+                opacity: 0.6;
+                transition: all 0.3s ease;
+            }
+
+            .menu-overlay a:hover {
+                opacity: 1;
+                transform: translateX(8px);
+                background: linear-gradient(135deg, #34d399, #10b981);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+
+            .sticky-nav {
+                position: fixed;
+                top: 50%;
+                right: 2.5rem;
+                transform: translateY(-50%);
+                z-index: 500;
+                display: flex;
+                flex-direction: column;
+                gap: 1rem;
+                font-size: var(--text-xs);
+                text-transform: uppercase;
+                letter-spacing: 0.06em;
+            }
+
+            .sticky-nav a {
+                color: var(--color-white-50);
+                text-decoration: none;
+                opacity: 0.5;
+                transition: all 0.3s ease;
+                padding-right: 0.875rem;
+                border-right: 2px solid transparent;
+                text-align: right;
+                font-weight: 500;
+            }
+
+            .sticky-nav a:hover {
+                opacity: 0.8;
+                color: var(--color-white-70);
+            }
+
+            .sticky-nav a.active {
+                background: linear-gradient(135deg, #34d399, #10b981);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                opacity: 1;
+                border-right-color: #34d399;
+            }
+
+            .side-actions {
+                position: fixed;
+                bottom: 1.75rem;
+                left: 2.5rem;
+                z-index: 500;
+                display: flex;
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+
+            .side-actions a {
+                color: var(--color-white-50);
+                text-decoration: none;
+                font-size: var(--text-xs);
+                font-weight: 500;
+                letter-spacing: 0.04em;
+                text-transform: uppercase;
+                transition: all 0.3s ease;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+
+            .side-actions a:hover {
+                background: linear-gradient(135deg, #22d3ee, #06b6d4);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+
+            .side-actions a::before {
+                content: '';
+                width: 14px;
+                height: 1px;
+                background: currentColor;
+                transition: width 0.3s ease;
+            }
+
+            .side-actions a:hover::before {
+                width: 20px;
+                background: linear-gradient(90deg, #22d3ee, #06b6d4);
+            }
+
+            .scroll-progress {
+                position: fixed;
+                bottom: 1.75rem;
+                right: 2.5rem;
+                z-index: 500;
+                display: flex;
+                flex-direction: column;
+                align-items: flex-end;
+                gap: 0.375rem;
+            }
+
+            .scroll-progress-bar {
+                width: 2px;
+                height: 50px;
+                background: var(--color-white-10);
+                position: relative;
+                overflow: hidden;
+            }
+
+            .scroll-progress-fill {
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                height: 0%;
+                background: linear-gradient(180deg, #34d399, #10b981);
+                transition: height 0.1s ease;
+            }
+
+            .scroll-progress-text {
+                font-size: 0.625rem;
+                color: var(--color-white-50);
+                font-weight: 500;
+                letter-spacing: 0.04em;
+                font-variant-numeric: tabular-nums;
+                font-family: var(--font-mono);
+            }
+        }
+
+        @layer responsive {
+            @media (max-width: 1024px) {
+                .section {
+                    padding: 5rem 1.5rem;
+                }
+
+                .section-content-card {
+                    padding: 2.5rem;
+                }
+
+                .feature-grid {
+                    grid-template-columns: 1fr;
+                }
+
+                .metrics-grid {
+                    grid-template-columns: repeat(3, 1fr);
+                }
+
+                .bg-columns__box {
+                    max-width: 30vw;
+                }
+
+                .bg-columns__box:nth-child(4),
+                .bg-columns__box:nth-child(5) {
+                    display: none;
+                }
+
+                .header {
+                    padding: 1rem 1.5rem;
+                }
+
+                .header-nav {
+                    display: none;
+                }
+
+                .sticky-nav {
+                    right: 1.5rem;
+                }
+
+                .side-actions {
+                    left: 1.5rem;
+                }
+
+                .scroll-progress {
+                    right: 1.5rem;
+                }
+            }
+
+            @media (max-width: 768px) {
+                .section {
+                    padding: 4rem 1.25rem;
+                }
+
+                .section-content-card {
+                    padding: 1.75rem;
+                    border-radius: 18px;
+                }
+
+                .hero-content {
+                    padding: 2.5rem 2rem;
+                    margin: 0 1rem;
+                    border-radius: 22px;
+                }
+
+                .hero-button {
+                    padding: 0.75rem 2rem;
+                }
+
+                .kinetic-hero-content {
+                    padding: 2.5rem 1.75rem;
+                }
+
+                .process-item {
+                    grid-template-columns: 1fr;
+                    gap: 0.5rem;
+                }
+
+                .metrics-grid {
+                    grid-template-columns: 1fr;
+                }
+
+                .cta-card {
+                    padding: 3rem 2rem;
+                    margin: 0 1rem;
+                }
+
+                .cta-buttons {
+                    flex-direction: column;
+                    align-items: center;
+                }
+
+                .footer-content {
+                    flex-direction: column;
+                    gap: 1.5rem;
+                    text-align: center;
+                }
+
+                .footer-links {
+                    flex-wrap: wrap;
+                    justify-content: center;
+                    gap: 1.25rem;
+                }
+
+                .bg-columns {
+                    gap: 0.5rem;
+                }
+
+                .bg-columns__box {
+                    max-width: 45vw;
+                }
+
+                .bg-columns__box:nth-child(3),
+                .bg-columns__box:nth-child(4),
+                .bg-columns__box:nth-child(5) {
+                    display: none;
+                }
+
+                .sticky-nav,
+                .side-actions,
+                .scroll-progress {
+                    display: none;
+                }
+
+                .header {
+                    padding: 1rem 1.25rem;
+                }
+
+                .header-left {
+                    gap: 1rem;
+                }
+
+                .header-cta {
+                    display: none;
+                }
+
+                .logo-badge {
+                    display: none;
+                }
+
+                .logo-text {
+                    font-size: var(--text-lg);
+                }
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Page Loader -->
+    <div class="page-loader" id="pageLoader">
+        <div class="page-loader-spinner"></div>
+    </div>
+
+    <!-- Header -->
+    <header class="header" data-animate="fade-down">
+        <div class="header-left">
+            <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation menu" aria-expanded="false">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <a href="#hero" class="logo">
+                <span class="logo-text">monitr-ai</span>
+                <span class="logo-badge">Beta</span>
+            </a>
+        </div>
+        <div class="header-right">
+            <nav class="header-nav">
+                <a href="#observatory">Observatory</a>
+                <a href="#insights">Insights</a>
+                <a href="#contact">Contact</a>
+                <a href="#">Docs</a>
+            </nav>
+            <a href="auth.html" class="header-cta">Get Started</a>
+        </div>
+    </header>
+
+    <!-- Menu Overlay -->
+    <nav class="menu-overlay" id="menuOverlay" aria-label="Main navigation">
+        <a href="#hero" onclick="closeMenu()">Overview</a>
+        <a href="#observatory" onclick="closeMenu()">Observatory</a>
+        <a href="#insights" onclick="closeMenu()">Insights</a>
+        <a href="#contact" onclick="closeMenu()">Contact</a>
+        <a href="#" onclick="closeMenu()">Documentation</a>
+        <a href="auth.html" onclick="closeMenu()">Sign In</a>
+    </nav>
+
+    <!-- Sticky Side Navigation -->
+    <nav class="sticky-nav" data-animate="fade-right" aria-label="Page sections">
+        <a href="#hero" class="nav-item active" data-section="hero">Overview</a>
+        <a href="#observatory" class="nav-item" data-section="observatory">Observatory</a>
+        <a href="#insights" class="nav-item" data-section="insights">Insights</a>
+        <a href="#contact" class="nav-item" data-section="contact">Contact</a>
+    </nav>
+
+    <!-- Side Actions -->
+    <div class="side-actions" data-animate="fade-left">
+        <a href="#">GitHub</a>
+        <a href="#">Docs</a>
+    </div>
+
+    <!-- Scroll Progress -->
+    <div class="scroll-progress" data-animate="fade-right">
+        <div class="scroll-progress-bar">
+            <div class="scroll-progress-fill" id="scrollFill"></div>
+        </div>
+        <span class="scroll-progress-text" id="scrollPercent">0%</span>
+    </div>
+
+    <!-- Background Columns -->
+    <div class="bg-columns">
+        <div class="bg-columns__box">
+            <div class="bg-columns__list">
+                <figure class="bg-columns__item">
+                    <img class="bg-columns__img" src="https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=800&q=80" alt="Data Center">
+                </figure>
+                <figure class="bg-columns__item">
+                    <img class="bg-columns__img" src="https://images.unsplash.com/photo-544197150-b99a580bb7a8?w=800&q=80" alt="Network Infrastructure">
+                </figure>
+                <figure class="bg-columns__item">
+                    <img class="bg-columns__img" src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&q=80" alt="Digital Globe">
+                </figure>
+                <figure class="bg-columns__item">
+                    <img class="bg-columns__img" src="https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&q=80" alt="Circuit Board">
+                </figure>
+                <figure class="bg-columns__item">
+                    <img class="bg-columns__img" src="https://images.unsplash.com/photo-1563986768609-322da13575f3?w=800&q=80" alt="Server Room">
+                </figure>
+                <figure class="bg-columns__item">
+                    <img class="bg-columns__img" src="https://images.unsplash.com/photo-1639322537228-f710d846310a?w=800&q=80" alt="AI Visualization">
+                </figure>
+            </div>
+        </div>
+        <div class="bg-columns__box">
+            <div class="bg-columns__list">
+                <figure class="bg-columns__item">
+                    <img class="bg-columns__img" src="https://images.unsplash.com/photo-1555255707-c07966088b7b?w=800&q=80" alt="Tech Dashboard">
+                </figure>
+                <figure class="bg-columns__item">
+                    <img class="bg-columns__img" src="https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?w=800&q=80" alt="Analytics">
+                </figure>
+                <figure class="bg-columns__item">
+                    <img class="bg-columns__img" src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80" alt="Data Visualization">
+                </figure>
+                <figure class="bg-columns__item">
+                    <img class="bg-columns__img" src="https://images.unsplash.com/photo-1573164713988-8665fc963095?w=800&q=80" alt="Woman with Tech">
+                </figure>
+                <figure class="bg-columns__item">
+                    <img class="bg-columns__img" src="https://images.unsplash.com/photo-1535378917042-10a22c95931a?w=800&q=80" alt="AI Robot">
+                </figure>
+                <figure class="bg-columns__item">
+                    <img class="bg-columns__img" src="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=800&q=80" alt="Matrix Code">
+                </figure>
+            </div>
+        </div>
+        <div class="bg-columns__box">
+            <div class="bg-columns__list">
+                <figure class="bg-columns__item">
+                    <img class="bg-columns__img" src="https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=800&q=80" alt="AI Brain">
+                </figure>
+                <figure class="bg-columns__item">
+                    <img class="bg-columns__img" src="https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800&q=80" alt="Robot">
+                </figure>
+                <figure class="bg-columns__item">
+                    <img class="bg-columns__img" src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=800&q=80" alt="Cyber Security">
+                </figure>
+                <figure class="bg-columns__item">
+                    <img class="bg-columns__img" src="https://images.unsplash.com/photo-1531746790731-6c087fecd65a?w=800&q=80" alt="AI Face">
+                </figure>
+                <figure class="bg-columns__item">
+                    <img class="bg-columns__img" src="https://images.unsplash.com/photo-1517433456452-f9633a875f6f?w=800&q=80" alt="Laptop Code">
+                </figure>
+                <figure class="bg-columns__item">
+                    <img class="bg-columns__img" src="https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=800&q=80" alt="Data Center 2">
+                </figure>
+            </div>
+        </div>
+        <div class="bg-columns__box">
+            <div class="bg-columns__list">
+                <figure class="bg-columns__item">
+                    <img class="bg-columns__img" src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&q=80" alt="Code Screen">
+                </figure>
+                <figure class="bg-columns__item">
+                    <img class="bg-columns__img" src="https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7?w=800&q=80" alt="Colorful Code">
+                </figure>
+                <figure class="bg-columns__item">
+                    <img class="bg-columns__img" src="https://images.unsplash.com/photo-1516110833967-0b5716ca1387?w=800&q=80" alt="Server Racks">
+                </figure>
+                <figure class="bg-columns__item">
+                    <img class="bg-columns__img" src="https://images.unsplash.com/photo-1558346490-a72e53ae2d4f?w=800&q=80" alt="Network Cables">
+                </figure>
+                <figure class="bg-columns__item">
+                    <img class="bg-columns__img" src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=800&q=80" alt="Woman Laptop">
+                </figure>
+                <figure class="bg-columns__item">
+                    <img class="bg-columns__img" src="https://images.unsplash.com/photo-1504639725590-34d0984388bd?w=800&q=80" alt="Code Close">
+                </figure>
+            </div>
+        </div>
+        <div class="bg-columns__box">
+            <div class="bg-columns__list">
+                <figure class="bg-columns__item">
+                    <img class="bg-columns__img" src="https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&q=80" alt="ChatGPT">
+                </figure>
+                <figure class="bg-columns__item">
+                    <img class="bg-columns__img" src="https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=800&q=80" alt="Neural Network">
+                </figure>
+                <figure class="bg-columns__item">
+                    <img class="bg-columns__img" src="https://images.unsplash.com/photo-1580894894513-541e068a3e2b?w=800&q=80" alt="Data Pipeline">
+                </figure>
+                <figure class="bg-columns__item">
+                    <img class="bg-columns__img" src="https://images.unsplash.com/photo-1551434678-e076c223a692?w=800&q=80" alt="Team Working">
+                </figure>
+                <figure class="bg-columns__item">
+                    <img class="bg-columns__img" src="https://images.unsplash.com/photo-1559028012-481c04fa702d?w=800&q=80" alt="UX Design">
+                </figure>
+                <figure class="bg-columns__item">
+                    <img class="bg-columns__img" src="https://images.unsplash.com/photo-1517433670267-30f294e479ae?w=800&q=80" alt="Developer">
+                </figure>
+            </div>
+        </div>
+        <div class="bg-columns__overlay"></div>
+    </div>
+
+    <main class="content">
+        <section class="hero-section" id="hero">
+            <div class="hero-content" data-animate="fade-scale">
+                <span class="hero-label" data-animate="fade-up" data-delay="0.1">Cognitive Efficiency Observatory</span>
+                <h1 class="hero-title" data-animate="fade-up" data-delay="0.2">Observe. Optimize.<br>Amplify AI.</h1>
+                <p class="hero-tagline" data-animate="fade-up" data-delay="0.3">A real-time observatory that illuminates the cognitive efficiency of your LLM interactions. Track performance, maximize output quality, and unlock the full potential of your AI investment.</p>
+                <a href="auth.html" class="hero-button" data-animate="fade-up" data-delay="0.4"><span>Start Observing</span></a>
+            </div>
+            <div class="scroll-indicator" data-animate="fade" data-delay="0.6">
+                <div class="scroll-icon"></div>
+            </div>
+        </section>
+
+        <section class="kinetic-hero">
+            <div class="kinetic-hero-content" data-scroll-animate="fade-up">
+                <h1 class="kinetic-hero-text">Peak Performance</h1>
+                <p class="kinetic-hero-description">Token efficiency. Response quality. Cognitive throughput. Measured in real-time.</p>
+            </div>
+        </section>
+
+        <section class="kinetic-hero">
+            <div class="kinetic-hero-content" data-scroll-animate="fade-up">
+                <h1 class="kinetic-hero-text">Continuously.</h1>
+                <h1 class="kinetic-hero-text gradient-amber">Intelligently.</h1>
+                <p class="kinetic-hero-description">Elevate your models to their highest potential.</p>
+            </div>
+        </section>
+
+        <section class="section" id="observatory">
+            <div class="section-content-card" data-scroll-animate="fade-up">
+                <div class="section-header">
+                    <div class="section-label">
+                        <span class="section-number">01</span>
+                        <span class="section-divider"></span>
+                        <span class="section-name">Observatory</span>
+                    </div>
+                    <h2 class="section-title">Illuminating cognitive<br>performance metrics</h2>
+                    <p class="section-description">Deep observability that goes beyond surface metrics. We measure the cognitive efficiency of your LLMs—revealing optimization opportunities you never knew existed.</p>
+                </div>
+
+                <div class="feature-grid">
+                    <div class="feature-card" data-scroll-animate="fade-up" data-delay="0">
+                        <div class="feature-icon">◈</div>
+                        <h3>Efficiency Index</h3>
+                        <p>A comprehensive metric combining token optimization, response precision, and cognitive throughput into a single actionable performance score.</p>
+                    </div>
+                    <div class="feature-card" data-scroll-animate="fade-up" data-delay="0.1">
+                        <div class="feature-icon">◇</div>
+                        <h3>Quality Assurance</h3>
+                        <p>Continuous monitoring for factual consistency and response accuracy, ensuring your LLMs deliver reliable, high-quality outputs.</p>
+                    </div>
+                    <div class="feature-card" data-scroll-animate="fade-up" data-delay="0.2">
+                        <div class="feature-icon">○</div>
+                        <h3>Performance Tracking</h3>
+                        <p>Monitor response consistency and quality over time. Identify trends, celebrate improvements, and maintain peak performance baselines.</p>
+                    </div>
+                    <div class="feature-card" data-scroll-animate="fade-up" data-delay="0.3">
+                        <div class="feature-icon">□</div>
+                        <h3>Stress Testing</h3>
+                        <p>Comprehensive testing suites that validate your model's capabilities, ensuring robust performance across diverse scenarios and edge cases.</p>
+                    </div>
+                    <div class="feature-card" data-scroll-animate="fade-up" data-delay="0.4">
+                        <div class="feature-icon">△</div>
+                        <h3>Token Intelligence</h3>
+                        <p>Granular analysis of token utilization patterns. Optimize prompts and responses to maximize value from every interaction.</p>
+                    </div>
+                    <div class="feature-card" data-scroll-animate="fade-up" data-delay="0.5">
+                        <div class="feature-icon">◎</div>
+                        <h3>Live Dashboard</h3>
+                        <p>Real-time metrics streaming to a beautiful interface. Watch your cognitive efficiency scores improve as optimizations take effect.</p>
+                    </div>
+                </div>
+
+                <div class="metrics-grid">
+                    <div class="metric-card" data-scroll-animate="fade-up" data-delay="0.6">
+                        <div class="metric-value">94%</div>
+                        <div class="metric-label">Average Efficiency Gain</div>
+                    </div>
+                    <div class="metric-card" data-scroll-animate="fade-up" data-delay="0.7">
+                        <div class="metric-value">3.2x</div>
+                        <div class="metric-label">Response Quality Improvement</div>
+                    </div>
+                    <div class="metric-card" data-scroll-animate="fade-up" data-delay="0.8">
+                        <div class="metric-value">47%</div>
+                        <div class="metric-label">Token Optimization</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="insights">
+            <div class="section-content-card" data-scroll-animate="fade-up">
+                <div class="section-header">
+                    <div class="section-label">
+                        <span class="section-number">02</span>
+                        <span class="section-divider"></span>
+                        <span class="section-name">Insights Pipeline</span>
+                    </div>
+                    <h2 class="section-title">From raw data<br>to actionable intelligence</h2>
+                    <p class="section-description">A sophisticated pipeline that transforms LLM interaction data into structured insights, validated through comprehensive quality assurance.</p>
+                </div>
+
+                <div class="process-list">
+                    <div class="process-item" data-scroll-animate="fade-left" data-delay="0">
+                        <span class="process-number">01</span>
+                        <div class="process-content">
+                            <h3>Collect</h3>
+                            <p>Seamlessly capture LLM interaction data from any provider. Lightweight telemetry flows through high-performance ingestion points designed for scale.</p>
+                        </div>
+                    </div>
+                    <div class="process-item" data-scroll-animate="fade-left" data-delay="0.1">
+                        <span class="process-number">02</span>
+                        <div class="process-content">
+                            <h3>Analyze</h3>
+                            <p>Our intelligent ETL pipeline transforms raw logs into structured performance metrics. Automated analysis calculates your Efficiency Index and surfaces optimization opportunities.</p>
+                        </div>
+                    </div>
+                    <div class="process-item" data-scroll-animate="fade-left" data-delay="0.2">
+                        <span class="process-number">03</span>
+                        <div class="process-content">
+                            <h3>Validate</h3>
+                            <p>Comprehensive testing validates your model's responses. Quality assurance layers ensure consistency, accuracy, and reliability across all interactions.</p>
+                        </div>
+                    </div>
+                    <div class="process-item" data-scroll-animate="fade-left" data-delay="0.3">
+                        <span class="process-number">04</span>
+                        <div class="process-content">
+                            <h3>Optimize</h3>
+                            <p>Real-time recommendations stream to your dashboard. Live insights guide continuous improvement, helping you achieve and maintain peak cognitive efficiency.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="cta-section" id="contact">
+            <div class="cta-card" data-scroll-animate="fade-scale">
+                <h2>Ready to unlock your<br>AI's full potential?</h2>
+                <p>Join teams who've transformed their LLM operations with complete cognitive observability.</p>
+                <div class="cta-buttons">
+                    <a href="auth.html" class="cta-button">Start Free Trial</a>
+                    <a href="#" class="cta-button cta-button-secondary">View Documentation</a>
+                </div>
+            </div>
+        </section>
+
+        <footer data-scroll-animate="fade-up">
+            <div class="footer-content">
+                <ul class="footer-links">
+                    <li><a href="#">Documentation</a></li>
+                    <li><a href="#">API Reference</a></li>
+                    <li><a href="#">Status</a></li>
+                    <li><a href="#">Privacy</a></li>
+                    <li><a href="#">Terms</a></li>
+                </ul>
+                <p class="copyright">© 2025 monitr-ai. All rights reserved.</p>
+            </div>
+        </footer>
+    </main>
+
+    <script>
+        gsap.registerPlugin(ScrollTrigger);
+
+        function initPageLoad() {
+            const tl = gsap.timeline({
+                onComplete: () => {
+                    document.getElementById('pageLoader').style.display = 'none';
+                }
+            });
+
+            tl.to('#pageLoader', {
+                opacity: 0,
+                duration: 0.6,
+                ease: 'power2.inOut'
+            });
+
+            tl.to('.bg-columns', {
+                opacity: 1,
+                duration: 1.2,
+                ease: 'power2.out'
+            }, '-=0.3');
+
+            tl.to('.header[data-animate]', {
+                opacity: 1,
+                y: 0,
+                duration: 0.8,
+                ease: 'power3.out'
+            }, '-=0.8');
+
+            tl.to('.hero-content[data-animate]', {
+                opacity: 1,
+                scale: 1,
+                duration: 1,
+                ease: 'power3.out'
+            }, '-=0.6');
+
+            const heroElements = document.querySelectorAll('.hero-content [data-animate]');
+            heroElements.forEach((el) => {
+                const delay = parseFloat(el.dataset.delay) || 0;
+                tl.to(el, {
+                    opacity: 1,
+                    y: 0,
+                    duration: 0.8,
+                    ease: 'power3.out'
+                }, `-=0.6`);
+            });
+
+            tl.to('.scroll-indicator[data-animate]', {
+                opacity: 1,
+                duration: 0.6,
+                ease: 'power2.out'
+            }, '-=0.4');
+
+            tl.to('.sticky-nav[data-animate]', {
+                opacity: 1,
+                x: 0,
+                duration: 0.6,
+                ease: 'power2.out'
+            }, '-=0.5');
+
+            tl.to('.side-actions[data-animate]', {
+                opacity: 1,
+                x: 0,
+                duration: 0.6,
+                ease: 'power2.out'
+            }, '-=0.5');
+
+            tl.to('.scroll-progress[data-animate]', {
+                opacity: 1,
+                x: 0,
+                duration: 0.6,
+                ease: 'power2.out'
+            }, '-=0.5');
+        }
+
+        function initScrollAnimations() {
+            gsap.utils.toArray('[data-scroll-animate="fade-up"]').forEach((el) => {
+                const delay = parseFloat(el.dataset.delay) || 0;
+                gsap.from(el, {
+                    opacity: 0,
+                    y: 60,
+                    duration: 1,
+                    delay: delay,
+                    ease: 'power3.out',
+                    scrollTrigger: {
+                        trigger: el,
+                        start: 'top 85%',
+                        toggleActions: 'play none none reverse'
+                    }
+                });
+            });
+
+            gsap.utils.toArray('[data-scroll-animate="fade-left"]').forEach((el) => {
+                const delay = parseFloat(el.dataset.delay) || 0;
+                gsap.from(el, {
+                    opacity: 0,
+                    x: -40,
+                    duration: 0.8,
+                    delay: delay,
+                    ease: 'power3.out',
+                    scrollTrigger: {
+                        trigger: el,
+                        start: 'top 85%',
+                        toggleActions: 'play none none reverse'
+                    }
+                });
+            });
+
+            gsap.utils.toArray('[data-scroll-animate="fade-scale"]').forEach((el) => {
+                gsap.from(el, {
+                    opacity: 0,
+                    scale: 0.95,
+                    duration: 1,
+                    ease: 'power3.out',
+                    scrollTrigger: {
+                        trigger: el,
+                        start: 'top 85%',
+                        toggleActions: 'play none none reverse'
+                    }
+                });
+            });
+        }
+
+        const lenis = new Lenis({
+            duration: 1.2,
+            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+            orientation: 'vertical',
+            smoothWheel: true
+        });
+
+        lenis.on('scroll', ScrollTrigger.update);
+
+        gsap.ticker.add((time) => {
+            lenis.raf(time * 1000);
+        });
+
+        gsap.ticker.lagSmoothing(0);
+
+        const oddColumns = gsap.utils.toArray('.bg-columns__box:nth-child(odd) .bg-columns__list');
+        oddColumns.forEach((element) => {
+            const elementHeight = element.offsetHeight;
+            const viewportHeight = window.innerHeight;
+            const extraSpace = viewportHeight * 0.2;
+            const scrollDistance = elementHeight + viewportHeight + extraSpace;
+
+            gsap.to(element, {
+                yPercent: 100,
+                ease: 'none',
+                scrollTrigger: {
+                    trigger: document.body,
+                    start: 'top top',
+                    end: `+=${scrollDistance * 2}`,
+                    scrub: 1
+                }
+            });
+        });
+
+        const evenColumns = gsap.utils.toArray('.bg-columns__box:nth-child(even) .bg-columns__list');
+        evenColumns.forEach((element) => {
+            const elementHeight = element.offsetHeight;
+            const viewportHeight = window.innerHeight;
+            const scrollDistance = elementHeight + viewportHeight;
+
+            gsap.fromTo(element, 
+                { yPercent: -50 },
+                {
+                    yPercent: 0,
+                    ease: 'none',
+                    scrollTrigger: {
+                        trigger: document.body,
+                        start: 'top top',
+                        end: `+=${scrollDistance * 2}`,
+                        scrub: 1
+                    }
+                }
+            );
+        });
+
+        const menuToggle = document.getElementById('menuToggle');
+        const menuOverlay = document.getElementById('menuOverlay');
+
+        menuToggle.addEventListener('click', () => {
+            const isActive = menuToggle.classList.toggle('active');
+            menuOverlay.classList.toggle('active');
+            menuToggle.setAttribute('aria-expanded', isActive);
+            
+            if (isActive) {
+                lenis.stop();
+            } else {
+                lenis.start();
+            }
+        });
+
+        function closeMenu() {
+            menuToggle.classList.remove('active');
+            menuOverlay.classList.remove('active');
+            menuToggle.setAttribute('aria-expanded', 'false');
+            lenis.start();
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeMenu();
+            }
+        });
+
+        const navItems = document.querySelectorAll('.sticky-nav .nav-item');
+        const sections = document.querySelectorAll('section[id]');
+
+        function updateActiveNav() {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (window.pageYOffset >= sectionTop - 300) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navItems.forEach(item => {
+                item.classList.remove('active');
+                if (item.getAttribute('data-section') === current) {
+                    item.classList.add('active');
+                }
+            });
+        }
+
+        const scrollFill = document.getElementById('scrollFill');
+        const scrollPercent = document.getElementById('scrollPercent');
+
+        function updateScrollProgress() {
+            const scrollTop = window.pageYOffset;
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const scrolled = (scrollTop / docHeight) * 100;
+            
+            scrollFill.style.height = scrolled + '%';
+            scrollPercent.textContent = Math.round(scrolled) + '%';
+        }
+
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                const target = document.querySelector(targetId);
+                if (target) {
+                    lenis.scrollTo(target, {
+                        offset: 0,
+                        duration: 1.5,
+                        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t))
+                    });
+                    closeMenu();
+                }
+            });
+        });
+
+        lenis.on('scroll', () => {
+            updateActiveNav();
+            updateScrollProgress();
+        });
+
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                initPageLoad();
+                initScrollAnimations();
+                updateActiveNav();
+                updateScrollProgress();
+            }, 100);
+        });
+    </script>
+</body>
+</html>

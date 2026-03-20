@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Configuration | Observability</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg-primary: #0c0c0f;
+            --bg-secondary: #12121a;
+            --bg-tertiary: #1a1a24;
+            --bg-card: rgba(18, 18, 26, 0.8);
+            --border-subtle: rgba(255, 255, 255, 0.06);
+            --border-light: rgba(255, 255, 255, 0.1);
+            --text-primary: #f4f4f5;
+            --text-secondary: #a1a1aa;
+            --text-muted: #71717a;
+            --accent-primary: #6366f1;
+            --accent-secondary: #818cf8;
+            --accent-glow: rgba(99, 102, 241, 0.15);
+            --success: #22c55e;
+            --error: #ef4444;
+            --transition-fast: 0.15s ease;
+            --transition-medium: 0.3s ease;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .mono { font-family: 'JetBrains Mono', monospace; }
+
+        /* ── Background ── */
+        .bg-wrapper { position: fixed; inset: 0; z-index: -1; overflow: hidden; }
+        .bg-gradient {
+            position: absolute; inset: 0;
+            background:
+                radial-gradient(ellipse 80% 50% at 50% -20%, rgba(99,102,241,0.15), transparent),
+                radial-gradient(ellipse 60% 40% at 100% 100%, rgba(99,102,241,0.08), transparent),
+                radial-gradient(ellipse 50% 30% at 0% 100%, rgba(129,140,248,0.06), transparent);
+        }
+        .bg-grid {
+            position: absolute; inset: 0;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+            background-size: 60px 60px;
+            mask-image: radial-gradient(ellipse 80% 60% at 50% 50%, black, transparent);
+        }
+        .bg-glow { position: absolute; width: 600px; height: 600px; border-radius: 50%; filter: blur(120px); animation: breathe 8s ease-in-out infinite; }
+        .bg-glow-1 { background: var(--accent-primary); top: -300px; left: 50%; transform: translateX(-50%); opacity: 0.12; }
+        .bg-glow-2 { background: linear-gradient(135deg,#6366f1,#8b5cf6); bottom: -400px; right: -200px; width: 500px; height: 500px; opacity: 0.08; animation-delay: -4s; }
+        @keyframes breathe {
+            0%,100% { transform: translateX(-50%) scale(1); opacity: 0.12; }
+            50%     { transform: translateX(-50%) scale(1.1); opacity: 0.18; }
+        }
+        .particles { position: absolute; inset: 0; overflow: hidden; }
+        .particle { position: absolute; width: 2px; height: 2px; background: rgba(255,255,255,0.3); border-radius: 50%; animation: drift 20s linear infinite; }
+        .particle:nth-child(1) { left:10%; animation-duration:25s; animation-delay:0s; }
+        .particle:nth-child(2) { left:20%; animation-duration:20s; animation-delay:-5s; }
+        .particle:nth-child(3) { left:35%; animation-duration:28s; animation-delay:-10s; }
+        .particle:nth-child(4) { left:50%; animation-duration:22s; animation-delay:-15s; }
+        .particle:nth-child(5) { left:65%; animation-duration:26s; animation-delay:-8s; }
+        @keyframes drift {
+            0%   { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10%  { opacity: 0.6; }
+            90%  { opacity: 0.6; }
+            100% { transform: translateY(-100vh) rotate(720deg); opacity: 0; }
+        }
+
+        /* ── Layout ── */
+        .container { width: 100%; max-width: 500px; padding: 2rem; z-index: 10; }
+
+        .api-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(40px);
+            -webkit-backdrop-filter: blur(40px);
+            border: 1px solid var(--border-subtle);
+            border-radius: 24px;
+            padding: 48px;
+            box-shadow:
+                0 0 0 1px rgba(255,255,255,0.03),
+                0 20px 50px -12px rgba(0,0,0,0.5),
+                0 0 100px -20px var(--accent-glow);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .form-header { text-align: center; margin-bottom: 40px; }
+        .form-logo {
+            width: 48px; height: 48px; margin: 0 auto 20px;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            border-radius: 12px; display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 8px 24px -8px rgba(99,102,241,0.4);
+        }
+        .form-logo svg { width: 24px; height: 24px; color: white; }
+        .form-title { font-size: 1.5rem; font-weight: 600; color: var(--text-primary); margin-bottom: 8px; letter-spacing: -0.02em; }
+        .form-subtitle { font-size: 0.875rem; color: var(--text-muted); font-weight: 400; }
+
+        /* ── Inputs ── */
+        .input-group { margin-bottom: 24px; }
+        .input-label { display: block; font-size: 0.8125rem; font-weight: 500; color: var(--text-secondary); margin-bottom: 8px; }
+        .input-wrapper { position: relative; }
+
+        .input-field {
+            width: 100%; padding: 14px 48px 14px 16px; font-size: 0.9375rem;
+            font-family: 'JetBrains Mono', monospace; color: var(--text-primary);
+            background: var(--bg-tertiary); border: 1px solid var(--border-subtle);
+            border-radius: 12px; outline: none; transition: all var(--transition-fast);
+            letter-spacing: 0.5px;
+        }
+        .input-field::placeholder { color: var(--text-muted); font-family: 'Inter', sans-serif; letter-spacing: normal; }
+        .input-field:hover { border-color: var(--border-light); }
+        .input-field:focus { border-color: var(--accent-primary); box-shadow: 0 0 0 3px var(--accent-glow); background: var(--bg-secondary); }
+        .input-field.error { border-color: var(--error); box-shadow: 0 0 0 3px rgba(239,68,68,0.1); }
+        .input-field.success { border-color: var(--success); box-shadow: 0 0 0 3px rgba(34,197,94,0.1); }
+
+        .select-field {
+            width: 100%; padding: 14px 40px 14px 16px; font-size: 0.9375rem;
+            font-family: inherit; color: var(--text-primary); background: var(--bg-tertiary);
+            border: 1px solid var(--border-subtle); border-radius: 12px; outline: none;
+            cursor: pointer; appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236366f1' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat; background-position: right 16px center;
+            transition: all var(--transition-fast);
+        }
+        .select-field:hover { border-color: var(--border-light); }
+        .select-field:focus { border-color: var(--accent-primary); box-shadow: 0 0 0 3px var(--accent-glow); background-color: var(--bg-secondary); }
+        .select-field:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .toggle-visibility {
+            position: absolute; right: 16px; top: 50%; transform: translateY(-50%);
+            background: none; border: none; color: var(--text-muted); cursor: pointer;
+            padding: 4px; transition: color var(--transition-fast);
+            display: flex; align-items: center; justify-content: center;
+        }
+        .toggle-visibility:hover { color: var(--accent-secondary); }
+        .toggle-visibility svg { width: 20px; height: 20px; }
+
+        /* ── Indicators ── */
+        .key-indicator {
+            display: none; align-items: center; gap: 8px; margin-top: 12px;
+            padding: 12px 16px; background: rgba(99,102,241,0.1);
+            border: 1px solid rgba(99,102,241,0.2); border-radius: 8px; font-size: 0.8125rem;
+        }
+        .key-indicator.show { display: flex; }
+        .indicator-icon {
+            width: 8px; height: 8px; border-radius: 50%; background: var(--accent-primary);
+            box-shadow: 0 0 12px rgba(99,102,241,0.6); animation: pulse 2s ease-in-out infinite;
+        }
+        @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.5; } }
+        .indicator-text { color: var(--accent-secondary); font-weight: 500; }
+
+        .error-message {
+            display: none; align-items: center; gap: 8px; margin-top: 12px;
+            padding: 12px 16px; background: rgba(239,68,68,0.1);
+            border: 1px solid rgba(239,68,68,0.2); border-radius: 8px;
+            color: var(--error); font-size: 0.8125rem;
+        }
+        .error-message.show { display: flex; }
+        .error-message svg { flex-shrink: 0; }
+
+        /* ── Animated groups ── */
+        .model-select-group { display: none; animation: fadeIn 0.3s ease; }
+        .model-select-group.show { display: block; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ── Button ── */
+        .btn-primary {
+            width: 100%; padding: 14px 24px; font-size: 0.9375rem; font-weight: 600;
+            font-family: inherit; color: white;
+            background: linear-gradient(135deg, var(--accent-primary), #7c3aed);
+            border: none; border-radius: 12px; cursor: pointer;
+            transition: all var(--transition-medium); position: relative; overflow: hidden; margin-top: 8px;
+        }
+        .btn-primary::before {
+            content: ''; position: absolute; inset: 0;
+            background: linear-gradient(135deg, #7c3aed, var(--accent-primary));
+            opacity: 0; transition: opacity var(--transition-medium);
+        }
+        .btn-primary:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 12px 32px -8px rgba(99,102,241,0.5); }
+        .btn-primary:hover::before { opacity: 1; }
+        .btn-primary:active:not(:disabled) { transform: translateY(0); }
+        .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+        .btn-text { position: relative; z-index: 1; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-primary.loading .btn-text { opacity: 0; }
+        .spinner {
+            display: none; position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%,-50%); width: 20px; height: 20px;
+            border: 2px solid rgba(255,255,255,0.3); border-top-color: white;
+            border-radius: 50%; animation: spin 0.8s linear infinite;
+        }
+        .btn-primary.loading .spinner { display: block; }
+        @keyframes spin { to { transform: translate(-50%,-50%) rotate(360deg); } }
+
+        /* ── Helper text ── */
+        .helper-text {
+            display: none; margin-top: 8px; font-size: 0.75rem; color: var(--text-muted); line-height: 1.5;
+        }
+        .helper-text.show { display: block; }
+        .helper-text code {
+            font-family: 'JetBrains Mono', monospace; font-size: 0.7rem;
+            background: var(--bg-tertiary); padding: 2px 6px; border-radius: 4px;
+            color: var(--accent-secondary);
+        }
+
+        /* ── Custom model input ── */
+        .custom-model-wrapper { display: none; margin-top: 12px; animation: fadeIn 0.3s ease; }
+        .custom-model-wrapper.show { display: block; }
+
+        @media (max-width: 520px) {
+            .container { padding: 1rem; }
+            .api-card { padding: 32px 24px; border-radius: 20px; }
+            .form-title { font-size: 1.25rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-wrapper">
+        <div class="bg-gradient"></div>
+        <div class="bg-grid"></div>
+        <div class="bg-glow bg-glow-1"></div>
+        <div class="bg-glow bg-glow-2"></div>
+        <div class="particles">
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="api-card">
+            <div class="form-header">
+                <div class="form-logo">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                        <path d="M2 17l10 5 10-5"/>
+                        <path d="M2 12l10 5 10-5"/>
+                    </svg>
+                </div>
+                <h1 class="form-title">API Configuration</h1>
+                <p class="form-subtitle">Connect any AI provider to get started</p>
+            </div>
+
+            <form id="api-form">
+                <!-- Provider Selector -->
+                <div class="input-group">
+                    <label class="input-label" for="provider-select">Provider</label>
+                    <select class="select-field" id="provider-select">
+                        <option value="auto">🔍 Auto-detect from key</option>
+                        <optgroup label="Major Providers">
+                            <option value="openai">OpenAI</option>
+                            <option value="anthropic">Anthropic</option>
+                            <option value="google">Google AI (Gemini)</option>
+                            <option value="mistral">Mistral AI</option>
+                            <option value="cohere">Cohere</option>
+                        </optgroup>
+                        <optgroup label="Open-Source Hosts">
+                            <option value="groq">Groq</option>
+                            <option value="together">Together AI</option>
+                            <option value="fireworks">Fireworks AI</option>
+                            <option value="bytez">Bytez</option>
+                            <option value="replicate">Replicate</option>
+                        </optgroup>
+                        <optgroup label="Specialized">
+                            <option value="xai">xAI (Grok)</option>
+                            <option value="deepseek">DeepSeek</option>
+                            <option value="perplexity">Perplexity</option>
+                            <option value="puter">Puter</option>
+                        </optgroup>
+                        <optgroup label="Aggregators">
+                            <option value="openrouter">OpenRouter</option>
+                        </optgroup>
+                    </select>
+                    <div class="helper-text" id="provider-helper"></div>
+                </div>
+
+                <!-- API Key -->
+                <div class="input-group">
+                    <label class="input-label" for="api-key">API Key</label>
+                    <div class="input-wrapper">
+                        <input
+                            type="password"
+                            class="input-field"
+                            id="api-key"
+                            placeholder="Enter your API key"
+                            required
+                            autocomplete="off"
+                        >
+                        <button type="button" class="toggle-visibility" id="toggle-key">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                <circle cx="12" cy="12" r="3"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="key-indicator" id="key-indicator">
+                        <span class="indicator-icon"></span>
+                        <span class="indicator-text" id="key-type-text">API key detected</span>
+                    </div>
+                    <div class="error-message" id="error-msg">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"/>
+                            <line x1="15" y1="9" x2="9" y2="15"/>
+                            <line x1="9" y1="9" x2="15" y2="15"/>
+                        </svg>
+                        <span id="error-text">Invalid API key format</span>
+                    </div>
+                </div>
+
+                <!-- Model Selector -->
+                <div class="input-group model-select-group" id="model-group">
+                    <label class="input-label" for="model-select">Select Model</label>
+                    <select class="select-field" id="model-select">
+                        <option value="">-- Select a model --</option>
+                    </select>
+                    <!-- Custom model ID input for providers with many models -->
+                    <div class="custom-model-wrapper" id="custom-model-wrapper">
+                        <input
+                            type="text"
+                            class="input-field"
+                            id="custom-model"
+                            placeholder="e.g. org/model-name"
+                            style="margin-top: 8px; padding-right: 16px;"
+                        >
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-primary" id="submit-btn" disabled>
+                    <span class="btn-text">
+                        Connect & Launch
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="5" y1="12" x2="19" y2="12"/>
+                            <polyline points="12 5 19 12 12 19"/>
+                        </svg>
+                    </span>
+                    <div class="spinner"></div>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script type="module">
+        import { ConvexClient } from "https://esm.sh/convex@1.17.4/browser";
+
+        const CONVEX_URL = "https://neat-chameleon-935.convex.cloud";
+        const client = new ConvexClient(CONVEX_URL);
+
+        // ─── Provider Database ───
+        const providerDB = {
+            anthropic: {
+                name: 'Anthropic',
+                helper: 'Get your key at <code>console.anthropic.com</code>',
+                models: [
+                    { id: 'claude-sonnet-4-20250514', name: 'Claude Sonnet 4' },
+                    { id: 'claude-opus-4-20250514', name: 'Claude Opus 4' },
+                    { id: 'claude-3-7-sonnet-20250219', name: 'Claude 3.7 Sonnet' },
+                    { id: 'claude-3-5-sonnet-20241022', name: 'Claude 3.5 Sonnet' },
+                    { id: 'claude-3-5-haiku-20241022', name: 'Claude 3.5 Haiku' },
+                    { id: 'claude-3-opus-20240229', name: 'Claude 3 Opus' },
+                    { id: 'claude-3-haiku-20240307', name: 'Claude 3 Haiku' },
+                ],
+            },
+            openai: {
+                name: 'OpenAI',
+                helper: 'Get your key at <code>platform.openai.com</code>',
+                models: [
+                    { id: 'gpt-4o', name: 'GPT-4o' },
+                    { id: 'gpt-4o-mini', name: 'GPT-4o Mini' },
+                    { id: 'gpt-4-turbo', name: 'GPT-4 Turbo' },
+                    { id: 'gpt-4', name: 'GPT-4' },
+                    { id: 'gpt-3.5-turbo', name: 'GPT-3.5 Turbo' },
+                    { id: 'o1-preview', name: 'o1 Preview' },
+                    { id: 'o1-mini', name: 'o1 Mini' },
+                ],
+            },
+            google: {
+                name: 'Google AI',
+                helper: 'Get your key at <code>aistudio.google.com</code>',
+                models: [
+                    { id: 'gemini-2.0-flash', name: 'Gemini 2.0 Flash' },
+                    { id: 'gemini-1.5-pro', name: 'Gemini 1.5 Pro' },
+                    { id: 'gemini-1.5-flash', name: 'Gemini 1.5 Flash' },
+                ],
+            },
+            groq: {
+                name: 'Groq',
+                helper: 'Get your key at <code>console.groq.com</code>',
+                models: [
+                    { id: 'llama-3.3-70b-versatile', name: 'Llama 3.3 70B' },
+                    { id: 'llama-3.1-8b-instant', name: 'Llama 3.1 8B Instant' },
+                    { id: 'mixtral-8x7b-32768', name: 'Mixtral 8x7B' },
+                    { id: 'gemma2-9b-it', name: 'Gemma 2 9B' },
+                ],
+            },
+            xai: {
+                name: 'xAI',
+                helper: 'Get your key at <code>console.x.ai</code>',
+                models: [
+                    { id: 'grok-2', name: 'Grok 2' },
+                    { id: 'grok-2-mini', name: 'Grok 2 Mini' },
+                ],
+            },
+            deepseek: {
+                name: 'DeepSeek',
+                helper: 'Get your key at <code>platform.deepseek.com</code>',
+                models: [
+                    { id: 'deepseek-chat', name: 'DeepSeek Chat (V3)' },
+                    { id: 'deepseek-reasoner', name: 'DeepSeek Reasoner (R1)' },
+                ],
+            },
+            mistral: {
+                name: 'Mistral AI',
+                helper: 'Get your key at <code>console.mistral.ai</code>',
+                models: [
+                    { id: 'mistral-large-latest', name: 'Mistral Large' },
+                    { id: 'mistral-small-latest', name: 'Mistral Small' },
+                    { id: 'codestral-latest', name: 'Codestral' },
+                    { id: 'open-mixtral-8x22b', name: 'Mixtral 8x22B' },
+                ],
+            },
+            cohere: {
+                name: 'Cohere',
+                helper: 'Get your key at <code>dashboard.cohere.com</code>',
+                models: [
+                    { id: 'command-r-plus', name: 'Command R+' },
+                    { id: 'command-r', name: 'Command R' },
+                    { id: 'command-light', name: 'Command Light' },
+                ],
+            },
+            together: {
+                name: 'Together AI',
+                helper: 'Get your key at <code>api.together.xyz</code>',
+                models: [
+                    { id: 'meta-llama/Llama-3.3-70B-Instruct-Turbo', name: 'Llama 3.3 70B Turbo' },
+                    { id: 'meta-llama/Llama-3.1-8B-Instruct-Turbo', name: 'Llama 3.1 8B Turbo' },
+                    { id: 'Qwen/Qwen2.5-72B-Instruct-Turbo', name: 'Qwen 2.5 72B Turbo' },
+                    { id: 'mistralai/Mixtral-8x7B-Instruct-v0.1', name: 'Mixtral 8x7B' },
+                    { id: 'deepseek-ai/DeepSeek-R1', name: 'DeepSeek R1' },
+                ],
+            },
+            fireworks: {
+                name: 'Fireworks AI',
+                helper: 'Get your key at <code>fireworks.ai</code>',
+                models: [
+                    { id: 'accounts/fireworks/models/llama-v3p3-70b-instruct', name: 'Llama 3.3 70B' },
+                    { id: 'accounts/fireworks/models/qwen2p5-72b-instruct', name: 'Qwen 2.5 72B' },
+                    { id: 'accounts/fireworks/models/deepseek-r1', name: 'DeepSeek R1' },
+                ],
+            },
+            perplexity: {
+                name: 'Perplexity',
+                helper: 'Get your key at <code>perplexity.ai/settings/api</code>',
+                models: [
+                    { id: 'sonar-pro', name: 'Sonar Pro' },
+                    { id: 'sonar', name: 'Sonar' },
+                    { id: 'sonar-reasoning-pro', name: 'Sonar Reasoning Pro' },
+                    { id: 'sonar-reasoning', name: 'Sonar Reasoning' },
+                ],
+            },
+            bytez: {
+                name: 'Bytez',
+                helper: 'Get your key at <code>bytez.com</code> — use <code>pip install bytez</code> for the SDK',
+                allowCustomModel: true,
+                models: [
+                    { id: 'zai-org/GLM-4.5', name: 'GLM 4.5' },
+                    { id: 'meta-llama/Llama-3.1-8B-Instruct', name: 'Llama 3.1 8B' },
+                    { id: 'mistralai/Mistral-7B-Instruct-v0.3', name: 'Mistral 7B v0.3' },
+                    { id: 'Qwen/Qwen2.5-7B-Instruct', name: 'Qwen 2.5 7B' },
+                    { id: '__custom__', name: '✏️ Enter custom model ID…' },
+                ],
+            },
+            puter: {
+                name: 'Puter',
+                helper: 'Get your API token from <code>puter.com</code> developer settings',
+                models: [
+                    { id: 'gpt-4o', name: 'GPT-4o (via Puter)' },
+                    { id: 'gpt-4o-mini', name: 'GPT-4o Mini (via Puter)' },
+                    { id: 'claude-3-5-sonnet', name: 'Claude 3.5 Sonnet (via Puter)' },
+                    { id: 'gemini-1.5-pro', name: 'Gemini 1.5 Pro (via Puter)' },
+                    { id: 'mistral-large', name: 'Mistral Large (via Puter)' },
+                ],
+            },
+            replicate: {
+                name: 'Replicate',
+                helper: 'Get your token at <code>replicate.com/account/api-tokens</code>',
+                allowCustomModel: true,
+                models: [
+                    { id: 'meta/llama-3.1-405b-instruct', name: 'Llama 3.1 405B' },
+                    { id: 'meta/llama-3.1-70b-instruct', name: 'Llama 3.1 70B' },
+                    { id: 'mistralai/mixtral-8x7b-instruct-v0.1', name: 'Mixtral 8x7B' },
+                    { id: '__custom__', name: '✏️ Enter custom model ID…' },
+                ],
+            },
+            openrouter: {
+                name: 'OpenRouter',
+                helper: 'Get your key at <code>openrouter.ai/keys</code> — routes to 200+ models',
+                allowCustomModel: true,
+                models: [
+                    { id: 'anthropic/claude-sonnet-4', name: 'Claude Sonnet 4' },
+                    { id: 'openai/gpt-4o', name: 'GPT-4o' },
+                    { id: 'google/gemini-pro-1.5', name: 'Gemini 1.5 Pro' },
+                    { id: 'meta-llama/llama-3.3-70b-instruct', name: 'Llama 3.3 70B' },
+                    { id: 'deepseek/deepseek-r1', name: 'DeepSeek R1' },
+                    { id: '__custom__', name: '✏️ Enter custom model ID…' },
+                ],
+            },
+        };
+
+        // ─── Auto-detection rules (ordered — first match wins) ───
+        const keyPatterns = [
+            { prefix: 'sk-ant-',  provider: 'anthropic' },
+            { prefix: 'sk-or-',   provider: 'openrouter' },
+            { prefix: 'sk-proj-', provider: 'openai' },
+            { prefix: 'AIzaSy',   provider: 'google' },
+            { prefix: 'gsk_',     provider: 'groq' },
+            { prefix: 'xai-',     provider: 'xai' },
+            { prefix: 'pplx-',    provider: 'perplexity' },
+            { prefix: 'r8_',      provider: 'replicate' },
+            { prefix: 'fw_',      provider: 'fireworks' },
+            { prefix: 'fw-',      provider: 'fireworks' },
+            // sk- is last because many providers use it
+            { prefix: 'sk-',      provider: 'openai' },
+        ];
+
+        function detectProvider(key) {
+            if (!key || key.length < 5) return null;
+            for (const rule of keyPatterns) {
+                if (key.startsWith(rule.prefix)) return rule.provider;
+            }
+            // 32-char hex → likely Bytez
+            if (/^[0-9a-f]{32}$/i.test(key)) return 'bytez';
+            // Fallback: long enough key but unknown
+            if (key.length >= 20) return null;
+            return null;
+        }
+
+        // ─── DOM ───
+        const providerSelect = document.getElementById('provider-select');
+        const apiKeyInput    = document.getElementById('api-key');
+        const toggleBtn      = document.getElementById('toggle-key');
+        const keyIndicator   = document.getElementById('key-indicator');
+        const keyTypeText    = document.getElementById('key-type-text');
+        const providerHelper = document.getElementById('provider-helper');
+        const modelGroup     = document.getElementById('model-group');
+        const modelSelect    = document.getElementById('model-select');
+        const customWrapper  = document.getElementById('custom-model-wrapper');
+        const customModel    = document.getElementById('custom-model');
+        const submitBtn      = document.getElementById('submit-btn');
+        const form           = document.getElementById('api-form');
+        const errorMsg       = document.getElementById('error-msg');
+        const errorText      = document.getElementById('error-text');
+
+        let resolvedProvider = null;
+
+        // ─── Helpers ───
+        function showError(message) {
+            errorText.textContent = message;
+            errorMsg.classList.add('show');
+            keyIndicator.classList.remove('show');
+            apiKeyInput.classList.add('error');
+            apiKeyInput.classList.remove('success');
+            submitBtn.disabled = true;
+        }
+
+        function hideError() {
+            errorMsg.classList.remove('show');
+            apiKeyInput.classList.remove('error');
+        }
+
+        function populateModels(provider) {
+            const data = providerDB[provider];
+            if (!data) return;
+
+            modelSelect.innerHTML = '<option value="">-- Select a model --</option>';
+            data.models.forEach(m => {
+                const opt = document.createElement('option');
+                opt.value = m.id;
+                opt.textContent = m.name;
+                modelSelect.appendChild(opt);
+            });
+            modelGroup.classList.add('show');
+            customWrapper.classList.remove('show');
+            customModel.value = '';
+
+            // Show helper
+            if (data.helper) {
+                providerHelper.innerHTML = data.helper;
+                providerHelper.classList.add('show');
+            } else {
+                providerHelper.classList.remove('show');
+            }
+        }
+
+        function getSelectedModel() {
+            const val = modelSelect.value;
+            if (val === '__custom__') return customModel.value.trim();
+            return val;
+        }
+
+        function updateSubmitState() {
+            const model = getSelectedModel();
+            submitBtn.disabled = !(resolvedProvider && apiKeyInput.value.trim().length >= 5 && model);
+        }
+
+        // ─── Toggle Key Visibility ───
+        toggleBtn.addEventListener('click', () => {
+            const type = apiKeyInput.type === 'password' ? 'text' : 'password';
+            apiKeyInput.type = type;
+            toggleBtn.innerHTML = type === 'password'
+                ? `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`
+                : `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>`;
+        });
+
+        // ─── Provider Dropdown Change ───
+        providerSelect.addEventListener('change', () => {
+            const val = providerSelect.value;
+            hideError();
+
+            if (val === 'auto') {
+                resolvedProvider = null;
+                providerHelper.classList.remove('show');
+                // Re-trigger auto-detect from current key
+                apiKeyInput.dispatchEvent(new Event('input'));
+                return;
+            }
+
+            resolvedProvider = val;
+            populateModels(val);
+            apiKeyInput.classList.remove('success');
+            keyIndicator.classList.remove('show');
+            updateSubmitState();
+        });
+
+        // ─── Key Input ───
+        apiKeyInput.addEventListener('input', () => {
+            hideError();
+            const key = apiKeyInput.value.trim();
+            const isAutoMode = providerSelect.value === 'auto';
+
+            if (isAutoMode) {
+                const detected = detectProvider(key);
+                if (detected && providerDB[detected]) {
+                    resolvedProvider = detected;
+                    keyTypeText.textContent = `${providerDB[detected].name} key detected`;
+                    keyIndicator.classList.add('show');
+                    apiKeyInput.classList.add('success');
+                    populateModels(detected);
+                } else if (key.length >= 20) {
+                    // Key is long enough but can't auto-detect — prompt manual selection
+                    resolvedProvider = null;
+                    keyTypeText.textContent = 'Key detected — select provider above';
+                    keyIndicator.classList.add('show');
+                    apiKeyInput.classList.remove('success');
+                    modelGroup.classList.remove('show');
+                    providerHelper.innerHTML = 'Could not auto-detect provider. Please select manually.';
+                    providerHelper.classList.add('show');
+                } else {
+                    resolvedProvider = null;
+                    keyIndicator.classList.remove('show');
+                    modelGroup.classList.remove('show');
+                    apiKeyInput.classList.remove('success');
+                    providerHelper.classList.remove('show');
+                }
+            } else {
+                // Manual mode — just validate key length
+                if (key.length >= 5) {
+                    apiKeyInput.classList.add('success');
+                    apiKeyInput.classList.remove('error');
+                } else {
+                    apiKeyInput.classList.remove('success');
+                }
+            }
+            updateSubmitState();
+        });
+
+        // ─── Model Dropdown Change ───
+        modelSelect.addEventListener('change', () => {
+            if (modelSelect.value === '__custom__') {
+                customWrapper.classList.add('show');
+                customModel.focus();
+            } else {
+                customWrapper.classList.remove('show');
+                customModel.value = '';
+            }
+            updateSubmitState();
+        });
+
+        customModel.addEventListener('input', updateSubmitState);
+
+        // ─── Form Submit ───
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            hideError();
+
+            const apiKey = apiKeyInput.value.trim();
+            const selectedModel = getSelectedModel();
+
+            if (!apiKey) { showError('Please enter your API key'); return; }
+            if (apiKey.length < 5) { showError('API key seems too short'); return; }
+            if (!resolvedProvider) { showError('Please select a provider'); return; }
+            if (!selectedModel) { showError('Please select or enter a model'); return; }
+
+            submitBtn.classList.add('loading');
+
+            try {
+                await client.mutation("api:saveApiConfig", {
+                    provider: resolvedProvider,
+                    apiKey,
+                    model: selectedModel,
+                });
+
+                const credentials = {
+                    provider: resolvedProvider,
+                    providerName: providerDB[resolvedProvider]?.name || resolvedProvider,
+                    apiKey,
+                    model: selectedModel,
+                    modelName: modelSelect.value === '__custom__'
+                        ? selectedModel
+                        : modelSelect.options[modelSelect.selectedIndex]?.text || selectedModel,
+                    timestamp: Date.now(),
+                };
+
+                localStorage.setItem('target_config', JSON.stringify(credentials));
+                apiKeyInput.classList.add('success');
+                submitBtn.classList.remove('loading');
+
+                setTimeout(() => { window.location.href = 'dashboard.html'; }, 500);
+            } catch (error) {
+                showError('Failed to save API configuration: ' + error.message);
+                submitBtn.classList.remove('loading');
+            }
+        });
+
+        // ─── Restore Saved Config ───
+        document.addEventListener('DOMContentLoaded', () => {
+            const stored = localStorage.getItem('target_config');
+            if (stored) {
+                const creds = JSON.parse(stored);
+                // Set provider dropdown first
+                if (creds.provider && providerDB[creds.provider]) {
+                    providerSelect.value = creds.provider;
+                    resolvedProvider = creds.provider;
+                    populateModels(creds.provider);
+                }
+                apiKeyInput.value = creds.apiKey;
+                apiKeyInput.dispatchEvent(new Event('input'));
+                setTimeout(() => {
+                    if (creds.model) {
+                        // Check if model exists in dropdown
+                        const exists = Array.from(modelSelect.options).some(o => o.value === creds.model);
+                        if (exists) {
+                            modelSelect.value = creds.model;
+                        } else {
+                            // Use custom model input
+                            modelSelect.value = '__custom__';
+                            customWrapper.classList.add('show');
+                            customModel.value = creds.model;
+                        }
+                        modelSelect.dispatchEvent(new Event('change'));
+                    }
+                    updateSubmitState();
+                }, 100);
+            }
+        });
+    </script>
+</body>
+</html>
