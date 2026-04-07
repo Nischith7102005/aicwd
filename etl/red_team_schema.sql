@@ -315,11 +315,21 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- ============================================================================
--- MAIN TRIGGER FUNCTION
+-- MAIN TRIGGER FUNCTION (LEGACY - DISABLED IN FAVOR OF ML SERVICE)
 -- ============================================================================
+-- NOTE: This trigger is disabled in favor of the ML-based Red Team Service.
+-- The ML service runs as a separate microservice and processes events
+-- through a trained XGBoost model for improved accuracy and adaptability.
+--
+-- To re-enable the SQL-based algorithm (fallback mode):
+--   ALTER TABLE raw_llm_events ENABLE TRIGGER trg_red_team_analysis;
+--
+-- To use the ML service (recommended):
+--   Ensure ml-service is running and polling the database.
+--   See etl/ml-service/ for the ML implementation.
 
 CREATE OR REPLACE FUNCTION process_red_team_analysis()
-RETURNS TRIGGER AS $$
+RETURNS TRIGGER AS $
 DECLARE
     inj_risk DOUBLE PRECISION;
     leak_risk DOUBLE PRECISION;
@@ -435,14 +445,17 @@ BEGIN
     
     RETURN NEW;
 END;
-$$ LANGUAGE plpgsql;
+$ LANGUAGE plpgsql;
 
--- Create trigger on raw_llm_events
+-- Create trigger on raw_llm_events (DISABLED BY DEFAULT - ML SERVICE HANDLES THIS)
 DROP TRIGGER IF EXISTS trg_red_team_analysis ON raw_llm_events;
 CREATE TRIGGER trg_red_team_analysis
     AFTER INSERT ON raw_llm_events
     FOR EACH ROW
     EXECUTE FUNCTION process_red_team_analysis();
+
+-- Disable trigger by default (ML service handles processing)
+ALTER TABLE raw_llm_events DISABLE TRIGGER trg_red_team_analysis;
 
 -- ============================================================================
 -- SEED DATA - Injection Patterns

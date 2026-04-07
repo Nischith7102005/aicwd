@@ -13,14 +13,17 @@ The ETL pipeline processes raw LLM telemetry data from Convex through a webhook 
 │   Convex     │──────▶  Webhook     │──────▶   Postgres   │──────▶   dbt        │
 │  Database    │      │   Handler    │      │  Database    │      │  Models      │
 └──────────────┘      └──────────────┘      └──────────────┘      └──────────────┘
-                                                          │
-                                                          ▼
-                                              ┌───────────────────┐
-                                              │  Analytics Marts  │
-                                              │  - Daily Metrics  │
-                                              │  - Waste Index    │
-                                              │  - Provider Comp  │
-                                              └───────────────────┘
+                                                   │
+                                                   ▼
+                                         ┌─────────────────────┐
+                                         │  ML Red Team Service │
+                                         │  (XGBoost Model)     │
+                                         └─────────────────────┘
+                                                   │
+                                                   ▼
+                                         ┌─────────────────────┐
+                                         │  security_metrics   │
+                                         └─────────────────────┘
 ```
 
 ## Components
@@ -34,22 +37,40 @@ A lightweight HTTP server that receives events from Convex and stores them in Po
 - `GET /health` - Health check
 - `GET /stats` - Event count statistics
 
-**Environment Variables:**
-```bash
-PORT=3001
-DATABASE_URL=postgresql://user:password@host.neon.tech/dbname?sslmode=require
-# OR use individual PG* variables:
-PGHOST=your-host.neon.tech
-PGPORT=5432
-PGDATABASE=your-database
-PGUSER=your-user
-PGPASSWORD=your-password
-PGSSLMODE=require
+### 2. ML Red Team Service (`ml-service/`)
 
-WEBHOOK_SECRET=your-secret
+Machine Learning-based security analysis that replaces SQL-based Red Team algorithms:
+
+- **XGBoost multi-output regressor** for 6 risk scores (injection, leakage, hallucination, bias, anomaly, tool_misuse)
+- **FastAPI** service with REST endpoints
+- **Background polling** for real-time processing
+- **50+ engineered features** including attack pattern detection
+
+**Key Files:**
+- `main.py` - FastAPI application
+- `model.py` - XGBoost model implementation
+- `features.py` - Feature extraction
+- `processor.py` - Event processing loop
+- `train.py` - Model training script
+
+**Quick Start:**
+```bash
+cd ml-service
+pip install -r requirements.txt
+python train.py --synthetic  # Train initial model
+python main.py               # Start service
 ```
 
-### 2. dbt Project
+**API Endpoints:**
+- `GET /health` - Service health
+- `POST /predict` - Predict risk for single event
+- `POST /predict/batch` - Batch prediction
+- `GET /stats` - Processing statistics
+- `GET /features/importance` - Model feature importance
+
+See `ml-service/README.md` for detailed documentation.
+
+### 3. dbt Project
 
 **Models:**
 - `staging/stg_llm_events` - Cleaned and enriched raw events
@@ -61,7 +82,7 @@ WEBHOOK_SECRET=your-secret
 **Metric lineage:**
 - `metrics_lineage.md` - Raw vs transformed table inventory and metric-to-source mapping
 
-### 3. GitHub Actions Workflow (`.github/workflows/dbt.yml`)
+### 4. GitHub Actions Workflow (`.github/workflows/dbt.yml`)
 
 Runs dbt on a schedule (hourly) and on manual trigger.
 
@@ -95,6 +116,19 @@ dbt docs serve     # Serve docs locally
 
 ## Deployment
 
+### Docker Compose (Recommended)
+
+Run the full stack locally:
+
+```bash
+cd etl
+docker-compose up
+```
+
+This starts:
+- ML Red Team Service (port 8000)
+- Webhook handler (port 3001)
+
 ### Webhook Handler Options
 
 **Option A: Vercel Serverless Function**
@@ -117,6 +151,28 @@ Set environment variables in your hosting platform:
 ```bash
 npx ts-node webhook.ts
 ```
+
+### ML Service Deployment
+
+**Docker:**
+```bash
+cd etl/ml-service
+docker build -t ml-red-team .
+docker run -p 8000:8000 --env-file .env ml-red-team
+```
+
+**Render:**
+1. Create new Web Service
+2. Connect to this repo
+3. Set root directory to `etl/ml-service`
+4. Build command: `pip install -r requirements.txt`
+5. Start command: `python main.py`
+
+**Environment Variables:**
+- `DATABASE_URL` - Postgres connection
+- `POLL_INTERVAL` - Seconds between polls (default: 2.0)
+- `MODEL_VERSION` - Model version tag
+- `ENABLE_FALLBACK` - Allow SQL trigger fallback
 
 ### Convex Configuration
 

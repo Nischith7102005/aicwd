@@ -1,0 +1,77 @@
+version: "3.8"
+
+services:
+  # ML Red Team Service
+  ml-service:
+    build:
+      context: ./ml-service
+      dockerfile: Dockerfile
+    container_name: ml-red-team-service
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+      - "9090:9090"
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - PGHOST=${PGHOST}
+      - PGPORT=${PGPORT:-5432}
+      - PGDATABASE=${PGDATABASE}
+      - PGUSER=${PGUSER}
+      - PGPASSWORD=${PGPASSWORD}
+      - PGSSLMODE=${PGSSLMODE:-require}
+      - MODEL_DIR=/app/artifacts
+      - MODEL_VERSION=${MODEL_VERSION:-v1}
+      - POLL_INTERVAL=${POLL_INTERVAL:-2.0}
+      - BATCH_SIZE=${BATCH_SIZE:-10}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - ENABLE_FALLBACK=${ENABLE_FALLBACK:-true}
+    volumes:
+      - ml-artifacts:/app/artifacts
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    networks:
+      - monitr-network
+
+  # ETL Webhook (optional - can be run separately)
+  webhook:
+    build:
+      context: .
+      dockerfile: webhook.Dockerfile
+    container_name: monitr-webhook
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    environment:
+      - PORT=3001
+      - DATABASE_URL=${DATABASE_URL}
+      - WEBHOOK_SECRET=${WEBHOOK_SECRET}
+    networks:
+      - monitr-network
+    profiles:
+      - webhook
+
+  # dbt (optional - for analytics)
+  dbt:
+    image: ghcr.io/dbt-labs/dbt-postgres:1.7.0
+    container_name: monitr-dbt
+    volumes:
+      - .:/usr/app/dbt
+      - ~/.dbt:/root/.dbt
+    working_dir: /usr/app/dbt
+    entrypoint: ["dbt"]
+    networks:
+      - monitr-network
+    profiles:
+      - dbt
+
+volumes:
+  ml-artifacts:
+    driver: local
+
+networks:
+  monitr-network:
+    driver: bridge
