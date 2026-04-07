@@ -30,6 +30,13 @@ interface WebhookPayload {
   tokensPerSecond?: number;
   costUsd?: number;
   success: boolean;
+  injectionRisk?: number;
+  leakageRisk?: number;
+  anomalyRisk?: number;
+  toolMisuseRisk?: number;
+  cri?: number;
+  criLevel?: string;
+  trustLevel?: string;
 }
 
 interface LogPayload {
@@ -136,6 +143,13 @@ export const exportInference = action({
     tokensPerSecond: v.optional(v.number()),
     costUsd: v.optional(v.number()),
     success: v.boolean(),
+    injectionRisk: v.optional(v.number()),
+    leakageRisk: v.optional(v.number()),
+    anomalyRisk: v.optional(v.number()),
+    toolMisuseRisk: v.optional(v.number()),
+    cri: v.optional(v.number()),
+    criLevel: v.optional(v.string()),
+    trustLevel: v.optional(v.string()),
   },
   handler: async (_ctx, args) => {
     const payload: WebhookPayload = {
@@ -159,6 +173,13 @@ export const exportInference = action({
       tokensPerSecond: args.tokensPerSecond,
       costUsd: args.costUsd,
       success: args.success,
+      injectionRisk: args.injectionRisk,
+      leakageRisk: args.leakageRisk,
+      anomalyRisk: args.anomalyRisk,
+      toolMisuseRisk: args.toolMisuseRisk,
+      cri: args.cri,
+      criLevel: args.criLevel,
+      trustLevel: args.trustLevel,
     };
 
     return await sendToWebhook(payload);

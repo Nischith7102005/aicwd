@@ -279,6 +279,132 @@
         /* Responsive */
         @media (max-width: 1200px) { .dashboard-grid { grid-template-columns: repeat(2, 1fr); } .card-triple { grid-column: span 2; } }
         @media (max-width: 768px) { .dashboard-grid { grid-template-columns: 1fr; } .card-wide, .card-triple { grid-column: span 1; } .header { flex-direction: column; gap: 1rem; } .header-actions { width: 100%; justify-content: center; } }
+
+        /* Security Metrics Cards */
+        .card-security {
+            border-color: var(--accent-red);
+            background: linear-gradient(135deg, rgba(255, 68, 102, 0.05), rgba(168, 85, 247, 0.05));
+        }
+
+        .cri-display {
+            font-family: 'VT323', monospace;
+            font-size: 4rem;
+            text-align: center;
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-red));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .cri-level-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            font-size: 0.75rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            border-radius: 4px;
+            margin-top: 0.5rem;
+        }
+
+        .cri-level-minimal { background: rgba(74, 222, 128, 0.2); color: #4ade80; border: 1px solid #4ade80; }
+        .cri-level-low { background: rgba(132, 204, 22, 0.2); color: #84cc16; border: 1px solid #84cc16; }
+        .cri-level-moderate { background: rgba(250, 204, 21, 0.2); color: #facc15; border: 1px solid #facc15; }
+        .cri-level-high { background: rgba(249, 115, 22, 0.2); color: #f97316; border: 1px solid #f97316; }
+        .cri-level-critical { background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid #ef4444; animation: pulse-critical 2s infinite; }
+
+        @keyframes pulse-critical {
+            0%, 100% { box-shadow: 0 0 5px rgba(239, 68, 68, 0.5); }
+            50% { box-shadow: 0 0 20px rgba(239, 68, 68, 0.8); }
+        }
+
+        .trust-indicator {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+        }
+
+        .trust-full { background: rgba(74, 222, 128, 0.15); color: #4ade80; }
+        .trust-restricted { background: rgba(250, 204, 21, 0.15); color: #facc15; }
+        .trust-minimal { background: rgba(249, 115, 22, 0.15); color: #f97316; }
+        .trust-revoked { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+
+        .trust-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .security-timeline {
+            flex: 1;
+            overflow-y: auto;
+            font-size: 0.7rem;
+        }
+
+        .timeline-event {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            border-left: 2px solid var(--border-color);
+            margin-left: 0.5rem;
+        }
+
+        .timeline-event.critical { border-left-color: #ef4444; }
+        .timeline-event.high { border-left-color: #f97316; }
+        .timeline-event.warning { border-left-color: #facc15; }
+
+        .timeline-time {
+            color: var(--text-secondary);
+            font-size: 0.65rem;
+            min-width: 50px;
+        }
+
+        .timeline-content {
+            flex: 1;
+        }
+
+        .risk-gauge-small {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 6px solid var(--bg-card);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .risk-gauge-small .gauge-fill {
+            position: absolute;
+            top: -6px;
+            left: -6px;
+            right: -6px;
+            bottom: -6px;
+            border-radius: 50%;
+            border: 6px solid;
+            border-left-color: transparent;
+            border-bottom-color: transparent;
+            transform: rotate(45deg);
+            transition: all 0.5s ease;
+        }
+
+        .risk-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .risk-item {
+            text-align: center;
+            padding: 0.75rem;
+            background: rgba(26, 27, 36, 0.5);
+            border-radius: 4px;
+        }
     </style>
 </head>
 <body>
@@ -406,6 +532,104 @@
                     <div class="latency-stat">
                         <div class="latency-stat-value" id="latencyP99">—</div>
                         <div class="latency-stat-label">P99 (ms)</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CRI Score (Prominent) -->
+            <div class="card card-security">
+                <div class="corner corner-tl"></div><div class="corner corner-tr"></div>
+                <div class="corner corner-bl"></div><div class="corner corner-br"></div>
+                <h3 class="card-title">Cognitive Risk Index (CRI)</h3>
+                <div class="cri-display" id="criValue">0.00</div>
+                <div style="text-align: center;">
+                    <span class="cri-level-badge cri-level-minimal" id="criLevelBadge">MINIMAL</span>
+                </div>
+                <div class="trust-indicator trust-full" id="trustIndicator">
+                    <div class="trust-dot" style="background: #4ade80; box-shadow: 0 0 8px #4ade80;"></div>
+                    <span id="trustText">FULL ACCESS</span>
+                </div>
+                <div style="margin-top: 1rem; font-size: 0.7rem; color: var(--text-secondary); text-align: center;">
+                    Action: <span id="actionText" style="color: var(--accent-green);">ALLOW</span>
+                </div>
+            </div>
+
+            <!-- Injection Risk -->
+            <div class="card">
+                <div class="corner corner-tl"></div><div class="corner corner-tr"></div>
+                <div class="corner corner-bl"></div><div class="corner corner-br"></div>
+                <h3 class="card-title">Injection Risk</h3>
+                <div class="gauge-container">
+                    <div class="risk-gauge-small">
+                        <div class="gauge-fill" id="injectionGauge" style="border-color: #4ade80;"></div>
+                        <span class="gauge-value" id="injectionValue" style="font-size: 1.5rem;">0%</span>
+                    </div>
+                </div>
+                <div class="gauge-status status-optimal" id="injectionStatus">SAFE</div>
+            </div>
+
+            <!-- Leakage Risk -->
+            <div class="card">
+                <div class="corner corner-tl"></div><div class="corner corner-tr"></div>
+                <div class="corner corner-bl"></div><div class="corner corner-br"></div>
+                <h3 class="card-title">Leakage Risk</h3>
+                <div class="gauge-container">
+                    <div class="risk-gauge-small">
+                        <div class="gauge-fill" id="leakageGauge" style="border-color: #4ade80;"></div>
+                        <span class="gauge-value" id="leakageValue" style="font-size: 1.5rem;">0%</span>
+                    </div>
+                </div>
+                <div class="gauge-status status-optimal" id="leakageStatus">SAFE</div>
+            </div>
+
+            <!-- Anomaly Risk -->
+            <div class="card">
+                <div class="corner corner-tl"></div><div class="corner corner-tr"></div>
+                <div class="corner corner-bl"></div><div class="corner corner-br"></div>
+                <h3 class="card-title">Anomaly Risk</h3>
+                <div class="gauge-container">
+                    <div class="risk-gauge-small">
+                        <div class="gauge-fill" id="anomalyGauge" style="border-color: #4ade80;"></div>
+                        <span class="gauge-value" id="anomalyValue" style="font-size: 1.5rem;">0%</span>
+                    </div>
+                </div>
+                <div class="gauge-status status-optimal" id="anomalyStatus">NORMAL</div>
+            </div>
+
+            <!-- Security Events Timeline -->
+            <div class="card card-wide">
+                <div class="corner corner-tl"></div><div class="corner corner-tr"></div>
+                <div class="corner corner-bl"></div><div class="corner corner-br"></div>
+                <h3 class="card-title">Security Events Timeline</h3>
+                <div class="security-timeline" id="securityTimeline">
+                    <div class="timeline-event">
+                        <span class="timeline-time">--:--</span>
+                        <span class="timeline-content">Waiting for security events...</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Risk Breakdown -->
+            <div class="card">
+                <div class="corner corner-tl"></div><div class="corner corner-tr"></div>
+                <div class="corner corner-bl"></div><div class="corner corner-br"></div>
+                <h3 class="card-title">Risk Breakdown</h3>
+                <div class="risk-grid">
+                    <div class="risk-item">
+                        <div style="font-size: 1.2rem; color: var(--accent-purple);" id="breakdownInjection">0.00</div>
+                        <div style="font-size: 0.6rem; color: var(--text-secondary);">Injection</div>
+                    </div>
+                    <div class="risk-item">
+                        <div style="font-size: 1.2rem; color: var(--accent-purple);" id="breakdownLeakage">0.00</div>
+                        <div style="font-size: 0.6rem; color: var(--text-secondary);">Leakage</div>
+                    </div>
+                    <div class="risk-item">
+                        <div style="font-size: 1.2rem; color: var(--accent-purple);" id="breakdownHallucination">0.00</div>
+                        <div style="font-size: 0.6rem; color: var(--text-secondary);">Hallucination</div>
+                    </div>
+                    <div class="risk-item">
+                        <div style="font-size: 1.2rem; color: var(--accent-purple);" id="breakdownAnomaly">0.00</div>
+                        <div style="font-size: 0.6rem; color: var(--text-secondary);">Anomaly</div>
                     </div>
                 </div>
             </div>
@@ -868,6 +1092,209 @@
         // Schedule next iteration with a small delay
         if (isMonitoring) {
             monitoringInterval = setTimeout(runMonitoringLoop, 1500);
+        }
+    };
+
+    // ── Neon Red Team Real-Time Streaming ─────────────────────────────
+    const STREAMING_SERVER_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+        ? 'http://localhost:3002'
+        : `https://${window.location.hostname.replace('dashboard', 'realtime')}`; // Heuristic for production URL
+
+    let eventSource = null;
+
+    function connectToStreamingServer() {
+        if (eventSource) eventSource.close();
+        
+        const streamUrl = `${STREAMING_SERVER_URL}/stream/metrics?session=${sessionId}`;
+        console.log(`Connecting to streaming server: ${streamUrl}`);
+        
+        eventSource = new EventSource(streamUrl);
+        
+        eventSource.onopen = () => {
+            console.log('Connected to Red Team streaming server');
+            addLogEntry('Connected to Neon Red Team analysis stream', 'INFO');
+        };
+        
+        eventSource.onmessage = (event) => {
+            try {
+                const data = JSON.parse(event.data);
+                if (data.type === 'initial') {
+                    if (data.metrics && data.metrics.length > 0) {
+                        updateSecurityMetrics(data.metrics[0]);
+                    }
+                } else if (data.type === 'update') {
+                    updateSecurityMetrics(data.metric);
+                }
+            } catch (err) {
+                console.error('Error parsing stream data:', err);
+            }
+        };
+        
+        eventSource.onerror = (err) => {
+            console.error('Streaming error:', err);
+            eventSource.close();
+            // Fallback to polling
+            setTimeout(startPollingFallback, 2000);
+        };
+    }
+
+    function startPollingFallback() {
+        if (!isMonitoring) return;
+        console.log('Using fallback polling...');
+        
+        const poll = async () => {
+            if (!isMonitoring) return;
+            try {
+                const response = await fetch(`${STREAMING_SERVER_URL}/api/metrics/latest?session=${sessionId}&limit=1`);
+                const data = await response.json();
+                if (data.success && data.metrics.length > 0) {
+                    updateSecurityMetrics(data.metrics[0]);
+                }
+            } catch (err) {
+                console.error('Polling error:', err);
+            }
+            setTimeout(poll, 2000);
+        };
+        poll();
+    }
+
+    function updateSecurityMetrics(metric) {
+        // Update CRI display
+        const cri = parseFloat(metric.cri) || 0;
+        document.getElementById('criValue').textContent = cri.toFixed(2);
+        
+        // Update CRI level badge
+        const criLevel = metric.cri_level || 'minimal';
+        const badgeEl = document.getElementById('criLevelBadge');
+        badgeEl.className = 'cri-level-badge cri-level-' + criLevel;
+        badgeEl.textContent = criLevel;
+        
+        // Update trust indicator
+        const trustLevel = metric.trust_level || 'full';
+        const trustEl = document.getElementById('trustIndicator');
+        trustEl.className = 'trust-indicator trust-' + trustLevel;
+        document.getElementById('trustText').textContent = trustLevel.toUpperCase() + ' ACCESS';
+        trustEl.querySelector('.trust-dot').style.background = getTrustColor(trustLevel);
+        trustEl.querySelector('.trust-dot').style.boxShadow = `0 0 8px ${getTrustColor(trustLevel)}`;
+        
+        // Update action text
+        const actionText = document.getElementById('actionText');
+        actionText.textContent = (metric.action || 'ALLOW').toUpperCase();
+        actionText.style.color = getActionColor(metric.action);
+        
+        // Update risk gauges
+        updateRiskGauge('injection', metric.injection_risk);
+        updateRiskGauge('leakage', metric.leakage_risk);
+        updateRiskGauge('anomaly', metric.anomaly_risk);
+        
+        // Update breakdown
+        document.getElementById('breakdownInjection').textContent = (metric.injection_risk || 0).toFixed(2);
+        document.getElementById('breakdownLeakage').textContent = (metric.leakage_risk || 0).toFixed(2);
+        document.getElementById('breakdownHallucination').textContent = (metric.hallucination_risk || 0).toFixed(2);
+        document.getElementById('breakdownAnomaly').textContent = (metric.anomaly_risk || 0).toFixed(2);
+        
+        // Add to security timeline if escalation or high risk
+        if (metric.escalation_triggered || cri > 0.4) {
+            addSecurityEvent(metric);
+        }
+    }
+
+    function updateRiskGauge(type, value) {
+        const pct = Math.round((value || 0) * 100);
+        const gauge = document.getElementById(type + 'Gauge');
+        if (!gauge) return;
+        const valueEl = document.getElementById(type + 'Value');
+        const statusEl = document.getElementById(type + 'Status');
+        
+        valueEl.textContent = pct + '%';
+        gauge.style.transform = `rotate(${45 + pct * 1.8}deg)`;
+        
+        // Color coding
+        let color = '#4ade80'; // green
+        let status = type === 'anomaly' ? 'NORMAL' : 'SAFE';
+        if (pct > 70) {
+            color = '#ef4444'; // red
+            status = 'CRITICAL';
+        } else if (pct > 40) {
+            color = '#facc15'; // yellow
+            status = 'WARNING';
+        }
+        
+        gauge.style.borderColor = color;
+        statusEl.textContent = status;
+        statusEl.className = 'gauge-status ' + (pct > 70 ? 'status-critical' : pct > 40 ? 'status-warning' : 'status-optimal');
+    }
+
+    function getTrustColor(level) {
+        const colors = {
+            full: '#4ade80',
+            restricted: '#facc15',
+            minimal: '#f97316',
+            revoked: '#ef4444'
+        };
+        return colors[level] || '#4ade80';
+    }
+
+    function getActionColor(action) {
+        const colors = {
+            allow: '#4ade80',
+            warn: '#facc15',
+            restrict: '#f97316',
+            block: '#ef4444'
+        };
+        return colors[action] || '#4ade80';
+    }
+
+    function addSecurityEvent(metric) {
+        const timeline = document.getElementById('securityTimeline');
+        if (!timeline) return;
+        
+        // Check if already added
+        const eventId = `evt-${metric.id || metric.raw_event_id}`;
+        if (document.getElementById(eventId)) return;
+
+        const eventDiv = document.createElement('div');
+        eventDiv.id = eventId;
+        eventDiv.className = 'timeline-event ' + (metric.cri > 0.7 ? 'critical' : metric.cri > 0.5 ? 'high' : 'warning');
+        
+        const timestamp = metric.computed_at || metric.timestamp || Date.now();
+        const time = new Date(timestamp).toLocaleTimeString();
+        eventDiv.innerHTML = `
+            <span class="timeline-time">${time}</span>
+            <div class="timeline-content">
+                <div style="font-weight: bold;">${metric.escalation_reason || 'Security Alert Detected'}</div>
+                <div>CRI: ${(metric.cri || 0).toFixed(2)} | Action: ${(metric.action || 'ALLOW').toUpperCase()}</div>
+            </div>
+        `;
+        
+        timeline.insertBefore(eventDiv, timeline.firstChild);
+        
+        // Keep only last 20 events
+        while (timeline.children.length > 20) {
+            timeline.removeChild(timeline.lastChild);
+        }
+    }
+
+    function addLogEntry(message, level) {
+        const logConsole = document.getElementById('logConsole');
+        const div = document.createElement('div');
+        div.className = `log-entry log-${level.toLowerCase()}`;
+        div.innerText = `[${new Date().toLocaleTimeString()}] ${message}`;
+        logConsole.appendChild(div);
+        logConsole.scrollTop = logConsole.scrollHeight;
+    }
+
+    // Update toggleMonitoring to include streaming connection
+    const originalToggleMonitoring = window.toggleMonitoring;
+    window.toggleMonitoring = async function() {
+        await originalToggleMonitoring();
+        if (isMonitoring) {
+            connectToStreamingServer();
+        } else {
+            if (eventSource) {
+                eventSource.close();
+                eventSource = null;
+            }
         }
     };
 
