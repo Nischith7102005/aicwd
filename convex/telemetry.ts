@@ -560,6 +560,30 @@ export const runSingleTest = action({
       model: args.model,
     });
 
+    // Export to Neon for Red Team analysis
+    await ctx.runAction(api.etlExport.exportInference, {
+      timestamp: Date.now(),
+      prompt: promptData.prompt,
+      response: llmResult.content || "",
+      inputTokens,
+      outputTokens,
+      latency: latencyMs,
+      model: args.model,
+      provider: args.provider,
+      configId: args.sessionId, // Using sessionId as configId for tracking
+      isAdversarial: true,
+      error: undefined,
+      efficiencyRatio,
+      wasteIndex,
+      semanticDrift,
+      hallucinationProb,
+      censorshipScore,
+      biasScore,
+      tokensPerSecond: inputTokens > 0 ? (outputTokens / (latencyMs || 1)) * 1000 : 0,
+      costUsd: undefined,
+      success: true,
+    });
+
     // Log success
     await ctx.runMutation(api.mutations.addLog, {
       level: "INFO",
