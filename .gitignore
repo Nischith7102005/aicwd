@@ -27,3 +27,18 @@ build/
 dist/
 node_modules/
 *.tsbuildinfo
+
+# ML Service
+etl/ml-service/artifacts/*.joblib
+etl/ml-service/artifacts/*.pkl
+etl/ml-service/artifacts/*.onnx
+etl/ml-service/__pycache__/
+etl/ml-service/*.pyc
+etl/ml-service/.pytest_cache/
+etl/ml-service/.coverage
+etl/ml-service/htmlcov/
+etl/ml-service/notebooks/.ipynb_checkpoints/
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb_checkpoints
