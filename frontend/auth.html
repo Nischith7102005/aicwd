@@ -8,7 +8,12 @@
         function gtag(){dataLayer.push(arguments);}
         gtag('js', new Date());
 
-        gtag('config', 'G-FK3PF0KZ2R');
+        const savedUid = localStorage.getItem('firebase_uid');
+        if (savedUid) {
+            gtag('config', 'G-FK3PF0KZ2R', { 'user_id': savedUid });
+        } else {
+            gtag('config', 'G-FK3PF0KZ2R');
+        }
     </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -712,6 +717,13 @@
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
 
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                gtag('config', 'G-FK3PF0KZ2R', { 'user_id': user.uid });
+                localStorage.setItem('firebase_uid', user.uid);
+            }
+        });
+
         function showLoader(type) {
             document.getElementById(`${type}-content`).classList.add('hidden');
             document.getElementById(`${type}-loader`).classList.add('active');
@@ -779,7 +791,11 @@
 
             try {
                 const userCredential = await auth.signInWithEmailAndPassword(email, password);
-                const idToken = await userCredential.user.getIdToken();
+                const user = userCredential.user;
+                gtag('config', 'G-FK3PF0KZ2R', { 'user_id': user.uid });
+                gtag('event', 'login', { method: 'email' });
+                localStorage.setItem('firebase_uid', user.uid);
+                const idToken = await user.getIdToken();
                 localStorage.setItem('firebase_id_token', idToken);
                 window.location.href = 'key.html';
             } catch (error) {
@@ -837,8 +853,12 @@
 
             try {
                 const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-                await userCredential.user.updateProfile({ displayName: name });
-                const idToken = await auth.currentUser.getIdToken();
+                const user = userCredential.user;
+                gtag('config', 'G-FK3PF0KZ2R', { 'user_id': user.uid });
+                gtag('event', 'sign_up', { method: 'email' });
+                localStorage.setItem('firebase_uid', user.uid);
+                await user.updateProfile({ displayName: name });
+                const idToken = await user.getIdToken();
                 localStorage.setItem('firebase_id_token', idToken);
                 window.location.href = 'key.html';
             } catch (error) {
