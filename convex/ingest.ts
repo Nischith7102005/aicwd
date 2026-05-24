@@ -67,16 +67,32 @@ export const logInference = mutation({
       const costUsd = inputCost + outputCost;
 
       // Calculate efficiency metrics
-      const totalTokens = (llmResponse.inputTokens || 0) + (llmResponse.outputTokens || 0);
-      const outputRatio = totalTokens > 0 ? (llmResponse.outputTokens || 0) / totalTokens : 0;
+      const inputTokens = llmResponse.inputTokens || 0;
+      const outputTokens = llmResponse.outputTokens || 0;
+      const totalTokens = inputTokens + outputTokens;
+      const outputRatio = totalTokens > 0 ? outputTokens / totalTokens : 0;
+
+      // Calculate heuristic semantic drift based on response length variance
+      const expectedLen = args.prompt.length * 3;
+      const actualLen = (llmResponse.content || "").length;
+      const semanticDrift = Math.min(
+        1,
+        Math.abs(actualLen - expectedLen) / (expectedLen || 1) * 0.3
+      );
+
+      // Calculate heuristic hallucination probability based on token ratios
+      const hallucinationProb = Math.min(
+        1,
+        (1 - Math.min(outputTokens, inputTokens * 5) / (inputTokens * 5 || 1)) * 0.15
+      );
 
       // Log the raw inference
       await ctx.db.insert("raw_logs", {
         timestamp,
         prompt: args.prompt,
         response: llmResponse.content || "",
-        inputTokens: llmResponse.inputTokens || 0,
-        outputTokens: llmResponse.outputTokens || 0,
+        inputTokens,
+        outputTokens,
         latency: llmResponse.latencyMs,
         model: config.modelName || config.model,
         provider: config.provider,
@@ -89,23 +105,47 @@ export const logInference = mutation({
       await ctx.db.insert("metrics", {
         timestamp,
         configId: args.configId,
-        inputTokens: llmResponse.inputTokens || 0,
-        outputTokens: llmResponse.outputTokens || 0,
+        inputTokens,
+        outputTokens,
         latencyMs: llmResponse.latencyMs,
         tokensPerSecond,
         costUsd,
         success: true,
-        // Placeholder for future semantic analysis
-        semanticDrift: 0,
-        hallucinationProb: null,
+        semanticDrift,
+        hallucinationProb,
+      });
+
+      // Export to ETL pipeline for dbt transformation
+      const efficiencyRatio = inputTokens > 0 ? outputTokens / inputTokens : 0;
+      const wasteIndex = Math.max(0, Math.min(1, 1 - efficiencyRatio));
+      
+      await ctx.scheduler.runAfter(0, api.etlExport.exportInference, {
+        timestamp,
+        prompt: args.prompt,
+        response: llmResponse.content || "",
+        inputTokens,
+        outputTokens,
+        latency: llmResponse.latencyMs,
+        model: config.modelName || config.model,
+        provider: config.provider,
+        configId: args.configId,
+        isAdversarial: false,
+        error: undefined,
+        efficiencyRatio,
+        wasteIndex,
+        semanticDrift,
+        hallucinationProb,
+        tokensPerSecond,
+        costUsd,
+        success: true,
       });
 
       return { 
         success: true, 
         content: llmResponse.content,
         tokens: {
-          input: llmResponse.inputTokens,
-          output: llmResponse.outputTokens,
+          input: inputTokens,
+          output: outputTokens,
         },
         latency: llmResponse.latencyMs,
         cost: costUsd,
@@ -374,4 +414,9 @@ export const getDashboardLive = query({
       },
     };
   }
-});
+});/home/engine/.bashrc: line 1: syntax error near unexpected token `('
+/home/engine/.bashrc: line 1: `. /etc/profile.d/workload-containment.shn# ~/.bashrc: executed by bash(1) for non-login shells.'
+/home/engine/.bashrc: line 1: syntax error near unexpected token `('
+/home/engine/.bashrc: line 1: `. /etc/profile.d/workload-containment.shn# ~/.bashrc: executed by bash(1) for non-login shells.'
+/home/engine/.bashrc: line 1: syntax error near unexpected token `('
+/home/engine/.bashrc: line 1: `. /etc/profile.d/workload-containment.shn# ~/.bashrc: executed by bash(1) for non-login shells.'
