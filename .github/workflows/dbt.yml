@@ -21,7 +21,7 @@ on:
   repository_dispatch:
     types: [new-telemetry-data]
 env:
-  DBT_PROFILES_DIR: ./etl
+  DBT_PROFILES_DIR: ${{ github.workspace }}/etl
   PGHOST: ${{ secrets.PGHOST }}
   PGPORT: ${{ secrets.PGPORT || '5432' }}
   PGDATABASE: ${{ secrets.PGDATABASE }}
@@ -92,3 +92,9 @@ jobs:
           echo "- **Target**: ${{ github.event.inputs.target || 'dev' }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Full Refresh**: ${{ github.event.inputs.full_refresh || 'false' }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Status**: ${{ needs.dbt-run.result }}" >> $GITHUB_STEP_SUMMARY
+/home/engine/.bashrc: line 1: syntax error near unexpected token `('
+/home/engine/.bashrc: line 1: `. /etc/profile.d/workload-containment.shn# ~/.bashrc: executed by bash(1) for non-login shells.'
+/home/engine/.bashrc: line 1: syntax error near unexpected token `('
+/home/engine/.bashrc: line 1: `. /etc/profile.d/workload-containment.shn# ~/.bashrc: executed by bash(1) for non-login shells.'
+/home/engine/.bashrc: line 1: syntax error near unexpected token `('
+/home/engine/.bashrc: line 1: `. /etc/profile.d/workload-containment.shn# ~/.bashrc: executed by bash(1) for non-login shells.'
