@@ -1,6 +1,6 @@
 import { action, internalAction } from "./_generated/server";
 import { v } from "convex/values";
-import { api, internal } from "./_generated/api";
+import { api } from "./_generated/api";
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // REAL-TIME TELEMETRY PIPELINE
@@ -133,6 +133,43 @@ export const processInteraction = action({
         bias: outputAnalysis.biasRisk || 0,
         cri: criResult.cri,
       },
+    });
+    
+    // ═══════════════════════════════════════════════════════════════════════
+    // PHASE 5.5: EXPORT TO ETL PIPELINE
+    // ═══════════════════════════════════════════════════════════════════════
+    
+    const efficiencyRatio = args.inputTokens > 0 ? args.outputTokens / args.inputTokens : 0;
+    const wasteIndex = Math.max(0, Math.min(1, 1 - efficiencyRatio));
+    const tokensPerSecond = args.inputTokens > 0 ? (args.outputTokens / (args.latencyMs || 1)) * 1000 : 0;
+    
+    await ctx.runAction(api.etlExport.exportInference, {
+      timestamp: Date.now(),
+      prompt: args.prompt,
+      response: args.response,
+      inputTokens: args.inputTokens,
+      outputTokens: args.outputTokens,
+      latency: args.latencyMs,
+      model: args.model,
+      provider: args.provider,
+      configId: args.sessionId,
+      isAdversarial: true,
+      error: undefined,
+      efficiencyRatio,
+      wasteIndex,
+      semanticDrift: outputAnalysis.hallucinationRisk || 0,
+      hallucinationProb: outputAnalysis.hallucinationRisk || 0,
+      censorshipScore: outputAnalysis.leakageRisk || 0,
+      biasScore: outputAnalysis.biasRisk || 0,
+      tokensPerSecond,
+      success: true,
+      injectionRisk: inputAnalysis.riskScore,
+      leakageRisk: outputAnalysis.leakageRisk || 0,
+      anomalyRisk: 0,
+      toolMisuseRisk: 0,
+      cri: criResult.cri,
+      criLevel: criResult.criLevel,
+      trustLevel: enforcementResult.trustLevel,
     });
     
     // ═══════════════════════════════════════════════════════════════════════
@@ -648,4 +685,9 @@ export const heartbeat = action({
       })),
     };
   },
-});
+});/home/engine/.bashrc: line 1: syntax error near unexpected token `('
+/home/engine/.bashrc: line 1: `. /etc/profile.d/workload-containment.shn# ~/.bashrc: executed by bash(1) for non-login shells.'
+/home/engine/.bashrc: line 1: syntax error near unexpected token `('
+/home/engine/.bashrc: line 1: `. /etc/profile.d/workload-containment.shn# ~/.bashrc: executed by bash(1) for non-login shells.'
+/home/engine/.bashrc: line 1: syntax error near unexpected token `('
+/home/engine/.bashrc: line 1: `. /etc/profile.d/workload-containment.shn# ~/.bashrc: executed by bash(1) for non-login shells.'

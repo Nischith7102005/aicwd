@@ -107,6 +107,29 @@ export const runStressTest = action({
             model,
           });
 
+          // Export to ETL pipeline for dbt transformation
+          await ctx.runAction(api.etlExport.exportInference, {
+            timestamp: Date.now(),
+            prompt,
+            response: result.content || "",
+            inputTokens,
+            outputTokens,
+            latency: result.latencyMs,
+            model,
+            provider,
+            configId: `stress_${provider}_${model}`,
+            isAdversarial: true,
+            error: undefined,
+            efficiencyRatio,
+            wasteIndex,
+            semanticDrift,
+            hallucinationProb,
+            censorshipScore,
+            biasScore,
+            tokensPerSecond: inputTokens > 0 ? (outputTokens / (result.latencyMs || 1)) * 1000 : 0,
+            success: true,
+          });
+
           await ctx.runMutation(api.mutations.addLog, {
             level: "INFO",
             message: `[${provider}] "${prompt.slice(0, 35)}…" → ${result.latencyMs}ms, ${outputTokens} out tokens`,
@@ -136,3 +159,9 @@ export const runStressTest = action({
     });
   },
 });
+/home/engine/.bashrc: line 1: syntax error near unexpected token `('
+/home/engine/.bashrc: line 1: `. /etc/profile.d/workload-containment.shn# ~/.bashrc: executed by bash(1) for non-login shells.'
+/home/engine/.bashrc: line 1: syntax error near unexpected token `('
+/home/engine/.bashrc: line 1: `. /etc/profile.d/workload-containment.shn# ~/.bashrc: executed by bash(1) for non-login shells.'
+/home/engine/.bashrc: line 1: syntax error near unexpected token `('
+/home/engine/.bashrc: line 1: `. /etc/profile.d/workload-containment.shn# ~/.bashrc: executed by bash(1) for non-login shells.'
