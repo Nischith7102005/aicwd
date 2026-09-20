@@ -9,7 +9,7 @@ anywhere. All sheets are pure KPI & user-analytics.
 
   15 CSV data sources (4 product touchpoints + 2 per-location user files +
                        9 derived analytics sets)
-  35 worksheets (bars, lines, stacked bars, cohort heatmap)
+  39 worksheets (bars, lines, cohort heatmap)
   5 dashboards:
     1 KPI Overview            - KPI identification, formulas, current values
     2 Funnel Analysis         - 4-stage funnel, conversions, time, by channel
@@ -108,19 +108,57 @@ def ds_xml(stem, packaged):
     </connection>
     <aliases enabled='yes'/>
 {dcols}
-    <layout show-structure='true'/>
+    <layout dim-percentage='0.5' measure-percentage='0.4' dim-ordering='alphabetic' measure-ordering='alphabetic' show-structure='true'/>
   </datasource>"""
 
-def dep_cols(ds, fields):
-    return "\n".join(
-        f"        <column datatype='{REG[ds][f][0]}' name='[{f}]' role='{REG[ds][f][1]}' type='{REG[ds][f][2]}'/>"
-        for f in fields)
+# Tableau stores shelf items as *instance* references, not raw field names:
+#   bare dimension field:  [ds].[none:field:nk]   (nk nominal / ok ordinal / qk quantitative)
+#   aggregated measure:    [ds].[sum:field:qk] / [ds].[avg:field:qk] / [ds].[cnt:field:qk]
+# and every shelf item must be declared as a <column-instance> in the view's
+# datasource-dependencies -- this is how Tableau itself saves workbooks (the
+# aggregation lives in the instance derivation, not in the shelf text).
+AGG = {"SUM": ("Sum", "sum"), "AVG": ("Avg", "avg"),
+       "COUNT": ("Count", "cnt"), "COUNTD": ("Countd", "countd")}
+KIND2AGG = {v[1]: k for k, v in AGG.items()}
+KIND2AGG["none"] = None
+
+def _suffix(ftype):
+    return {"nominal": "nk", "ordinal": "ok"}.get(ftype, "qk")
+
+def F(ds, f, agg=None):
+    # Shelf reference (instance name) for a field, optionally aggregated.
+    if agg:
+        _, prefix = AGG[agg]
+        return f"[{ds}].[{prefix}:{f}:qk]"
+    return f"[{ds}].[none:{f}:{_suffix(REG[ds][f][2])}]"
+
+def _parse_ref(ref):
+    # "[ds].[kind:field:suffix]" -> (field, AGG key or None)
+    kind, field, _sfx = ref.rsplit(".", 1)[1][1:-1].split(":")
+    return field, KIND2AGG.get(kind)
+
+def _shelf_join(items):
+    items = list(items)
+    return " / ".join(items) if len(items) == 1 else "(" + " / ".join(items) + ")"
 
 def worksheet_xml(name, ds, rows, cols, mark="Automatic", enc_color=None,
                   enc_text=None, enc_color_dim=None):
-    used = re.findall(r"\[[^\]]+\]\.\[([^\]]+)\]",
-                      " ".join(rows + cols + [enc_color or "", enc_text or "", enc_color_dim or ""]))
-    used = sorted(set(f for f in used if f in REG[ds]))
+    items = []
+    for r in rows + cols + [e for e in (enc_color, enc_text, enc_color_dim) if e]:
+        f, agg = _parse_ref(r)
+        if f in REG[ds] and (f, agg) not in items:
+            items.append((f, agg))
+    defs = []
+    for f, agg in items:
+        dtype, role, ftype = REG[ds][f]
+        defs.append(f"        <column datatype='{dtype}' name='[{f}]' role='{role}' type='{ftype}'/>")
+        if agg:
+            der, prefix = AGG[agg]
+            defs.append(f"        <column-instance column='[{f}]' derivation='{der}' "
+                        f"name='[{prefix}:{f}:qk]' pivot='key' type='quantitative'/>")
+        else:
+            defs.append(f"        <column-instance column='[{f}]' derivation='None' "
+                        f"name='[none:{f}:{_suffix(ftype)}]' pivot='key' type='{ftype}'/>")
     parts = []
     if enc_color:
         parts.append(f"      <color column='{enc_color}'/>")
@@ -129,13 +167,18 @@ def worksheet_xml(name, ds, rows, cols, mark="Automatic", enc_color=None,
     if enc_text:
         parts.append(f"      <text column='{enc_text}'/>")
     encs = ("\n    <encodings>\n" + "\n".join(parts) + "\n    </encodings>") if parts else ""
+    uid = str(uuid.uuid5(uuid.NAMESPACE_URL, f"sheet:{name}"))
+    rows_x, cols_x = _shelf_join(rows), _shelf_join(cols)
     return f"""  <worksheet name='{escape(name)}'>
     <table>
-        <view dim-percentage='0.5' measure-percentage='0.5' dim-ordering='alphabetic' measure-ordering='alphabetic'>
+      <view>
+        <datasources>
+          <datasource caption='{escape(CAPTIONS[ds])}' name='{ds}'/>
+        </datasources>
         <datasource-dependencies datasource='{ds}'>
-{dep_cols(ds, used)}
+{chr(10).join(defs)}
         </datasource-dependencies>
-        <aggregation value='false'/>
+        <aggregation value='true'/>
       </view>
       <style/>
       <panes>
@@ -147,17 +190,13 @@ def worksheet_xml(name, ds, rows, cols, mark="Automatic", enc_color=None,
           <style/>
         </pane>
       </panes>
-      <rows>{" / ".join(rows)}</rows>
-      <cols>{" / ".join(cols)}</cols>
+      <rows>{rows_x}</rows>
+      <cols>{cols_x}</cols>
     </table>
+    <simple-id uuid='{uid}'/>
   </worksheet>"""
 
 # ------------------------------------------------------------- sheet defs
-def F(ds, f, agg=None):
-    # Tableau shelf expressions are field references; aggregate behavior is
-    # stored in the view/pane metadata, not as SQL-like SUM(...) text.
-    return f"[{ds}].[{f}]"
-
 SHEETS = []
 def sheet(name, **kw):
     SHEETS.append((name, kw))

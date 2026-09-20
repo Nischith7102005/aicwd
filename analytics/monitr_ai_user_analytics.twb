@@ -78,7 +78,7 @@
     <column datatype='string' caption='signup user id' name='[signup_user_id]' role='dimension' type='nominal'/>
     <column datatype='integer' caption='days to signup' name='[days_to_signup]' role='measure' type='quantitative'/>
     <column datatype='string' caption='cohort week' name='[cohort_week]' role='dimension' type='nominal'/>
-    <layout show-structure='true'/>
+    <layout dim-percentage='0.5' measure-percentage='0.4' dim-ordering='alphabetic' measure-ordering='alphabetic' show-structure='true'/>
   </datasource>
   <datasource caption='P2 User Signups (Firebase auth records, free beta)' inline='true' name='user_signups' version='18.1'>
     <connection class='textfile' directory='data' filename='user_signups.csv' password='' server=''>
@@ -174,7 +174,7 @@
     <column datatype='date' caption='last active date' name='[last_active_date]' role='dimension' type='nominal'/>
     <column datatype='integer' caption='power user flag' name='[power_user_flag]' role='measure' type='quantitative'/>
     <column datatype='integer' caption='nps score' name='[nps_score]' role='dimension' type='nominal'/>
-    <layout show-structure='true'/>
+    <layout dim-percentage='0.5' measure-percentage='0.4' dim-ordering='alphabetic' measure-ordering='alphabetic' show-structure='true'/>
   </datasource>
   <datasource caption='P3 API Key Connections (Convex apiConfigs)' inline='true' name='api_key_configs' version='18.1'>
     <connection class='textfile' directory='data' filename='api_key_configs.csv' password='' server=''>
@@ -252,7 +252,7 @@
     <column datatype='integer' caption='adversarial tests run' name='[adversarial_tests_run]' role='measure' type='quantitative'/>
     <column datatype='date' caption='last used date' name='[last_used_date]' role='dimension' type='nominal'/>
     <column datatype='integer' caption='config age days' name='[config_age_days]' role='measure' type='quantitative'/>
-    <layout show-structure='true'/>
+    <layout dim-percentage='0.5' measure-percentage='0.4' dim-ordering='alphabetic' measure-ordering='alphabetic' show-structure='true'/>
   </datasource>
   <datasource caption='P4 Monitoring Sessions (Convex sessions + telemetry)' inline='true' name='monitoring_sessions' version='18.1'>
     <connection class='textfile' directory='data' filename='monitoring_sessions.csv' password='' server=''>
@@ -366,7 +366,7 @@
     <column datatype='integer' caption='stress test used' name='[stress_test_used]' role='measure' type='quantitative'/>
     <column datatype='integer' caption='success flag' name='[success_flag]' role='measure' type='quantitative'/>
     <column datatype='string' caption='error type' name='[error_type]' role='dimension' type='nominal'/>
-    <layout show-structure='true'/>
+    <layout dim-percentage='0.5' measure-percentage='0.4' dim-ordering='alphabetic' measure-ordering='alphabetic' show-structure='true'/>
   </datasource>
   <datasource caption='Users recorded at DSU Campus' inline='true' name='users_dsu_campus' version='18.1'>
     <connection class='textfile' directory='data' filename='users_dsu_campus.csv' password='' server=''>
@@ -462,7 +462,7 @@
     <column datatype='date' caption='last active date' name='[last_active_date]' role='dimension' type='nominal'/>
     <column datatype='integer' caption='power user flag' name='[power_user_flag]' role='measure' type='quantitative'/>
     <column datatype='integer' caption='nps score' name='[nps_score]' role='dimension' type='nominal'/>
-    <layout show-structure='true'/>
+    <layout dim-percentage='0.5' measure-percentage='0.4' dim-ordering='alphabetic' measure-ordering='alphabetic' show-structure='true'/>
   </datasource>
   <datasource caption='Users recorded Outside Campus' inline='true' name='users_outside_campus' version='18.1'>
     <connection class='textfile' directory='data' filename='users_outside_campus.csv' password='' server=''>
@@ -558,7 +558,7 @@
     <column datatype='date' caption='last active date' name='[last_active_date]' role='dimension' type='nominal'/>
     <column datatype='integer' caption='power user flag' name='[power_user_flag]' role='measure' type='quantitative'/>
     <column datatype='integer' caption='nps score' name='[nps_score]' role='dimension' type='nominal'/>
-    <layout show-structure='true'/>
+    <layout dim-percentage='0.5' measure-percentage='0.4' dim-ordering='alphabetic' measure-ordering='alphabetic' show-structure='true'/>
   </datasource>
   <datasource caption='Funnel - Overall (derived)' inline='true' name='funnel_overall' version='18.1'>
     <connection class='textfile' directory='data' filename='funnel_overall.csv' password='' server=''>
@@ -584,7 +584,7 @@
     <column datatype='real' caption='conversion from top pct' name='[conversion_from_top_pct]' role='measure' type='quantitative'/>
     <column datatype='integer' caption='median days from previous' name='[median_days_from_previous]' role='measure' type='quantitative'/>
     <column datatype='integer' caption='dropoff from previous' name='[dropoff_from_previous]' role='measure' type='quantitative'/>
-    <layout show-structure='true'/>
+    <layout dim-percentage='0.5' measure-percentage='0.4' dim-ordering='alphabetic' measure-ordering='alphabetic' show-structure='true'/>
   </datasource>
   <datasource caption='Funnel - By Channel (derived)' inline='true' name='funnel_by_channel' version='18.1'>
     <connection class='textfile' directory='data' filename='funnel_by_channel.csv' password='' server=''>
@@ -606,7 +606,7 @@
     <column datatype='integer' caption='users' name='[users]' role='measure' type='quantitative'/>
     <column datatype='real' caption='conversion from previous pct' name='[conversion_from_previous_pct]' role='measure' type='quantitative'/>
     <column datatype='real' caption='conversion from top pct' name='[conversion_from_top_pct]' role='measure' type='quantitative'/>
-    <layout show-structure='true'/>
+    <layout dim-percentage='0.5' measure-percentage='0.4' dim-ordering='alphabetic' measure-ordering='alphabetic' show-structure='true'/>
   </datasource>
   <datasource caption='Funnel - By Location (derived)' inline='true' name='funnel_by_location' version='18.1'>
     <connection class='textfile' directory='data' filename='funnel_by_location.csv' password='' server=''>
@@ -628,7 +628,7 @@
     <column datatype='integer' caption='users' name='[users]' role='measure' type='quantitative'/>
     <column datatype='real' caption='conversion from previous pct' name='[conversion_from_previous_pct]' role='measure' type='quantitative'/>
     <column datatype='real' caption='conversion from top pct' name='[conversion_from_top_pct]' role='measure' type='quantitative'/>
-    <layout show-structure='true'/>
+    <layout dim-percentage='0.5' measure-percentage='0.4' dim-ordering='alphabetic' measure-ordering='alphabetic' show-structure='true'/>
   </datasource>
   <datasource caption='KPI Monthly Timeseries (derived)' inline='true' name='kpi_monthly' version='18.1'>
     <connection class='textfile' directory='data' filename='kpi_monthly.csv' password='' server=''>
@@ -698,7 +698,7 @@
     <column datatype='real' caption='flagged sessions pct' name='[flagged_sessions_pct]' role='measure' type='quantitative'/>
     <column datatype='real' caption='w4 retention pct' name='[w4_retention_pct]' role='measure' type='quantitative'/>
     <column datatype='real' caption='nps' name='[nps]' role='measure' type='quantitative'/>
-    <layout show-structure='true'/>
+    <layout dim-percentage='0.5' measure-percentage='0.4' dim-ordering='alphabetic' measure-ordering='alphabetic' show-structure='true'/>
   </datasource>
   <datasource caption='KPI Monthly By Location (derived)' inline='true' name='kpi_monthly_by_location' version='18.1'>
     <connection class='textfile' directory='data' filename='kpi_monthly_by_location.csv' password='' server=''>
@@ -732,7 +732,7 @@
     <column datatype='real' caption='sessions per active user' name='[sessions_per_active_user]' role='measure' type='quantitative'/>
     <column datatype='real' caption='avg cognitive waste index' name='[avg_cognitive_waste_index]' role='measure' type='quantitative'/>
     <column datatype='real' caption='avg cri' name='[avg_cri]' role='measure' type='quantitative'/>
-    <layout show-structure='true'/>
+    <layout dim-percentage='0.5' measure-percentage='0.4' dim-ordering='alphabetic' measure-ordering='alphabetic' show-structure='true'/>
   </datasource>
   <datasource caption='Retention Cohorts (derived)' inline='true' name='retention_cohorts' version='18.1'>
     <connection class='textfile' directory='data' filename='retention_cohorts.csv' password='' server=''>
@@ -752,7 +752,7 @@
     <column datatype='integer' caption='cohort size' name='[cohort_size]' role='measure' type='quantitative'/>
     <column datatype='integer' caption='active users' name='[active_users]' role='measure' type='quantitative'/>
     <column datatype='real' caption='retention pct' name='[retention_pct]' role='measure' type='quantitative'/>
-    <layout show-structure='true'/>
+    <layout dim-percentage='0.5' measure-percentage='0.4' dim-ordering='alphabetic' measure-ordering='alphabetic' show-structure='true'/>
   </datasource>
   <datasource caption='Feature Adoption - All Users (derived)' inline='true' name='feature_adoption_overall' version='18.1'>
     <connection class='textfile' directory='data' filename='feature_adoption_overall.csv' password='' server=''>
@@ -776,7 +776,7 @@
     <column datatype='integer' caption='users used' name='[users_used]' role='measure' type='quantitative'/>
     <column datatype='integer' caption='activated users in scope' name='[activated_users_in_scope]' role='measure' type='quantitative'/>
     <column datatype='real' caption='adoption pct' name='[adoption_pct]' role='measure' type='quantitative'/>
-    <layout show-structure='true'/>
+    <layout dim-percentage='0.5' measure-percentage='0.4' dim-ordering='alphabetic' measure-ordering='alphabetic' show-structure='true'/>
   </datasource>
   <datasource caption='Feature Adoption - By Persona (derived)' inline='true' name='feature_adoption_by_persona' version='18.1'>
     <connection class='textfile' directory='data' filename='feature_adoption_by_persona.csv' password='' server=''>
@@ -800,7 +800,7 @@
     <column datatype='integer' caption='users used' name='[users_used]' role='measure' type='quantitative'/>
     <column datatype='integer' caption='activated users in scope' name='[activated_users_in_scope]' role='measure' type='quantitative'/>
     <column datatype='real' caption='adoption pct' name='[adoption_pct]' role='measure' type='quantitative'/>
-    <layout show-structure='true'/>
+    <layout dim-percentage='0.5' measure-percentage='0.4' dim-ordering='alphabetic' measure-ordering='alphabetic' show-structure='true'/>
   </datasource>
   <datasource caption='KPI Definitions &amp; Formulas' inline='true' name='kpi_definitions' version='18.1'>
     <connection class='textfile' directory='data' filename='kpi_definitions.csv' password='' server=''>
@@ -826,18 +826,23 @@
     <column datatype='string' caption='target benchmark' name='[target_benchmark]' role='dimension' type='nominal'/>
     <column datatype='string' caption='status' name='[status]' role='dimension' type='nominal'/>
     <column datatype='string' caption='significance interpretation' name='[significance_interpretation]' role='dimension' type='nominal'/>
-    <layout show-structure='true'/>
+    <layout dim-percentage='0.5' measure-percentage='0.4' dim-ordering='alphabetic' measure-ordering='alphabetic' show-structure='true'/>
   </datasource>
   </datasources>
   <worksheets>
   <worksheet name='KPI MAU Trend'>
     <table>
-        <view dim-percentage='0.5' measure-percentage='0.5' dim-ordering='alphabetic' measure-ordering='alphabetic'>
+      <view>
+        <datasources>
+          <datasource caption='KPI Monthly Timeseries (derived)' name='kpi_monthly'/>
+        </datasources>
         <datasource-dependencies datasource='kpi_monthly'>
         <column datatype='integer' name='[mau]' role='measure' type='quantitative'/>
+        <column-instance column='[mau]' derivation='Sum' name='[sum:mau:qk]' pivot='key' type='quantitative'/>
         <column datatype='string' name='[month]' role='dimension' type='nominal'/>
+        <column-instance column='[month]' derivation='None' name='[none:month:nk]' pivot='key' type='nominal'/>
         </datasource-dependencies>
-        <aggregation value='false'/>
+        <aggregation value='true'/>
       </view>
       <style/>
       <panes>
@@ -847,23 +852,29 @@
           </view>
           <mark class='Bar'/>
     <encodings>
-      <text column='[kpi_monthly].[mau]'/>
+      <text column='[kpi_monthly].[sum:mau:qk]'/>
     </encodings>
           <style/>
         </pane>
       </panes>
-      <rows>[kpi_monthly].[mau]</rows>
-      <cols>[kpi_monthly].[month]</cols>
+      <rows>[kpi_monthly].[sum:mau:qk]</rows>
+      <cols>[kpi_monthly].[none:month:nk]</cols>
     </table>
+    <simple-id uuid='4c7e5398-cabc-5f91-a380-df39479825ee'/>
   </worksheet>
   <worksheet name='KPI North Star WOU Trend'>
     <table>
-        <view dim-percentage='0.5' measure-percentage='0.5' dim-ordering='alphabetic' measure-ordering='alphabetic'>
+      <view>
+        <datasources>
+          <datasource caption='KPI Monthly Timeseries (derived)' name='kpi_monthly'/>
+        </datasources>
         <datasource-dependencies datasource='kpi_monthly'>
-        <column datatype='string' name='[month]' role='dimension' type='nominal'/>
         <column datatype='real' name='[wau_avg]' role='measure' type='quantitative'/>
+        <column-instance column='[wau_avg]' derivation='Sum' name='[sum:wau_avg:qk]' pivot='key' type='quantitative'/>
+        <column datatype='string' name='[month]' role='dimension' type='nominal'/>
+        <column-instance column='[month]' derivation='None' name='[none:month:nk]' pivot='key' type='nominal'/>
         </datasource-dependencies>
-        <aggregation value='false'/>
+        <aggregation value='true'/>
       </view>
       <style/>
       <panes>
@@ -873,23 +884,29 @@
           </view>
           <mark class='Bar'/>
     <encodings>
-      <text column='[kpi_monthly].[wau_avg]'/>
+      <text column='[kpi_monthly].[sum:wau_avg:qk]'/>
     </encodings>
           <style/>
         </pane>
       </panes>
-      <rows>[kpi_monthly].[wau_avg]</rows>
-      <cols>[kpi_monthly].[month]</cols>
+      <rows>[kpi_monthly].[sum:wau_avg:qk]</rows>
+      <cols>[kpi_monthly].[none:month:nk]</cols>
     </table>
+    <simple-id uuid='a5cd0fa3-5ec6-5352-9273-8029ace0705e'/>
   </worksheet>
   <worksheet name='KPI Key Connections Trend'>
     <table>
-        <view dim-percentage='0.5' measure-percentage='0.5' dim-ordering='alphabetic' measure-ordering='alphabetic'>
+      <view>
+        <datasources>
+          <datasource caption='KPI Monthly Timeseries (derived)' name='kpi_monthly'/>
+        </datasources>
         <datasource-dependencies datasource='kpi_monthly'>
         <column datatype='integer' name='[api_keys_connected]' role='measure' type='quantitative'/>
+        <column-instance column='[api_keys_connected]' derivation='Sum' name='[sum:api_keys_connected:qk]' pivot='key' type='quantitative'/>
         <column datatype='string' name='[month]' role='dimension' type='nominal'/>
+        <column-instance column='[month]' derivation='None' name='[none:month:nk]' pivot='key' type='nominal'/>
         </datasource-dependencies>
-        <aggregation value='false'/>
+        <aggregation value='true'/>
       </view>
       <style/>
       <panes>
@@ -899,23 +916,29 @@
           </view>
           <mark class='Bar'/>
     <encodings>
-      <text column='[kpi_monthly].[api_keys_connected]'/>
+      <text column='[kpi_monthly].[sum:api_keys_connected:qk]'/>
     </encodings>
           <style/>
         </pane>
       </panes>
-      <rows>[kpi_monthly].[api_keys_connected]</rows>
-      <cols>[kpi_monthly].[month]</cols>
+      <rows>[kpi_monthly].[sum:api_keys_connected:qk]</rows>
+      <cols>[kpi_monthly].[none:month:nk]</cols>
     </table>
+    <simple-id uuid='a8c0a973-cb7e-56ec-88c7-0e42d2976d0e'/>
   </worksheet>
   <worksheet name='KPI Power Users Trend'>
     <table>
-        <view dim-percentage='0.5' measure-percentage='0.5' dim-ordering='alphabetic' measure-ordering='alphabetic'>
+      <view>
+        <datasources>
+          <datasource caption='KPI Monthly Timeseries (derived)' name='kpi_monthly'/>
+        </datasources>
         <datasource-dependencies datasource='kpi_monthly'>
-        <column datatype='string' name='[month]' role='dimension' type='nominal'/>
         <column datatype='integer' name='[power_users]' role='measure' type='quantitative'/>
+        <column-instance column='[power_users]' derivation='Sum' name='[sum:power_users:qk]' pivot='key' type='quantitative'/>
+        <column datatype='string' name='[month]' role='dimension' type='nominal'/>
+        <column-instance column='[month]' derivation='None' name='[none:month:nk]' pivot='key' type='nominal'/>
         </datasource-dependencies>
-        <aggregation value='false'/>
+        <aggregation value='true'/>
       </view>
       <style/>
       <panes>
@@ -925,23 +948,29 @@
           </view>
           <mark class='Bar'/>
     <encodings>
-      <text column='[kpi_monthly].[power_users]'/>
+      <text column='[kpi_monthly].[sum:power_users:qk]'/>
     </encodings>
           <style/>
         </pane>
       </panes>
-      <rows>[kpi_monthly].[power_users]</rows>
-      <cols>[kpi_monthly].[month]</cols>
+      <rows>[kpi_monthly].[sum:power_users:qk]</rows>
+      <cols>[kpi_monthly].[none:month:nk]</cols>
     </table>
+    <simple-id uuid='acde67b1-8c8b-5137-95fa-bcaf866efc5f'/>
   </worksheet>
   <worksheet name='KPI Sessions Trend'>
     <table>
-        <view dim-percentage='0.5' measure-percentage='0.5' dim-ordering='alphabetic' measure-ordering='alphabetic'>
+      <view>
+        <datasources>
+          <datasource caption='KPI Monthly Timeseries (derived)' name='kpi_monthly'/>
+        </datasources>
         <datasource-dependencies datasource='kpi_monthly'>
-        <column datatype='string' name='[month]' role='dimension' type='nominal'/>
         <column datatype='integer' name='[total_sessions]' role='measure' type='quantitative'/>
+        <column-instance column='[total_sessions]' derivation='Sum' name='[sum:total_sessions:qk]' pivot='key' type='quantitative'/>
+        <column datatype='string' name='[month]' role='dimension' type='nominal'/>
+        <column-instance column='[month]' derivation='None' name='[none:month:nk]' pivot='key' type='nominal'/>
         </datasource-dependencies>
-        <aggregation value='false'/>
+        <aggregation value='true'/>
       </view>
       <style/>
       <panes>
@@ -951,23 +980,29 @@
           </view>
           <mark class='Bar'/>
     <encodings>
-      <text column='[kpi_monthly].[total_sessions]'/>
+      <text column='[kpi_monthly].[sum:total_sessions:qk]'/>
     </encodings>
           <style/>
         </pane>
       </panes>
-      <rows>[kpi_monthly].[total_sessions]</rows>
-      <cols>[kpi_monthly].[month]</cols>
+      <rows>[kpi_monthly].[sum:total_sessions:qk]</rows>
+      <cols>[kpi_monthly].[none:month:nk]</cols>
     </table>
+    <simple-id uuid='164edbff-85df-521d-9781-3f83cdb989b4'/>
   </worksheet>
   <worksheet name='KPI Tokens Monitored Trend'>
     <table>
-        <view dim-percentage='0.5' measure-percentage='0.5' dim-ordering='alphabetic' measure-ordering='alphabetic'>
+      <view>
+        <datasources>
+          <datasource caption='KPI Monthly Timeseries (derived)' name='kpi_monthly'/>
+        </datasources>
         <datasource-dependencies datasource='kpi_monthly'>
-        <column datatype='string' name='[month]' role='dimension' type='nominal'/>
         <column datatype='real' name='[total_tokens_millions]' role='measure' type='quantitative'/>
+        <column-instance column='[total_tokens_millions]' derivation='Sum' name='[sum:total_tokens_millions:qk]' pivot='key' type='quantitative'/>
+        <column datatype='string' name='[month]' role='dimension' type='nominal'/>
+        <column-instance column='[month]' derivation='None' name='[none:month:nk]' pivot='key' type='nominal'/>
         </datasource-dependencies>
-        <aggregation value='false'/>
+        <aggregation value='true'/>
       </view>
       <style/>
       <panes>
@@ -977,23 +1012,29 @@
           </view>
           <mark class='Bar'/>
     <encodings>
-      <text column='[kpi_monthly].[total_tokens_millions]'/>
+      <text column='[kpi_monthly].[sum:total_tokens_millions:qk]'/>
     </encodings>
           <style/>
         </pane>
       </panes>
-      <rows>[kpi_monthly].[total_tokens_millions]</rows>
-      <cols>[kpi_monthly].[month]</cols>
+      <rows>[kpi_monthly].[sum:total_tokens_millions:qk]</rows>
+      <cols>[kpi_monthly].[none:month:nk]</cols>
     </table>
+    <simple-id uuid='e3fd94dc-687f-5c4f-919b-b303897a8374'/>
   </worksheet>
   <worksheet name='KPI Activation Rate Trend'>
     <table>
-        <view dim-percentage='0.5' measure-percentage='0.5' dim-ordering='alphabetic' measure-ordering='alphabetic'>
+      <view>
+        <datasources>
+          <datasource caption='KPI Monthly Timeseries (derived)' name='kpi_monthly'/>
+        </datasources>
         <datasource-dependencies datasource='kpi_monthly'>
         <column datatype='real' name='[activation_rate_pct]' role='measure' type='quantitative'/>
+        <column-instance column='[activation_rate_pct]' derivation='Avg' name='[avg:activation_rate_pct:qk]' pivot='key' type='quantitative'/>
         <column datatype='string' name='[month]' role='dimension' type='nominal'/>
+        <column-instance column='[month]' derivation='None' name='[none:month:nk]' pivot='key' type='nominal'/>
         </datasource-dependencies>
-        <aggregation value='false'/>
+        <aggregation value='true'/>
       </view>
       <style/>
       <panes>
@@ -1003,23 +1044,29 @@
           </view>
           <mark class='Line'/>
     <encodings>
-      <text column='[kpi_monthly].[activation_rate_pct]'/>
+      <text column='[kpi_monthly].[avg:activation_rate_pct:qk]'/>
     </encodings>
           <style/>
         </pane>
       </panes>
-      <rows>[kpi_monthly].[activation_rate_pct]</rows>
-      <cols>[kpi_monthly].[month]</cols>
+      <rows>[kpi_monthly].[avg:activation_rate_pct:qk]</rows>
+      <cols>[kpi_monthly].[none:month:nk]</cols>
     </table>
+    <simple-id uuid='ae80cc9b-0869-527f-9358-bbefa8df8b21'/>
   </worksheet>
   <worksheet name='KPI Visitor to Signup CVR Trend'>
     <table>
-        <view dim-percentage='0.5' measure-percentage='0.5' dim-ordering='alphabetic' measure-ordering='alphabetic'>
+      <view>
+        <datasources>
+          <datasource caption='KPI Monthly Timeseries (derived)' name='kpi_monthly'/>
+        </datasources>
         <datasource-dependencies datasource='kpi_monthly'>
-        <column datatype='string' name='[month]' role='dimension' type='nominal'/>
         <column datatype='real' name='[visitor_to_signup_cvr_pct]' role='measure' type='quantitative'/>
+        <column-instance column='[visitor_to_signup_cvr_pct]' derivation='Avg' name='[avg:visitor_to_signup_cvr_pct:qk]' pivot='key' type='quantitative'/>
+        <column datatype='string' name='[month]' role='dimension' type='nominal'/>
+        <column-instance column='[month]' derivation='None' name='[none:month:nk]' pivot='key' type='nominal'/>
         </datasource-dependencies>
-        <aggregation value='false'/>
+        <aggregation value='true'/>
       </view>
       <style/>
       <panes>
@@ -1029,23 +1076,29 @@
           </view>
           <mark class='Line'/>
     <encodings>
-      <text column='[kpi_monthly].[visitor_to_signup_cvr_pct]'/>
+      <text column='[kpi_monthly].[avg:visitor_to_signup_cvr_pct:qk]'/>
     </encodings>
           <style/>
         </pane>
       </panes>
-      <rows>[kpi_monthly].[visitor_to_signup_cvr_pct]</rows>
-      <cols>[kpi_monthly].[month]</cols>
+      <rows>[kpi_monthly].[avg:visitor_to_signup_cvr_pct:qk]</rows>
+      <cols>[kpi_monthly].[none:month:nk]</cols>
     </table>
+    <simple-id uuid='581cc783-bd91-5d72-9c5d-914dd6d04580'/>
   </worksheet>
   <worksheet name='KPI W4 Retention Trend'>
     <table>
-        <view dim-percentage='0.5' measure-percentage='0.5' dim-ordering='alphabetic' measure-ordering='alphabetic'>
+      <view>
+        <datasources>
+          <datasource caption='KPI Monthly Timeseries (derived)' name='kpi_monthly'/>
+        </datasources>
         <datasource-dependencies datasource='kpi_monthly'>
-        <column datatype='string' name='[month]' role='dimension' type='nominal'/>
         <column datatype='real' name='[w4_retention_pct]' role='measure' type='quantitative'/>
+        <column-instance column='[w4_retention_pct]' derivation='Avg' name='[avg:w4_retention_pct:qk]' pivot='key' type='quantitative'/>
+        <column datatype='string' name='[month]' role='dimension' type='nominal'/>
+        <column-instance column='[month]' derivation='None' name='[none:month:nk]' pivot='key' type='nominal'/>
         </datasource-dependencies>
-        <aggregation value='false'/>
+        <aggregation value='true'/>
       </view>
       <style/>
       <panes>
@@ -1055,23 +1108,29 @@
           </view>
           <mark class='Line'/>
     <encodings>
-      <text column='[kpi_monthly].[w4_retention_pct]'/>
+      <text column='[kpi_monthly].[avg:w4_retention_pct:qk]'/>
     </encodings>
           <style/>
         </pane>
       </panes>
-      <rows>[kpi_monthly].[w4_retention_pct]</rows>
-      <cols>[kpi_monthly].[month]</cols>
+      <rows>[kpi_monthly].[avg:w4_retention_pct:qk]</rows>
+      <cols>[kpi_monthly].[none:month:nk]</cols>
     </table>
+    <simple-id uuid='7f70f9a6-f68d-5b75-a340-58ea73e7e7d7'/>
   </worksheet>
   <worksheet name='KPI Next Month Return Rate Trend'>
     <table>
-        <view dim-percentage='0.5' measure-percentage='0.5' dim-ordering='alphabetic' measure-ordering='alphabetic'>
+      <view>
+        <datasources>
+          <datasource caption='KPI Monthly Timeseries (derived)' name='kpi_monthly'/>
+        </datasources>
         <datasource-dependencies datasource='kpi_monthly'>
-        <column datatype='string' name='[month]' role='dimension' type='nominal'/>
         <column datatype='real' name='[next_month_return_rate_pct]' role='measure' type='quantitative'/>
+        <column-instance column='[next_month_return_rate_pct]' derivation='Avg' name='[avg:next_month_return_rate_pct:qk]' pivot='key' type='quantitative'/>
+        <column datatype='string' name='[month]' role='dimension' type='nominal'/>
+        <column-instance column='[month]' derivation='None' name='[none:month:nk]' pivot='key' type='nominal'/>
         </datasource-dependencies>
-        <aggregation value='false'/>
+        <aggregation value='true'/>
       </view>
       <style/>
       <panes>
@@ -1081,23 +1140,29 @@
           </view>
           <mark class='Line'/>
     <encodings>
-      <text column='[kpi_monthly].[next_month_return_rate_pct]'/>
+      <text column='[kpi_monthly].[avg:next_month_return_rate_pct:qk]'/>
     </encodings>
           <style/>
         </pane>
       </panes>
-      <rows>[kpi_monthly].[next_month_return_rate_pct]</rows>
-      <cols>[kpi_monthly].[month]</cols>
+      <rows>[kpi_monthly].[avg:next_month_return_rate_pct:qk]</rows>
+      <cols>[kpi_monthly].[none:month:nk]</cols>
     </table>
+    <simple-id uuid='868f2c84-0206-57b0-a38d-dffe1bd91191'/>
   </worksheet>
   <worksheet name='KPI Invite Referral Share Trend'>
     <table>
-        <view dim-percentage='0.5' measure-percentage='0.5' dim-ordering='alphabetic' measure-ordering='alphabetic'>
+      <view>
+        <datasources>
+          <datasource caption='KPI Monthly Timeseries (derived)' name='kpi_monthly'/>
+        </datasources>
         <datasource-dependencies datasource='kpi_monthly'>
         <column datatype='real' name='[invite_referral_share_pct]' role='measure' type='quantitative'/>
+        <column-instance column='[invite_referral_share_pct]' derivation='Avg' name='[avg:invite_referral_share_pct:qk]' pivot='key' type='quantitative'/>
         <column datatype='string' name='[month]' role='dimension' type='nominal'/>
+        <column-instance column='[month]' derivation='None' name='[none:month:nk]' pivot='key' type='nominal'/>
         </datasource-dependencies>
-        <aggregation value='false'/>
+        <aggregation value='true'/>
       </view>
       <style/>
       <panes>
@@ -1107,23 +1172,29 @@
           </view>
           <mark class='Line'/>
     <encodings>
-      <text column='[kpi_monthly].[invite_referral_share_pct]'/>
+      <text column='[kpi_monthly].[avg:invite_referral_share_pct:qk]'/>
     </encodings>
           <style/>
         </pane>
       </panes>
-      <rows>[kpi_monthly].[invite_referral_share_pct]</rows>
-      <cols>[kpi_monthly].[month]</cols>
+      <rows>[kpi_monthly].[avg:invite_referral_share_pct:qk]</rows>
+      <cols>[kpi_monthly].[none:month:nk]</cols>
     </table>
+    <simple-id uuid='177cebe6-c949-5196-be94-5e8b946fd921'/>
   </worksheet>
   <worksheet name='KPI Signups Trend'>
     <table>
-        <view dim-percentage='0.5' measure-percentage='0.5' dim-ordering='alphabetic' measure-ordering='alphabetic'>
+      <view>
+        <datasources>
+          <datasource caption='KPI Monthly Timeseries (derived)' name='kpi_monthly'/>
+        </datasources>
         <datasource-dependencies datasource='kpi_monthly'>
-        <column datatype='string' name='[month]' role='dimension' type='nominal'/>
         <column datatype='integer' name='[new_signups]' role='measure' type='quantitative'/>
+        <column-instance column='[new_signups]' derivation='Sum' name='[sum:new_signups:qk]' pivot='key' type='quantitative'/>
+        <column datatype='string' name='[month]' role='dimension' type='nominal'/>
+        <column-instance column='[month]' derivation='None' name='[none:month:nk]' pivot='key' type='nominal'/>
         </datasource-dependencies>
-        <aggregation value='false'/>
+        <aggregation value='true'/>
       </view>
       <style/>
       <panes>
@@ -1133,24 +1204,31 @@
           </view>
           <mark class='Bar'/>
     <encodings>
-      <text column='[kpi_monthly].[new_signups]'/>
+      <text column='[kpi_monthly].[sum:new_signups:qk]'/>
     </encodings>
           <style/>
         </pane>
       </panes>
-      <rows>[kpi_monthly].[new_signups]</rows>
-      <cols>[kpi_monthly].[month]</cols>
+      <rows>[kpi_monthly].[sum:new_signups:qk]</rows>
+      <cols>[kpi_monthly].[none:month:nk]</cols>
     </table>
+    <simple-id uuid='c08c896e-706d-5ec9-b231-8aab36fa911b'/>
   </worksheet>
   <worksheet name='KPI Sessions By Location'>
     <table>
-        <view dim-percentage='0.5' measure-percentage='0.5' dim-ordering='alphabetic' measure-ordering='alphabetic'>
+      <view>
+        <datasources>
+          <datasource caption='KPI Monthly By Location (derived)' name='kpi_monthly_by_location'/>
+        </datasources>
         <datasource-dependencies datasource='kpi_monthly_by_location'>
-        <column datatype='string' name='[collection_location]' role='dimension' type='nominal'/>
-        <column datatype='string' name='[month]' role='dimension' type='nominal'/>
         <column datatype='integer' name='[total_sessions]' role='measure' type='quantitative'/>
+        <column-instance column='[total_sessions]' derivation='Sum' name='[sum:total_sessions:qk]' pivot='key' type='quantitative'/>
+        <column datatype='string' name='[month]' role='dimension' type='nominal'/>
+        <column-instance column='[month]' derivation='None' name='[none:month:nk]' pivot='key' type='nominal'/>
+        <column datatype='string' name='[collection_location]' role='dimension' type='nominal'/>
+        <column-instance column='[collection_location]' derivation='None' name='[none:collection_location:nk]' pivot='key' type='nominal'/>
         </datasource-dependencies>
-        <aggregation value='false'/>
+        <aggregation value='true'/>
       </view>
       <style/>
       <panes>
@@ -1160,24 +1238,31 @@
           </view>
           <mark class='Bar'/>
     <encodings>
-      <color column='[kpi_monthly_by_location].[collection_location]'/>
+      <color column='[kpi_monthly_by_location].[none:collection_location:nk]'/>
     </encodings>
           <style/>
         </pane>
       </panes>
-      <rows>[kpi_monthly_by_location].[total_sessions]</rows>
-      <cols>[kpi_monthly_by_location].[month]</cols>
+      <rows>[kpi_monthly_by_location].[sum:total_sessions:qk]</rows>
+      <cols>[kpi_monthly_by_location].[none:month:nk]</cols>
     </table>
+    <simple-id uuid='cad7e213-dcbf-5c0f-a698-2e2aabf7ec01'/>
   </worksheet>
   <worksheet name='KPI Activation By Location'>
     <table>
-        <view dim-percentage='0.5' measure-percentage='0.5' dim-ordering='alphabetic' measure-ordering='alphabetic'>
+      <view>
+        <datasources>
+          <datasource caption='KPI Monthly By Location (derived)' name='kpi_monthly_by_location'/>
+        </datasources>
         <datasource-dependencies datasource='kpi_monthly_by_location'>
         <column datatype='real' name='[activation_rate_pct]' role='measure' type='quantitative'/>
-        <column datatype='string' name='[collection_location]' role='dimension' type='nominal'/>
+        <column-instance column='[activation_rate_pct]' derivation='Avg' name='[avg:activation_rate_pct:qk]' pivot='key' type='quantitative'/>
         <column datatype='string' name='[month]' role='dimension' type='nominal'/>
+        <column-instance column='[month]' derivation='None' name='[none:month:nk]' pivot='key' type='nominal'/>
+        <column datatype='string' name='[collection_location]' role='dimension' type='nominal'/>
+        <column-instance column='[collection_location]' derivation='None' name='[none:collection_location:nk]' pivot='key' type='nominal'/>
         </datasource-dependencies>
-        <aggregation value='false'/>
+        <aggregation value='true'/>
       </view>
       <style/>
       <panes>
@@ -1187,24 +1272,31 @@
           </view>
           <mark class='Line'/>
     <encodings>
-      <color column='[kpi_monthly_by_location].[collection_location]'/>
+      <color column='[kpi_monthly_by_location].[none:collection_location:nk]'/>
     </encodings>
           <style/>
         </pane>
       </panes>
-      <rows>[kpi_monthly_by_location].[activation_rate_pct]</rows>
-      <cols>[kpi_monthly_by_location].[month]</cols>
+      <rows>[kpi_monthly_by_location].[avg:activation_rate_pct:qk]</rows>
+      <cols>[kpi_monthly_by_location].[none:month:nk]</cols>
     </table>
+    <simple-id uuid='0b2e472f-7eae-5ae9-91a3-7accfa00544b'/>
   </worksheet>
   <worksheet name='KPI MAU By Location'>
     <table>
-        <view dim-percentage='0.5' measure-percentage='0.5' dim-ordering='alphabetic' measure-ordering='alphabetic'>
+      <view>
+        <datasources>
+          <datasource caption='KPI Monthly By Location (derived)' name='kpi_monthly_by_location'/>
+        </datasources>
         <datasource-dependencies datasource='kpi_monthly_by_location'>
-        <column datatype='string' name='[collection_location]' role='dimension' type='nominal'/>
         <column datatype='integer' name='[mau]' role='measure' type='quantitative'/>
+        <column-instance column='[mau]' derivation='Sum' name='[sum:mau:qk]' pivot='key' type='quantitative'/>
         <column datatype='string' name='[month]' role='dimension' type='nominal'/>
+        <column-instance column='[month]' derivation='None' name='[none:month:nk]' pivot='key' type='nominal'/>
+        <column datatype='string' name='[collection_location]' role='dimension' type='nominal'/>
+        <column-instance column='[collection_location]' derivation='None' name='[none:collection_location:nk]' pivot='key' type='nominal'/>
         </datasource-dependencies>
-        <aggregation value='false'/>
+        <aggregation value='true'/>
       </view>
       <style/>
       <panes>
@@ -1214,23 +1306,29 @@
           </view>
           <mark class='Bar'/>
     <encodings>
-      <color column='[kpi_monthly_by_location].[collection_location]'/>
+      <color column='[kpi_monthly_by_location].[none:collection_location:nk]'/>
     </encodings>
           <style/>
         </pane>
       </panes>
-      <rows>[kpi_monthly_by_location].[mau]</rows>
-      <cols>[kpi_monthly_by_location].[month]</cols>
+      <rows>[kpi_monthly_by_location].[sum:mau:qk]</rows>
+      <cols>[kpi_monthly_by_location].[none:month:nk]</cols>
     </table>
+    <simple-id uuid='ed42bf41-1191-5a1e-8db4-1d9d042f2c95'/>
   </worksheet>
   <worksheet name='Funnel Stage Volumes'>
     <table>
-        <view dim-percentage='0.5' measure-percentage='0.5' dim-ordering='alphabetic' measure-ordering='alphabetic'>
+      <view>
+        <datasources>
+          <datasource caption='Funnel - Overall (derived)' name='funnel_overall'/>
+        </datasources>
         <datasource-dependencies datasource='funnel_overall'>
-        <column datatype='string' name='[stage_name]' role='dimension' type='nominal'/>
         <column datatype='integer' name='[users]' role='measure' type='quantitative'/>
+        <column-instance column='[users]' derivation='Sum' name='[sum:users:qk]' pivot='key' type='quantitative'/>
+        <column datatype='string' name='[stage_name]' role='dimension' type='nominal'/>
+        <column-instance column='[stage_name]' derivation='None' name='[none:stage_name:nk]' pivot='key' type='nominal'/>
         </datasource-dependencies>
-        <aggregation value='false'/>
+        <aggregation value='true'/>
       </view>
       <style/>
       <panes>
@@ -1240,23 +1338,29 @@
           </view>
           <mark class='Bar'/>
     <encodings>
-      <text column='[funnel_overall].[users]'/>
+      <text column='[funnel_overall].[sum:users:qk]'/>
     </encodings>
           <style/>
         </pane>
       </panes>
-      <rows>[funnel_overall].[users]</rows>
-      <cols>[funnel_overall].[stage_name]</cols>
+      <rows>[funnel_overall].[sum:users:qk]</rows>
+      <cols>[funnel_overall].[none:stage_name:nk]</cols>
     </table>
+    <simple-id uuid='3a375399-ebf1-5abc-b9ac-e7f99f9655ef'/>
   </worksheet>
   <worksheet name='Funnel Conversion From Previous'>
     <table>
-        <view dim-percentage='0.5' measure-percentage='0.5' dim-ordering='alphabetic' measure-ordering='alphabetic'>
+      <view>
+        <datasources>
+          <datasource caption='Funnel - Overall (derived)' name='funnel_overall'/>
+        </datasources>
         <datasource-dependencies datasource='funnel_overall'>
         <column datatype='real' name='[conversion_from_previous_pct]' role='measure' type='quantitative'/>
+        <column-instance column='[conversion_from_previous_pct]' derivation='Avg' name='[avg:conversion_from_previous_pct:qk]' pivot='key' type='quantitative'/>
         <column datatype='string' name='[stage_name]' role='dimension' type='nominal'/>
+        <column-instance column='[stage_name]' derivation='None' name='[none:stage_name:nk]' pivot='key' type='nominal'/>
         </datasource-dependencies>
-        <aggregation value='false'/>
+        <aggregation value='true'/>
       </view>
       <style/>
       <panes>
@@ -1266,23 +1370,29 @@
           </view>
           <mark class='Bar'/>
     <encodings>
-      <text column='[funnel_overall].[conversion_from_previous_pct]'/>
+      <text column='[funnel_overall].[avg:conversion_from_previous_pct:qk]'/>
     </encodings>
           <style/>
         </pane>
       </panes>
-      <rows>[funnel_overall].[conversion_from_previous_pct]</rows>
-      <cols>[funnel_overall].[stage_name]</cols>
+      <rows>[funnel_overall].[avg:conversion_from_previous_pct:qk]</rows>
+      <cols>[funnel_overall].[none:stage_name:nk]</cols>
     </table>
+    <simple-id uuid='eb30acb1-8254-5aab-86c2-5cfea35d265c'/>
   </worksheet>
   <worksheet name='Funnel Median Days Between Stages'>
     <table>
-        <view dim-percentage='0.5' measure-percentage='0.5' dim-ordering='alphabetic' measure-ordering='alphabetic'>
+      <view>
+        <datasources>
+          <datasource caption='Funnel - Overall (derived)' name='funnel_overall'/>
+        </datasources>
         <datasource-dependencies datasource='funnel_overall'>
         <column datatype='integer' name='[median_days_from_previous]' role='measure' type='quantitative'/>
+        <column-instance column='[median_days_from_previous]' derivation='Avg' name='[avg:median_days_from_previous:qk]' pivot='key' type='quantitative'/>
         <column datatype='string' name='[stage_name]' role='dimension' type='nominal'/>
+        <column-instance column='[stage_name]' derivation='None' name='[none:stage_name:nk]' pivot='key' type='nominal'/>
         </datasource-dependencies>
-        <aggregation value='false'/>
+        <aggregation value='true'/>
       </view>
       <style/>
       <panes>
@@ -1292,24 +1402,31 @@
           </view>
           <mark class='Bar'/>
     <encodings>
-      <text column='[funnel_overall].[median_days_from_previous]'/>
+      <text column='[funnel_overall].[avg:median_days_from_previous:qk]'/>
     </encodings>
           <style/>
         </pane>
       </panes>
-      <rows>[funnel_overall].[median_days_from_previous]</rows>
-      <cols>[funnel_overall].[stage_name]</cols>
+      <rows>[funnel_overall].[avg:median_days_from_previous:qk]</rows>
+      <cols>[funnel_overall].[none:stage_name:nk]</cols>
     </table>
+    <simple-id uuid='eba0a8b6-d18b-5d72-ab40-56338934d29e'/>
   </worksheet>
   <worksheet name='Funnel By Channel'>
     <table>
-        <view dim-percentage='0.5' measure-percentage='0.5' dim-ordering='alphabetic' measure-ordering='alphabetic'>
+      <view>
+        <datasources>
+          <datasource caption='Funnel - By Channel (derived)' name='funnel_by_channel'/>
+        </datasources>
         <datasource-dependencies datasource='funnel_by_channel'>
-        <column datatype='string' name='[acquisition_channel]' role='dimension' type='nominal'/>
-        <column datatype='string' name='[stage_name]' role='dimension' type='nominal'/>
         <column datatype='integer' name='[users]' role='measure' type='quantitative'/>
+        <column-instance column='[users]' derivation='Sum' name='[sum:users:qk]' pivot='key' type='quantitative'/>
+        <column datatype='string' name='[stage_name]' role='dimension' type='nominal'/>
+        <column-instance column='[stage_name]' derivation='None' name='[none:stage_name:nk]' pivot='key' type='nominal'/>
+        <column datatype='string' name='[acquisition_channel]' role='dimension' type='nominal'/>
+        <column-instance column='[acquisition_channel]' derivation='None' name='[none:acquisition_channel:nk]' pivot='key' type='nominal'/>
         </datasource-dependencies>
-        <aggregation value='false'/>
+        <aggregation value='true'/>
       </view>
       <style/>
       <panes>
@@ -1319,24 +1436,31 @@
           </view>
           <mark class='Bar'/>
     <encodings>
-      <color column='[funnel_by_channel].[acquisition_channel]'/>
+      <color column='[funnel_by_channel].[none:acquisition_channel:nk]'/>
     </encodings>
           <style/>
         </pane>
       </panes>
-      <rows>[funnel_by_channel].[users]</rows>
-      <cols>[funnel_by_channel].[stage_name]</cols>
+      <rows>[funnel_by_channel].[sum:users:qk]</rows>
+      <cols>[funnel_by_channel].[none:stage_name:nk]</cols>
     </table>
+    <simple-id uuid='87bde5fd-5981-53a8-b6f1-7d013c437fac'/>
   </worksheet>
   <worksheet name='Funnel By Location'>
     <table>
-        <view dim-percentage='0.5' measure-percentage='0.5' dim-ordering='alphabetic' measure-ordering='alphabetic'>
+      <view>
+        <datasources>
+          <datasource caption='Funnel - By Location (derived)' name='funnel_by_location'/>
+        </datasources>
         <datasource-dependencies datasource='funnel_by_location'>
-        <column datatype='string' name='[collection_location]' role='dimension' type='nominal'/>
-        <column datatype='string' name='[stage_name]' role='dimension' type='nominal'/>
         <column datatype='integer' name='[users]' role='measure' type='quantitative'/>
+        <column-instance column='[users]' derivation='Sum' name='[sum:users:qk]' pivot='key' type='quantitative'/>
+        <column datatype='string' name='[stage_name]' role='dimension' type='nominal'/>
+        <column-instance column='[stage_name]' derivation='None' name='[none:stage_name:nk]' pivot='key' type='nominal'/>
+        <column datatype='string' name='[collection_location]' role='dimension' type='nominal'/>
+        <column-instance column='[collection_location]' derivation='None' name='[none:collection_location:nk]' pivot='key' type='nominal'/>
         </datasource-dependencies>
-        <aggregation value='false'/>
+        <aggregation value='true'/>
       </view>
       <style/>
       <panes>
@@ -1346,23 +1470,29 @@
           </view>
           <mark class='Bar'/>
     <encodings>
-      <color column='[funnel_by_location].[collection_location]'/>
+      <color column='[funnel_by_location].[none:collection_location:nk]'/>
     </encodings>
           <style/>
         </pane>
       </panes>
-      <rows>[funnel_by_location].[users]</rows>
-      <cols>[funnel_by_location].[stage_name]</cols>
+      <rows>[funnel_by_location].[sum:users:qk]</rows>
+      <cols>[funnel_by_location].[none:stage_name:nk]</cols>
     </table>
+    <simple-id uuid='f2a7b58d-7c84-5269-b4a7-e1267110dfd0'/>
   </worksheet>
   <worksheet name='Behaviour Signups By Channel'>
     <table>
-        <view dim-percentage='0.5' measure-percentage='0.5' dim-ordering='alphabetic' measure-ordering='alphabetic'>
+      <view>
+        <datasources>
+          <datasource caption='P2 User Signups (Firebase auth records, free beta)' name='user_signups'/>
+        </datasources>
         <datasource-dependencies datasource='user_signups'>
-        <column datatype='string' name='[acquisition_channel]' role='dimension' type='nominal'/>
         <column datatype='string' name='[user_id]' role='dimension' type='nominal'/>
+        <column-instance column='[user_id]' derivation='Count' name='[cnt:user_id:qk]' pivot='key' type='quantitative'/>
+        <column datatype='string' name='[acquisition_channel]' role='dimension' type='nominal'/>
+        <column-instance column='[acquisition_channel]' derivation='None' name='[none:acquisition_channel:nk]' pivot='key' type='nominal'/>
         </datasource-dependencies>
-        <aggregation value='false'/>
+        <aggregation value='true'/>
       </view>
       <style/>
       <panes>
@@ -1372,23 +1502,29 @@
           </view>
           <mark class='Bar'/>
     <encodings>
-      <text column='[user_signups].[user_id]'/>
+      <text column='[user_signups].[cnt:user_id:qk]'/>
     </encodings>
           <style/>
         </pane>
       </panes>
-      <rows>[user_signups].[user_id]</rows>
-      <cols>[user_signups].[acquisition_channel]</cols>
+      <rows>[user_signups].[cnt:user_id:qk]</rows>
+      <cols>[user_signups].[none:acquisition_channel:nk]</cols>
     </table>
+    <simple-id uuid='a47f2ead-f678-5995-ba96-55d357ae1d84'/>
   </worksheet>
   <worksheet name='Behaviour Users By Persona'>
     <table>
-        <view dim-percentage='0.5' measure-percentage='0.5' dim-ordering='alphabetic' measure-ordering='alphabetic'>
+      <view>
+        <datasources>
+          <datasource caption='P2 User Signups (Firebase auth records, free beta)' name='user_signups'/>
+        </datasources>
         <datasource-dependencies datasource='user_signups'>
-        <column datatype='string' name='[persona]' role='dimension' type='nominal'/>
         <column datatype='string' name='[user_id]' role='dimension' type='nominal'/>
+        <column-instance column='[user_id]' derivation='Count' name='[cnt:user_id:qk]' pivot='key' type='quantitative'/>
+        <column datatype='string' name='[persona]' role='dimension' type='nominal'/>
+        <column-instance column='[persona]' derivation='None' name='[none:persona:nk]' pivot='key' type='nominal'/>
         </datasource-dependencies>
-        <aggregation value='false'/>
+        <aggregation value='true'/>
       </view>
       <style/>
       <panes>
@@ -1398,23 +1534,29 @@
           </view>
           <mark class='Bar'/>
     <encodings>
-      <text column='[user_signups].[user_id]'/>
+      <text column='[user_signups].[cnt:user_id:qk]'/>
     </encodings>
           <style/>
         </pane>
       </panes>
-      <rows>[user_signups].[user_id]</rows>
-      <cols>[user_signups].[persona]</cols>
+      <rows>[user_signups].[cnt:user_id:qk]</rows>
+      <cols>[user_signups].[none:persona:nk]</cols>
     </table>
+    <simple-id uuid='04ec6076-78d0-545d-ba7e-7a475a854f15'/>
   </worksheet>
   <worksheet name='Behaviour Activation Rate By Persona'>
     <table>
-        <view dim-percentage='0.5' measure-percentage='0.5' dim-ordering='alphabetic' measure-ordering='alphabetic'>
+      <view>
+        <datasources>
+          <datasource caption='P2 User Signups (Firebase auth records, free beta)' name='user_signups'/>
+        </datasources>
         <datasource-dependencies datasource='user_signups'>
         <column datatype='integer' name='[activated_within_7d_flag]' role='measure' type='quantitative'/>
+        <column-instance column='[activated_within_7d_flag]' derivation='Avg' name='[avg:activated_within_7d_flag:qk]' pivot='key' type='quantitative'/>
         <column datatype='string' name='[persona]' role='dimension' type='nominal'/>
+        <column-instance column='[persona]' derivation='None' name='[none:persona:nk]' pivot='key' type='nominal'/>
         </datasource-dependencies>
-        <aggregation value='false'/>
+        <aggregation value='true'/>
       </view>
       <style/>
       <panes>
@@ -1424,23 +1566,29 @@
           </view>
           <mark class='Bar'/>
     <encodings>
-      <text column='[user_signups].[activated_within_7d_flag]'/>
+      <text column='[user_signups].[avg:activated_within_7d_flag:qk]'/>
     </encodings>
           <style/>
         </pane>
       </panes>
-      <rows>[user_signups].[activated_within_7d_flag]</rows>
-      <cols>[user_signups].[persona]</cols>
+      <rows>[user_signups].[avg:activated_within_7d_flag:qk]</rows>
+      <cols>[user_signups].[none:persona:nk]</cols>
     </table>
+    <simple-id uuid='696dbb50-e601-5c3c-a0e8-aff68790fe13'/>
   </worksheet>
   <worksheet name='Behaviour Signups By Use Case'>
     <table>
-        <view dim-percentage='0.5' measure-percentage='0.5' dim-ordering='alphabetic' measure-ordering='alphabetic'>
+      <view>
+        <datasources>
+          <datasource caption='P2 User Signups (Firebase auth records, free beta)' name='user_signups'/>
+        </datasources>
         <datasource-dependencies datasource='user_signups'>
-        <column datatype='string' name='[primary_use_case]' role='dimension' type='nominal'/>
         <column datatype='string' name='[user_id]' role='dimension' type='nominal'/>
+        <column-instance column='[user_id]' derivation='Count' name='[cnt:user_id:qk]' pivot='key' type='quantitative'/>
+        <column datatype='string' name='[primary_use_case]' role='dimension' type='nominal'/>
+        <column-instance column='[primary_use_case]' derivation='None' name='[none:primary_use_case:nk]' pivot='key' type='nominal'/>
         </datasource-dependencies>
-        <aggregation value='false'/>
+        <aggregation value='true'/>
       </view>
       <style/>
       <panes>
@@ -1450,23 +1598,29 @@
           </view>
           <mark class='Bar'/>
     <encodings>
-      <text column='[user_signups].[user_id]'/>
+      <text column='[user_signups].[cnt:user_id:qk]'/>
     </encodings>
           <style/>
         </pane>
       </panes>
-      <rows>[user_signups].[user_id]</rows>
-      <cols>[user_signups].[primary_use_case]</cols>
+      <rows>[user_signups].[cnt:user_id:qk]</rows>
+      <cols>[user_signups].[none:primary_use_case:nk]</cols>
     </table>
+    <simple-id uuid='4a052fcb-84d4-5fb2-ab2a-d280101265e0'/>
   </worksheet>
   <worksheet name='Behaviour Signups By Program'>
     <table>
-        <view dim-percentage='0.5' measure-percentage='0.5' dim-ordering='alphabetic' measure-ordering='alphabetic'>
+      <view>
+        <datasources>
+          <datasource caption='P2 User Signups (Firebase auth records, free beta)' name='user_signups'/>
+        </datasources>
         <datasource-dependencies datasource='user_signups'>
-        <column datatype='string' name='[signup_program]' role='dimension' type='nominal'/>
         <column datatype='string' name='[user_id]' role='dimension' type='nominal'/>
+        <column-instance column='[user_id]' derivation='Count' name='[cnt:user_id:qk]' pivot='key' type='quantitative'/>
+        <column datatype='string' name='[signup_program]' role='dimension' type='nominal'/>
+        <column-instance column='[signup_program]' derivation='None' name='[none:signup_program:nk]' pivot='key' type='nominal'/>
         </datasource-dependencies>
-        <aggregation value='false'/>
+        <aggregation value='true'/>
       </view>
       <style/>
       <panes>
@@ -1476,23 +1630,29 @@
           </view>
           <mark class='Bar'/>
     <encodings>
-      <text column='[user_signups].[user_id]'/>
+      <text column='[user_signups].[cnt:user_id:qk]'/>
     </encodings>
           <style/>
         </pane>
       </panes>
-      <rows>[user_signups].[user_id]</rows>
-      <cols>[user_signups].[signup_program]</cols>
+      <rows>[user_signups].[cnt:user_id:qk]</rows>
+      <cols>[user_signups].[none:signup_program:nk]</cols>
     </table>
+    <simple-id uuid='e5ee60d4-5038-5a23-b98f-32ae10eab310'/>
   </worksheet>
   <worksheet name='Behaviour Users By Location'>
     <table>
-        <view dim-percentage='0.5' measure-percentage='0.5' dim-ordering='alphabetic' measure-ordering='alphabetic'>
+      <view>
+        <datasources>
+          <datasource caption='P2 User Signups (Firebase auth records, free beta)' name='user_signups'/>
+        </datasources>
         <datasource-dependencies datasource='user_signups'>
-        <column datatype='string' name='[collection_location]' role='dimension' type='nominal'/>
         <column datatype='string' name='[user_id]' role='dimension' type='nominal'/>
+        <column-instance column='[user_id]' derivation='Count' name='[cnt:user_id:qk]' pivot='key' type='quantitative'/>
+        <column datatype='string' name='[collection_location]' role='dimension' type='nominal'/>
+        <column-instance column='[collection_location]' derivation='None' name='[none:collection_location:nk]' pivot='key' type='nominal'/>
         </datasource-dependencies>
-        <aggregation value='false'/>
+        <aggregation value='true'/>
       </view>
       <style/>
       <panes>
@@ -1502,23 +1662,29 @@
           </view>
           <mark class='Bar'/>
     <encodings>
-      <text column='[user_signups].[user_id]'/>
+      <text column='[user_signups].[cnt:user_id:qk]'/>
     </encodings>
           <style/>
         </pane>
       </panes>
-      <rows>[user_signups].[user_id]</rows>
-      <cols>[user_signups].[collection_location]</cols>
+      <rows>[user_signups].[cnt:user_id:qk]</rows>
+      <cols>[user_signups].[none:collection_location:nk]</cols>
     </table>
+    <simple-id uuid='fb8c43cd-61cf-5e2b-a751-a2e365f451b3'/>
   </worksheet>
   <worksheet name='Behaviour Activation Rate By Location'>
     <table>
-        <view dim-percentage='0.5' measure-percentage='0.5' dim-ordering='alphabetic' measure-ordering='alphabetic'>
+      <view>
+        <datasources>
+          <datasource caption='P2 User Signups (Firebase auth records, free beta)' name='user_signups'/>
+        </datasources>
         <datasource-dependencies datasource='user_signups'>
         <column datatype='integer' name='[activated_within_7d_flag]' role='measure' type='quantitative'/>
+        <column-instance column='[activated_within_7d_flag]' derivation='Avg' name='[avg:activated_within_7d_flag:qk]' pivot='key' type='quantitative'/>
         <column datatype='string' name='[collection_location]' role='dimension' type='nominal'/>
+        <column-instance column='[collection_location]' derivation='None' name='[none:collection_location:nk]' pivot='key' type='nominal'/>
         </datasource-dependencies>
-        <aggregation value='false'/>
+        <aggregation value='true'/>
       </view>
       <style/>
       <panes>
@@ -1528,23 +1694,29 @@
           </view>
           <mark class='Bar'/>
     <encodings>
-      <text column='[user_signups].[activated_within_7d_flag]'/>
+      <text column='[user_signups].[avg:activated_within_7d_flag:qk]'/>
     </encodings>
           <style/>
         </pane>
       </panes>
-      <rows>[user_signups].[activated_within_7d_flag]</rows>
-      <cols>[user_signups].[collection_location]</cols>
+      <rows>[user_signups].[avg:activated_within_7d_flag:qk]</rows>
+      <cols>[user_signups].[none:collection_location:nk]</cols>
     </table>
+    <simple-id uuid='79d29b42-143f-59ad-99f3-386c5d1625f0'/>
   </worksheet>
   <worksheet name='Behaviour Onboarding Rate By Location'>
     <table>
-        <view dim-percentage='0.5' measure-percentage='0.5' dim-ordering='alphabetic' measure-ordering='alphabetic'>
+      <view>
+        <datasources>
+          <datasource caption='P2 User Signups (Firebase auth records, free beta)' name='user_signups'/>
+        </datasources>
         <datasource-dependencies datasource='user_signups'>
-        <column datatype='string' name='[collection_location]' role='dimension' type='nominal'/>
         <column datatype='integer' name='[onboarding_completed_flag]' role='measure' type='quantitative'/>
+        <column-instance column='[onboarding_completed_flag]' derivation='Avg' name='[avg:onboarding_completed_flag:qk]' pivot='key' type='quantitative'/>
+        <column datatype='string' name='[collection_location]' role='dimension' type='nominal'/>
+        <column-instance column='[collection_location]' derivation='None' name='[none:collection_location:nk]' pivot='key' type='nominal'/>
         </datasource-dependencies>
-        <aggregation value='false'/>
+        <aggregation value='true'/>
       </view>
       <style/>
       <panes>
@@ -1554,23 +1726,29 @@
           </view>
           <mark class='Bar'/>
     <encodings>
-      <text column='[user_signups].[onboarding_completed_flag]'/>
+      <text column='[user_signups].[avg:onboarding_completed_flag:qk]'/>
     </encodings>
           <style/>
         </pane>
       </panes>
-      <rows>[user_signups].[onboarding_completed_flag]</rows>
-      <cols>[user_signups].[collection_location]</cols>
+      <rows>[user_signups].[avg:onboarding_completed_flag:qk]</rows>
+      <cols>[user_signups].[none:collection_location:nk]</cols>
     </table>
+    <simple-id uuid='2499050c-cebb-5d4f-a675-2941936bd667'/>
   </worksheet>
   <worksheet name='Behaviour Inactivity Rate By Location'>
     <table>
-        <view dim-percentage='0.5' measure-percentage='0.5' dim-ordering='alphabetic' measure-ordering='alphabetic'>
+      <view>
+        <datasources>
+          <datasource caption='P2 User Signups (Firebase auth records, free beta)' name='user_signups'/>
+        </datasources>
         <datasource-dependencies datasource='user_signups'>
-        <column datatype='string' name='[collection_location]' role='dimension' type='nominal'/>
         <column datatype='integer' name='[inactive_30d_flag]' role='measure' type='quantitative'/>
+        <column-instance column='[inactive_30d_flag]' derivation='Avg' name='[avg:inactive_30d_flag:qk]' pivot='key' type='quantitative'/>
+        <column datatype='string' name='[collection_location]' role='dimension' type='nominal'/>
+        <column-instance column='[collection_location]' derivation='None' name='[none:collection_location:nk]' pivot='key' type='nominal'/>
         </datasource-dependencies>
-        <aggregation value='false'/>
+        <aggregation value='true'/>
       </view>
       <style/>
       <panes>
@@ -1580,23 +1758,29 @@
           </view>
           <mark class='Bar'/>
     <encodings>
-      <text column='[user_signups].[inactive_30d_flag]'/>
+      <text column='[user_signups].[avg:inactive_30d_flag:qk]'/>
     </encodings>
           <style/>
         </pane>
       </panes>
-      <rows>[user_signups].[inactive_30d_flag]</rows>
-      <cols>[user_signups].[collection_location]</cols>
+      <rows>[user_signups].[avg:inactive_30d_flag:qk]</rows>
+      <cols>[user_signups].[none:collection_location:nk]</cols>
     </table>
+    <simple-id uuid='8524c3b3-5384-5e35-8b98-54bb7586ede6'/>
   </worksheet>
   <worksheet name='Behaviour Feature Adoption All'>
     <table>
-        <view dim-percentage='0.5' measure-percentage='0.5' dim-ordering='alphabetic' measure-ordering='alphabetic'>
+      <view>
+        <datasources>
+          <datasource caption='Feature Adoption - All Users (derived)' name='feature_adoption_overall'/>
+        </datasources>
         <datasource-dependencies datasource='feature_adoption_overall'>
         <column datatype='real' name='[adoption_pct]' role='measure' type='quantitative'/>
+        <column-instance column='[adoption_pct]' derivation='Sum' name='[sum:adoption_pct:qk]' pivot='key' type='quantitative'/>
         <column datatype='string' name='[feature_name]' role='dimension' type='nominal'/>
+        <column-instance column='[feature_name]' derivation='None' name='[none:feature_name:nk]' pivot='key' type='nominal'/>
         </datasource-dependencies>
-        <aggregation value='false'/>
+        <aggregation value='true'/>
       </view>
       <style/>
       <panes>
@@ -1606,24 +1790,31 @@
           </view>
           <mark class='Bar'/>
     <encodings>
-      <text column='[feature_adoption_overall].[adoption_pct]'/>
+      <text column='[feature_adoption_overall].[sum:adoption_pct:qk]'/>
     </encodings>
           <style/>
         </pane>
       </panes>
-      <rows>[feature_adoption_overall].[adoption_pct]</rows>
-      <cols>[feature_adoption_overall].[feature_name]</cols>
+      <rows>[feature_adoption_overall].[sum:adoption_pct:qk]</rows>
+      <cols>[feature_adoption_overall].[none:feature_name:nk]</cols>
     </table>
+    <simple-id uuid='83610f15-63b1-5a0e-b106-05afb7d8e3af'/>
   </worksheet>
   <worksheet name='Behaviour Feature Adoption By Persona'>
     <table>
-        <view dim-percentage='0.5' measure-percentage='0.5' dim-ordering='alphabetic' measure-ordering='alphabetic'>
+      <view>
+        <datasources>
+          <datasource caption='Feature Adoption - By Persona (derived)' name='feature_adoption_by_persona'/>
+        </datasources>
         <datasource-dependencies datasource='feature_adoption_by_persona'>
         <column datatype='real' name='[adoption_pct]' role='measure' type='quantitative'/>
+        <column-instance column='[adoption_pct]' derivation='Sum' name='[sum:adoption_pct:qk]' pivot='key' type='quantitative'/>
         <column datatype='string' name='[feature_name]' role='dimension' type='nominal'/>
+        <column-instance column='[feature_name]' derivation='None' name='[none:feature_name:nk]' pivot='key' type='nominal'/>
         <column datatype='string' name='[persona]' role='dimension' type='nominal'/>
+        <column-instance column='[persona]' derivation='None' name='[none:persona:nk]' pivot='key' type='nominal'/>
         </datasource-dependencies>
-        <aggregation value='false'/>
+        <aggregation value='true'/>
       </view>
       <style/>
       <panes>
@@ -1635,18 +1826,24 @@
           <style/>
         </pane>
       </panes>
-      <rows>[feature_adoption_by_persona].[adoption_pct]</rows>
-      <cols>[feature_adoption_by_persona].[feature_name] / [feature_adoption_by_persona].[persona]</cols>
+      <rows>[feature_adoption_by_persona].[sum:adoption_pct:qk]</rows>
+      <cols>([feature_adoption_by_persona].[none:feature_name:nk] / [feature_adoption_by_persona].[none:persona:nk])</cols>
     </table>
+    <simple-id uuid='d6daee7c-a0c5-5ccc-8f80-92cf22baf0d9'/>
   </worksheet>
   <worksheet name='Behaviour Sessions By Hour'>
     <table>
-        <view dim-percentage='0.5' measure-percentage='0.5' dim-ordering='alphabetic' measure-ordering='alphabetic'>
+      <view>
+        <datasources>
+          <datasource caption='P4 Monitoring Sessions (Convex sessions + telemetry)' name='monitoring_sessions'/>
+        </datasources>
         <datasource-dependencies datasource='monitoring_sessions'>
         <column datatype='string' name='[session_id]' role='dimension' type='nominal'/>
+        <column-instance column='[session_id]' derivation='Count' name='[cnt:session_id:qk]' pivot='key' type='quantitative'/>
         <column datatype='integer' name='[start_hour_utc]' role='dimension' type='nominal'/>
+        <column-instance column='[start_hour_utc]' derivation='None' name='[none:start_hour_utc:nk]' pivot='key' type='nominal'/>
         </datasource-dependencies>
-        <aggregation value='false'/>
+        <aggregation value='true'/>
       </view>
       <style/>
       <panes>
@@ -1658,19 +1855,26 @@
           <style/>
         </pane>
       </panes>
-      <rows>[monitoring_sessions].[session_id]</rows>
-      <cols>[monitoring_sessions].[start_hour_utc]</cols>
+      <rows>[monitoring_sessions].[cnt:session_id:qk]</rows>
+      <cols>[monitoring_sessions].[none:start_hour_utc:nk]</cols>
     </table>
+    <simple-id uuid='4f283859-53c6-5e5c-a4d9-f4767bac4db3'/>
   </worksheet>
   <worksheet name='Behaviour Retention Cohort Heatmap'>
     <table>
-        <view dim-percentage='0.5' measure-percentage='0.5' dim-ordering='alphabetic' measure-ordering='alphabetic'>
+      <view>
+        <datasources>
+          <datasource caption='Retention Cohorts (derived)' name='retention_cohorts'/>
+        </datasources>
         <datasource-dependencies datasource='retention_cohorts'>
         <column datatype='string' name='[cohort_month]' role='dimension' type='nominal'/>
-        <column datatype='real' name='[retention_pct]' role='measure' type='quantitative'/>
+        <column-instance column='[cohort_month]' derivation='None' name='[none:cohort_month:nk]' pivot='key' type='nominal'/>
         <column datatype='integer' name='[week_number]' role='dimension' type='nominal'/>
+        <column-instance column='[week_number]' derivation='None' name='[none:week_number:nk]' pivot='key' type='nominal'/>
+        <column datatype='real' name='[retention_pct]' role='measure' type='quantitative'/>
+        <column-instance column='[retention_pct]' derivation='Avg' name='[avg:retention_pct:qk]' pivot='key' type='quantitative'/>
         </datasource-dependencies>
-        <aggregation value='false'/>
+        <aggregation value='true'/>
       </view>
       <style/>
       <panes>
@@ -1680,24 +1884,30 @@
           </view>
           <mark class='Square'/>
     <encodings>
-      <color column='[retention_cohorts].[retention_pct]'/>
-      <text column='[retention_cohorts].[retention_pct]'/>
+      <color column='[retention_cohorts].[avg:retention_pct:qk]'/>
+      <text column='[retention_cohorts].[avg:retention_pct:qk]'/>
     </encodings>
           <style/>
         </pane>
       </panes>
-      <rows>[retention_cohorts].[cohort_month]</rows>
-      <cols>[retention_cohorts].[week_number]</cols>
+      <rows>[retention_cohorts].[none:cohort_month:nk]</rows>
+      <cols>[retention_cohorts].[none:week_number:nk]</cols>
     </table>
+    <simple-id uuid='b0994cee-b750-5eed-be60-76cbb7b3855c'/>
   </worksheet>
   <worksheet name='Quality Provider Token Mix'>
     <table>
-        <view dim-percentage='0.5' measure-percentage='0.5' dim-ordering='alphabetic' measure-ordering='alphabetic'>
+      <view>
+        <datasources>
+          <datasource caption='P4 Monitoring Sessions (Convex sessions + telemetry)' name='monitoring_sessions'/>
+        </datasources>
         <datasource-dependencies datasource='monitoring_sessions'>
-        <column datatype='string' name='[provider]' role='dimension' type='nominal'/>
         <column datatype='integer' name='[total_tokens]' role='measure' type='quantitative'/>
+        <column-instance column='[total_tokens]' derivation='Sum' name='[sum:total_tokens:qk]' pivot='key' type='quantitative'/>
+        <column datatype='string' name='[provider]' role='dimension' type='nominal'/>
+        <column-instance column='[provider]' derivation='None' name='[none:provider:nk]' pivot='key' type='nominal'/>
         </datasource-dependencies>
-        <aggregation value='false'/>
+        <aggregation value='true'/>
       </view>
       <style/>
       <panes>
@@ -1707,23 +1917,29 @@
           </view>
           <mark class='Bar'/>
     <encodings>
-      <text column='[monitoring_sessions].[total_tokens]'/>
+      <text column='[monitoring_sessions].[sum:total_tokens:qk]'/>
     </encodings>
           <style/>
         </pane>
       </panes>
-      <rows>[monitoring_sessions].[total_tokens]</rows>
-      <cols>[monitoring_sessions].[provider]</cols>
+      <rows>[monitoring_sessions].[sum:total_tokens:qk]</rows>
+      <cols>[monitoring_sessions].[none:provider:nk]</cols>
     </table>
+    <simple-id uuid='09240d03-961d-5d3f-9f6d-afb5b2810691'/>
   </worksheet>
   <worksheet name='Quality CRI Level Mix'>
     <table>
-        <view dim-percentage='0.5' measure-percentage='0.5' dim-ordering='alphabetic' measure-ordering='alphabetic'>
+      <view>
+        <datasources>
+          <datasource caption='P4 Monitoring Sessions (Convex sessions + telemetry)' name='monitoring_sessions'/>
+        </datasources>
         <datasource-dependencies datasource='monitoring_sessions'>
-        <column datatype='string' name='[cri_level]' role='dimension' type='nominal'/>
         <column datatype='string' name='[session_id]' role='dimension' type='nominal'/>
+        <column-instance column='[session_id]' derivation='Count' name='[cnt:session_id:qk]' pivot='key' type='quantitative'/>
+        <column datatype='string' name='[cri_level]' role='dimension' type='nominal'/>
+        <column-instance column='[cri_level]' derivation='None' name='[none:cri_level:nk]' pivot='key' type='nominal'/>
         </datasource-dependencies>
-        <aggregation value='false'/>
+        <aggregation value='true'/>
       </view>
       <style/>
       <panes>
@@ -1733,23 +1949,29 @@
           </view>
           <mark class='Bar'/>
     <encodings>
-      <text column='[monitoring_sessions].[session_id]'/>
+      <text column='[monitoring_sessions].[cnt:session_id:qk]'/>
     </encodings>
           <style/>
         </pane>
       </panes>
-      <rows>[monitoring_sessions].[session_id]</rows>
-      <cols>[monitoring_sessions].[cri_level]</cols>
+      <rows>[monitoring_sessions].[cnt:session_id:qk]</rows>
+      <cols>[monitoring_sessions].[none:cri_level:nk]</cols>
     </table>
+    <simple-id uuid='9dd8b3ce-bead-5949-84ea-20cdd86191db'/>
   </worksheet>
   <worksheet name='Quality Waste Index Trend'>
     <table>
-        <view dim-percentage='0.5' measure-percentage='0.5' dim-ordering='alphabetic' measure-ordering='alphabetic'>
+      <view>
+        <datasources>
+          <datasource caption='KPI Monthly Timeseries (derived)' name='kpi_monthly'/>
+        </datasources>
         <datasource-dependencies datasource='kpi_monthly'>
         <column datatype='real' name='[avg_cognitive_waste_index]' role='measure' type='quantitative'/>
+        <column-instance column='[avg_cognitive_waste_index]' derivation='Avg' name='[avg:avg_cognitive_waste_index:qk]' pivot='key' type='quantitative'/>
         <column datatype='string' name='[month]' role='dimension' type='nominal'/>
+        <column-instance column='[month]' derivation='None' name='[none:month:nk]' pivot='key' type='nominal'/>
         </datasource-dependencies>
-        <aggregation value='false'/>
+        <aggregation value='true'/>
       </view>
       <style/>
       <panes>
@@ -1759,23 +1981,29 @@
           </view>
           <mark class='Line'/>
     <encodings>
-      <text column='[kpi_monthly].[avg_cognitive_waste_index]'/>
+      <text column='[kpi_monthly].[avg:avg_cognitive_waste_index:qk]'/>
     </encodings>
           <style/>
         </pane>
       </panes>
-      <rows>[kpi_monthly].[avg_cognitive_waste_index]</rows>
-      <cols>[kpi_monthly].[month]</cols>
+      <rows>[kpi_monthly].[avg:avg_cognitive_waste_index:qk]</rows>
+      <cols>[kpi_monthly].[none:month:nk]</cols>
     </table>
+    <simple-id uuid='7395e244-2e38-5583-b0a7-a7d23e184e91'/>
   </worksheet>
   <worksheet name='Quality CRI Trend'>
     <table>
-        <view dim-percentage='0.5' measure-percentage='0.5' dim-ordering='alphabetic' measure-ordering='alphabetic'>
+      <view>
+        <datasources>
+          <datasource caption='KPI Monthly Timeseries (derived)' name='kpi_monthly'/>
+        </datasources>
         <datasource-dependencies datasource='kpi_monthly'>
         <column datatype='real' name='[avg_cri]' role='measure' type='quantitative'/>
+        <column-instance column='[avg_cri]' derivation='Avg' name='[avg:avg_cri:qk]' pivot='key' type='quantitative'/>
         <column datatype='string' name='[month]' role='dimension' type='nominal'/>
+        <column-instance column='[month]' derivation='None' name='[none:month:nk]' pivot='key' type='nominal'/>
         </datasource-dependencies>
-        <aggregation value='false'/>
+        <aggregation value='true'/>
       </view>
       <style/>
       <panes>
@@ -1785,23 +2013,29 @@
           </view>
           <mark class='Line'/>
     <encodings>
-      <text column='[kpi_monthly].[avg_cri]'/>
+      <text column='[kpi_monthly].[avg:avg_cri:qk]'/>
     </encodings>
           <style/>
         </pane>
       </panes>
-      <rows>[kpi_monthly].[avg_cri]</rows>
-      <cols>[kpi_monthly].[month]</cols>
+      <rows>[kpi_monthly].[avg:avg_cri:qk]</rows>
+      <cols>[kpi_monthly].[none:month:nk]</cols>
     </table>
+    <simple-id uuid='ce63b38b-ddff-561b-b87d-5046fe7f8e55'/>
   </worksheet>
   <worksheet name='Quality Security Events Trend'>
     <table>
-        <view dim-percentage='0.5' measure-percentage='0.5' dim-ordering='alphabetic' measure-ordering='alphabetic'>
+      <view>
+        <datasources>
+          <datasource caption='KPI Monthly Timeseries (derived)' name='kpi_monthly'/>
+        </datasources>
         <datasource-dependencies datasource='kpi_monthly'>
-        <column datatype='string' name='[month]' role='dimension' type='nominal'/>
         <column datatype='real' name='[security_events_per_100_sessions]' role='measure' type='quantitative'/>
+        <column-instance column='[security_events_per_100_sessions]' derivation='Avg' name='[avg:security_events_per_100_sessions:qk]' pivot='key' type='quantitative'/>
+        <column datatype='string' name='[month]' role='dimension' type='nominal'/>
+        <column-instance column='[month]' derivation='None' name='[none:month:nk]' pivot='key' type='nominal'/>
         </datasource-dependencies>
-        <aggregation value='false'/>
+        <aggregation value='true'/>
       </view>
       <style/>
       <panes>
@@ -1811,23 +2045,29 @@
           </view>
           <mark class='Line'/>
     <encodings>
-      <text column='[kpi_monthly].[security_events_per_100_sessions]'/>
+      <text column='[kpi_monthly].[avg:security_events_per_100_sessions:qk]'/>
     </encodings>
           <style/>
         </pane>
       </panes>
-      <rows>[kpi_monthly].[security_events_per_100_sessions]</rows>
-      <cols>[kpi_monthly].[month]</cols>
+      <rows>[kpi_monthly].[avg:security_events_per_100_sessions:qk]</rows>
+      <cols>[kpi_monthly].[none:month:nk]</cols>
     </table>
+    <simple-id uuid='1d1bfffe-637b-5dd2-97dc-f2789e0a7d5c'/>
   </worksheet>
   <worksheet name='Quality Efficiency Ratio Trend'>
     <table>
-        <view dim-percentage='0.5' measure-percentage='0.5' dim-ordering='alphabetic' measure-ordering='alphabetic'>
+      <view>
+        <datasources>
+          <datasource caption='KPI Monthly Timeseries (derived)' name='kpi_monthly'/>
+        </datasources>
         <datasource-dependencies datasource='kpi_monthly'>
         <column datatype='real' name='[avg_efficiency_ratio]' role='measure' type='quantitative'/>
+        <column-instance column='[avg_efficiency_ratio]' derivation='Avg' name='[avg:avg_efficiency_ratio:qk]' pivot='key' type='quantitative'/>
         <column datatype='string' name='[month]' role='dimension' type='nominal'/>
+        <column-instance column='[month]' derivation='None' name='[none:month:nk]' pivot='key' type='nominal'/>
         </datasource-dependencies>
-        <aggregation value='false'/>
+        <aggregation value='true'/>
       </view>
       <style/>
       <panes>
@@ -1837,14 +2077,15 @@
           </view>
           <mark class='Line'/>
     <encodings>
-      <text column='[kpi_monthly].[avg_efficiency_ratio]'/>
+      <text column='[kpi_monthly].[avg:avg_efficiency_ratio:qk]'/>
     </encodings>
           <style/>
         </pane>
       </panes>
-      <rows>[kpi_monthly].[avg_efficiency_ratio]</rows>
-      <cols>[kpi_monthly].[month]</cols>
+      <rows>[kpi_monthly].[avg:avg_efficiency_ratio:qk]</rows>
+      <cols>[kpi_monthly].[none:month:nk]</cols>
     </table>
+    <simple-id uuid='db8e7066-7142-53b3-8c44-8b407f96a793'/>
   </worksheet>
   </worksheets>
   <dashboards>
