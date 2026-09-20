@@ -1,0 +1,5 @@
+stage_order,stage_name,users,description,conversion_from_previous_pct,conversion_from_top_pct,median_days_from_previous,dropoff_from_previous
+1,1. Website Visit,20731,Unique visitor lands on monitr.ai marketing site (tracked via GA4 gtag user-id),100.0,100.0,0,0
+2,2. Signup (Account Created),1440,Visitor creates account on /auth (Firebase auth record created),6.95,6.95,0,19291
+3,3. API Key Connected,964,User connects an LLM provider key on /key (Convex apiConfigs row created),66.94,4.65,1,476
+4,4. Activation (First Monitoring Session),813,User starts a monitoring session on /dashboard within 7 days of connecting a key,84.34,3.92,0,151
