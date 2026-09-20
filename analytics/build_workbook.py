@@ -131,11 +131,11 @@ def worksheet_xml(name, ds, rows, cols, mark="Automatic", enc_color=None,
     encs = ("\n    <encodings>\n" + "\n".join(parts) + "\n    </encodings>") if parts else ""
     return f"""  <worksheet name='{escape(name)}'>
     <table>
-      <view>
+        <view dim-percentage='0.5' measure-percentage='0.5' dim-ordering='alphabetic' measure-ordering='alphabetic'>
         <datasource-dependencies datasource='{ds}'>
 {dep_cols(ds, used)}
         </datasource-dependencies>
-        <aggregation value='DatatypeSpecific'/>
+        <aggregation value='false'/>
       </view>
       <style/>
       <panes>
@@ -150,12 +150,13 @@ def worksheet_xml(name, ds, rows, cols, mark="Automatic", enc_color=None,
       <rows>{" / ".join(rows)}</rows>
       <cols>{" / ".join(cols)}</cols>
     </table>
-    <simple-id uuid='{{{uuid.uuid4()}}}'/>
   </worksheet>"""
 
 # ------------------------------------------------------------- sheet defs
 def F(ds, f, agg=None):
-    return f"{agg + '(' if agg else ''}[{ds}].[{f}]{')' if agg else ''}"
+    # Tableau shelf expressions are field references; aggregate behavior is
+    # stored in the view/pane metadata, not as SQL-like SUM(...) text.
+    return f"[{ds}].[{f}]"
 
 SHEETS = []
 def sheet(name, **kw):
@@ -309,16 +310,14 @@ def lay(rows):
     return "\n".join(out)
 
 def dashboard_xml(name, rows_xml, px_h=1200):
-    return f"""  <dashboard name='{escape(name)}' type='devicemocked'>
+    return f"""  <dashboard name='{escape(name)}'>
     <style/>
-    <size maxheight='{px_h}' maxwidth='1600' minheight='{px_h}' minwidth='1600' type='fixed' sizing-initially-hidden='true'/>
+    <size maxheight='{px_h}' maxwidth='1600' minheight='{px_h}' minwidth='1600'/>
     <zones>
       <zone h='100000' id='2' type-v2='layout-basic' w='100000' x='0' y='0'>
 {rows_xml}
       </zone>
     </zones>
-    <devicelayouts/>
-    <simple-id uuid='{{{uuid.uuid4()}}}'/>
   </dashboard>"""
 
 A = S["aug"]
@@ -470,7 +469,6 @@ def build(packaged):
             f"  <datasources>\n{datasources}\n  </datasources>\n"
             f"  <worksheets>\n{WORKSHEETS}\n  </worksheets>\n"
             f"  <dashboards>\n{DASHES}\n  </dashboards>\n"
-            f"{WINDOWS}\n"
             f"</workbook>")
 
 twb = build(packaged=False)
