@@ -860,7 +860,6 @@
       <rows>[kpi_monthly].[sum:mau:qk]</rows>
       <cols>[kpi_monthly].[none:month:nk]</cols>
     </table>
-    <simple-id uuid='4c7e5398-cabc-5f91-a380-df39479825ee'/>
   </worksheet>
   <worksheet name='KPI North Star WOU Trend'>
     <table>
@@ -892,7 +891,6 @@
       <rows>[kpi_monthly].[sum:wau_avg:qk]</rows>
       <cols>[kpi_monthly].[none:month:nk]</cols>
     </table>
-    <simple-id uuid='a5cd0fa3-5ec6-5352-9273-8029ace0705e'/>
   </worksheet>
   <worksheet name='KPI Key Connections Trend'>
     <table>
@@ -924,7 +922,6 @@
       <rows>[kpi_monthly].[sum:api_keys_connected:qk]</rows>
       <cols>[kpi_monthly].[none:month:nk]</cols>
     </table>
-    <simple-id uuid='a8c0a973-cb7e-56ec-88c7-0e42d2976d0e'/>
   </worksheet>
   <worksheet name='KPI Power Users Trend'>
     <table>
@@ -956,7 +953,6 @@
       <rows>[kpi_monthly].[sum:power_users:qk]</rows>
       <cols>[kpi_monthly].[none:month:nk]</cols>
     </table>
-    <simple-id uuid='acde67b1-8c8b-5137-95fa-bcaf866efc5f'/>
   </worksheet>
   <worksheet name='KPI Sessions Trend'>
     <table>
@@ -988,7 +984,6 @@
       <rows>[kpi_monthly].[sum:total_sessions:qk]</rows>
       <cols>[kpi_monthly].[none:month:nk]</cols>
     </table>
-    <simple-id uuid='164edbff-85df-521d-9781-3f83cdb989b4'/>
   </worksheet>
   <worksheet name='KPI Tokens Monitored Trend'>
     <table>
@@ -1020,7 +1015,6 @@
       <rows>[kpi_monthly].[sum:total_tokens_millions:qk]</rows>
       <cols>[kpi_monthly].[none:month:nk]</cols>
     </table>
-    <simple-id uuid='e3fd94dc-687f-5c4f-919b-b303897a8374'/>
   </worksheet>
   <worksheet name='KPI Activation Rate Trend'>
     <table>
@@ -1052,7 +1046,6 @@
       <rows>[kpi_monthly].[avg:activation_rate_pct:qk]</rows>
       <cols>[kpi_monthly].[none:month:nk]</cols>
     </table>
-    <simple-id uuid='ae80cc9b-0869-527f-9358-bbefa8df8b21'/>
   </worksheet>
   <worksheet name='KPI Visitor to Signup CVR Trend'>
     <table>
@@ -1084,7 +1077,6 @@
       <rows>[kpi_monthly].[avg:visitor_to_signup_cvr_pct:qk]</rows>
       <cols>[kpi_monthly].[none:month:nk]</cols>
     </table>
-    <simple-id uuid='581cc783-bd91-5d72-9c5d-914dd6d04580'/>
   </worksheet>
   <worksheet name='KPI W4 Retention Trend'>
     <table>
@@ -1116,7 +1108,6 @@
       <rows>[kpi_monthly].[avg:w4_retention_pct:qk]</rows>
       <cols>[kpi_monthly].[none:month:nk]</cols>
     </table>
-    <simple-id uuid='7f70f9a6-f68d-5b75-a340-58ea73e7e7d7'/>
   </worksheet>
   <worksheet name='KPI Next Month Return Rate Trend'>
     <table>
@@ -1148,7 +1139,6 @@
       <rows>[kpi_monthly].[avg:next_month_return_rate_pct:qk]</rows>
       <cols>[kpi_monthly].[none:month:nk]</cols>
     </table>
-    <simple-id uuid='868f2c84-0206-57b0-a38d-dffe1bd91191'/>
   </worksheet>
   <worksheet name='KPI Invite Referral Share Trend'>
     <table>
@@ -1180,7 +1170,6 @@
       <rows>[kpi_monthly].[avg:invite_referral_share_pct:qk]</rows>
       <cols>[kpi_monthly].[none:month:nk]</cols>
     </table>
-    <simple-id uuid='177cebe6-c949-5196-be94-5e8b946fd921'/>
   </worksheet>
   <worksheet name='KPI Signups Trend'>
     <table>
@@ -1212,7 +1201,6 @@
       <rows>[kpi_monthly].[sum:new_signups:qk]</rows>
       <cols>[kpi_monthly].[none:month:nk]</cols>
     </table>
-    <simple-id uuid='c08c896e-706d-5ec9-b231-8aab36fa911b'/>
   </worksheet>
   <worksheet name='KPI Sessions By Location'>
     <table>
@@ -1246,7 +1234,6 @@
       <rows>[kpi_monthly_by_location].[sum:total_sessions:qk]</rows>
       <cols>[kpi_monthly_by_location].[none:month:nk]</cols>
     </table>
-    <simple-id uuid='cad7e213-dcbf-5c0f-a698-2e2aabf7ec01'/>
   </worksheet>
   <worksheet name='KPI Activation By Location'>
     <table>
@@ -1280,7 +1267,6 @@
       <rows>[kpi_monthly_by_location].[avg:activation_rate_pct:qk]</rows>
       <cols>[kpi_monthly_by_location].[none:month:nk]</cols>
     </table>
-    <simple-id uuid='0b2e472f-7eae-5ae9-91a3-7accfa00544b'/>
   </worksheet>
   <worksheet name='KPI MAU By Location'>
     <table>
@@ -1314,7 +1300,6 @@
       <rows>[kpi_monthly_by_location].[sum:mau:qk]</rows>
       <cols>[kpi_monthly_by_location].[none:month:nk]</cols>
     </table>
-    <simple-id uuid='ed42bf41-1191-5a1e-8db4-1d9d042f2c95'/>
   </worksheet>
   <worksheet name='Funnel Stage Volumes'>
     <table>
@@ -1346,7 +1331,6 @@
       <rows>[funnel_overall].[sum:users:qk]</rows>
       <cols>[funnel_overall].[none:stage_name:nk]</cols>
     </table>
-    <simple-id uuid='3a375399-ebf1-5abc-b9ac-e7f99f9655ef'/>
   </worksheet>
   <worksheet name='Funnel Conversion From Previous'>
     <table>
@@ -1378,7 +1362,6 @@
       <rows>[funnel_overall].[avg:conversion_from_previous_pct:qk]</rows>
       <cols>[funnel_overall].[none:stage_name:nk]</cols>
     </table>
-    <simple-id uuid='eb30acb1-8254-5aab-86c2-5cfea35d265c'/>
   </worksheet>
   <worksheet name='Funnel Median Days Between Stages'>
     <table>
@@ -1410,7 +1393,6 @@
       <rows>[funnel_overall].[avg:median_days_from_previous:qk]</rows>
       <cols>[funnel_overall].[none:stage_name:nk]</cols>
     </table>
-    <simple-id uuid='eba0a8b6-d18b-5d72-ab40-56338934d29e'/>
   </worksheet>
   <worksheet name='Funnel By Channel'>
     <table>
@@ -1444,7 +1426,6 @@
       <rows>[funnel_by_channel].[sum:users:qk]</rows>
       <cols>[funnel_by_channel].[none:stage_name:nk]</cols>
     </table>
-    <simple-id uuid='87bde5fd-5981-53a8-b6f1-7d013c437fac'/>
   </worksheet>
   <worksheet name='Funnel By Location'>
     <table>
@@ -1478,7 +1459,6 @@
       <rows>[funnel_by_location].[sum:users:qk]</rows>
       <cols>[funnel_by_location].[none:stage_name:nk]</cols>
     </table>
-    <simple-id uuid='f2a7b58d-7c84-5269-b4a7-e1267110dfd0'/>
   </worksheet>
   <worksheet name='Behaviour Signups By Channel'>
     <table>
@@ -1510,7 +1490,6 @@
       <rows>[user_signups].[cnt:user_id:qk]</rows>
       <cols>[user_signups].[none:acquisition_channel:nk]</cols>
     </table>
-    <simple-id uuid='a47f2ead-f678-5995-ba96-55d357ae1d84'/>
   </worksheet>
   <worksheet name='Behaviour Users By Persona'>
     <table>
@@ -1542,7 +1521,6 @@
       <rows>[user_signups].[cnt:user_id:qk]</rows>
       <cols>[user_signups].[none:persona:nk]</cols>
     </table>
-    <simple-id uuid='04ec6076-78d0-545d-ba7e-7a475a854f15'/>
   </worksheet>
   <worksheet name='Behaviour Activation Rate By Persona'>
     <table>
@@ -1574,7 +1552,6 @@
       <rows>[user_signups].[avg:activated_within_7d_flag:qk]</rows>
       <cols>[user_signups].[none:persona:nk]</cols>
     </table>
-    <simple-id uuid='696dbb50-e601-5c3c-a0e8-aff68790fe13'/>
   </worksheet>
   <worksheet name='Behaviour Signups By Use Case'>
     <table>
@@ -1606,7 +1583,6 @@
       <rows>[user_signups].[cnt:user_id:qk]</rows>
       <cols>[user_signups].[none:primary_use_case:nk]</cols>
     </table>
-    <simple-id uuid='4a052fcb-84d4-5fb2-ab2a-d280101265e0'/>
   </worksheet>
   <worksheet name='Behaviour Signups By Program'>
     <table>
@@ -1638,7 +1614,6 @@
       <rows>[user_signups].[cnt:user_id:qk]</rows>
       <cols>[user_signups].[none:signup_program:nk]</cols>
     </table>
-    <simple-id uuid='e5ee60d4-5038-5a23-b98f-32ae10eab310'/>
   </worksheet>
   <worksheet name='Behaviour Users By Location'>
     <table>
@@ -1670,7 +1645,6 @@
       <rows>[user_signups].[cnt:user_id:qk]</rows>
       <cols>[user_signups].[none:collection_location:nk]</cols>
     </table>
-    <simple-id uuid='fb8c43cd-61cf-5e2b-a751-a2e365f451b3'/>
   </worksheet>
   <worksheet name='Behaviour Activation Rate By Location'>
     <table>
@@ -1702,7 +1676,6 @@
       <rows>[user_signups].[avg:activated_within_7d_flag:qk]</rows>
       <cols>[user_signups].[none:collection_location:nk]</cols>
     </table>
-    <simple-id uuid='79d29b42-143f-59ad-99f3-386c5d1625f0'/>
   </worksheet>
   <worksheet name='Behaviour Onboarding Rate By Location'>
     <table>
@@ -1734,7 +1707,6 @@
       <rows>[user_signups].[avg:onboarding_completed_flag:qk]</rows>
       <cols>[user_signups].[none:collection_location:nk]</cols>
     </table>
-    <simple-id uuid='2499050c-cebb-5d4f-a675-2941936bd667'/>
   </worksheet>
   <worksheet name='Behaviour Inactivity Rate By Location'>
     <table>
@@ -1766,7 +1738,6 @@
       <rows>[user_signups].[avg:inactive_30d_flag:qk]</rows>
       <cols>[user_signups].[none:collection_location:nk]</cols>
     </table>
-    <simple-id uuid='8524c3b3-5384-5e35-8b98-54bb7586ede6'/>
   </worksheet>
   <worksheet name='Behaviour Feature Adoption All'>
     <table>
@@ -1798,7 +1769,6 @@
       <rows>[feature_adoption_overall].[sum:adoption_pct:qk]</rows>
       <cols>[feature_adoption_overall].[none:feature_name:nk]</cols>
     </table>
-    <simple-id uuid='83610f15-63b1-5a0e-b106-05afb7d8e3af'/>
   </worksheet>
   <worksheet name='Behaviour Feature Adoption By Persona'>
     <table>
@@ -1829,7 +1799,6 @@
       <rows>[feature_adoption_by_persona].[sum:adoption_pct:qk]</rows>
       <cols>([feature_adoption_by_persona].[none:feature_name:nk] / [feature_adoption_by_persona].[none:persona:nk])</cols>
     </table>
-    <simple-id uuid='d6daee7c-a0c5-5ccc-8f80-92cf22baf0d9'/>
   </worksheet>
   <worksheet name='Behaviour Sessions By Hour'>
     <table>
@@ -1858,7 +1827,6 @@
       <rows>[monitoring_sessions].[cnt:session_id:qk]</rows>
       <cols>[monitoring_sessions].[none:start_hour_utc:nk]</cols>
     </table>
-    <simple-id uuid='4f283859-53c6-5e5c-a4d9-f4767bac4db3'/>
   </worksheet>
   <worksheet name='Behaviour Retention Cohort Heatmap'>
     <table>
@@ -1893,7 +1861,6 @@
       <rows>[retention_cohorts].[none:cohort_month:nk]</rows>
       <cols>[retention_cohorts].[none:week_number:nk]</cols>
     </table>
-    <simple-id uuid='b0994cee-b750-5eed-be60-76cbb7b3855c'/>
   </worksheet>
   <worksheet name='Quality Provider Token Mix'>
     <table>
@@ -1925,7 +1892,6 @@
       <rows>[monitoring_sessions].[sum:total_tokens:qk]</rows>
       <cols>[monitoring_sessions].[none:provider:nk]</cols>
     </table>
-    <simple-id uuid='09240d03-961d-5d3f-9f6d-afb5b2810691'/>
   </worksheet>
   <worksheet name='Quality CRI Level Mix'>
     <table>
@@ -1957,7 +1923,6 @@
       <rows>[monitoring_sessions].[cnt:session_id:qk]</rows>
       <cols>[monitoring_sessions].[none:cri_level:nk]</cols>
     </table>
-    <simple-id uuid='9dd8b3ce-bead-5949-84ea-20cdd86191db'/>
   </worksheet>
   <worksheet name='Quality Waste Index Trend'>
     <table>
@@ -1989,7 +1954,6 @@
       <rows>[kpi_monthly].[avg:avg_cognitive_waste_index:qk]</rows>
       <cols>[kpi_monthly].[none:month:nk]</cols>
     </table>
-    <simple-id uuid='7395e244-2e38-5583-b0a7-a7d23e184e91'/>
   </worksheet>
   <worksheet name='Quality CRI Trend'>
     <table>
@@ -2021,7 +1985,6 @@
       <rows>[kpi_monthly].[avg:avg_cri:qk]</rows>
       <cols>[kpi_monthly].[none:month:nk]</cols>
     </table>
-    <simple-id uuid='ce63b38b-ddff-561b-b87d-5046fe7f8e55'/>
   </worksheet>
   <worksheet name='Quality Security Events Trend'>
     <table>
@@ -2053,7 +2016,6 @@
       <rows>[kpi_monthly].[avg:security_events_per_100_sessions:qk]</rows>
       <cols>[kpi_monthly].[none:month:nk]</cols>
     </table>
-    <simple-id uuid='1d1bfffe-637b-5dd2-97dc-f2789e0a7d5c'/>
   </worksheet>
   <worksheet name='Quality Efficiency Ratio Trend'>
     <table>
@@ -2085,7 +2047,6 @@
       <rows>[kpi_monthly].[avg:avg_efficiency_ratio:qk]</rows>
       <cols>[kpi_monthly].[none:month:nk]</cols>
     </table>
-    <simple-id uuid='db8e7066-7142-53b3-8c44-8b407f96a793'/>
   </worksheet>
   </worksheets>
   <dashboards>

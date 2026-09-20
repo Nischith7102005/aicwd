@@ -20,7 +20,7 @@ anywhere. All sheets are pure KPI & user-analytics.
     5 Data Collection         - sources (4 places + 2 locations), methods,
                                 relevance
 """
-import csv, json, os, re, uuid, zipfile
+import csv, json, os, re, zipfile
 from xml.sax.saxutils import escape
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -167,7 +167,6 @@ def worksheet_xml(name, ds, rows, cols, mark="Automatic", enc_color=None,
     if enc_text:
         parts.append(f"      <text column='{enc_text}'/>")
     encs = ("\n    <encodings>\n" + "\n".join(parts) + "\n    </encodings>") if parts else ""
-    uid = str(uuid.uuid5(uuid.NAMESPACE_URL, f"sheet:{name}"))
     rows_x, cols_x = _shelf_join(rows), _shelf_join(cols)
     return f"""  <worksheet name='{escape(name)}'>
     <table>
@@ -193,7 +192,6 @@ def worksheet_xml(name, ds, rows, cols, mark="Automatic", enc_color=None,
       <rows>{rows_x}</rows>
       <cols>{cols_x}</cols>
     </table>
-    <simple-id uuid='{uid}'/>
   </worksheet>"""
 
 # ------------------------------------------------------------- sheet defs
