@@ -1,0 +1,9 @@
+collection_location,stage_order,stage_name,users,conversion_from_previous_pct,conversion_from_top_pct
+DSU Campus,1,1. Website Visit,6169,100.0,100.0
+DSU Campus,2,2. Signup (Account Created),452,7.33,7.33
+DSU Campus,3,3. API Key Connected,275,60.84,4.46
+DSU Campus,4,4. Activation (First Monitoring Session),226,82.18,3.66
+Outside Campus,1,1. Website Visit,14562,100.0,100.0
+Outside Campus,2,2. Signup (Account Created),988,6.78,6.78
+Outside Campus,3,3. API Key Connected,689,69.74,4.73
+Outside Campus,4,4. Activation (First Monitoring Session),587,85.2,4.03

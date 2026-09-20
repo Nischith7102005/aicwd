@@ -1,0 +1,33 @@
+acquisition_channel,stage_order,stage_name,users,conversion_from_previous_pct,conversion_from_top_pct
+organic_search,1,1. Website Visit,4774,100.0,100.0
+organic_search,2,2. Signup (Account Created),273,5.72,5.72
+organic_search,3,3. API Key Connected,180,65.93,3.77
+organic_search,4,4. Activation (First Monitoring Session),157,87.22,3.29
+direct,1,1. Website Visit,3136,100.0,100.0
+direct,2,2. Signup (Account Created),217,6.92,6.92
+direct,3,3. API Key Connected,137,63.13,4.37
+direct,4,4. Activation (First Monitoring Session),110,80.29,3.51
+social_twitter,1,1. Website Visit,2886,100.0,100.0
+social_twitter,2,2. Signup (Account Created),153,5.3,5.3
+social_twitter,3,3. API Key Connected,102,66.67,3.53
+social_twitter,4,4. Activation (First Monitoring Session),88,86.27,3.05
+hackernews,1,1. Website Visit,1853,100.0,100.0
+hackernews,2,2. Signup (Account Created),145,7.83,7.83
+hackernews,3,3. API Key Connected,99,68.28,5.34
+hackernews,4,4. Activation (First Monitoring Session),83,83.84,4.48
+linkedin,1,1. Website Visit,1985,100.0,100.0
+linkedin,2,2. Signup (Account Created),147,7.41,7.41
+linkedin,3,3. API Key Connected,95,64.63,4.79
+linkedin,4,4. Activation (First Monitoring Session),78,82.11,3.93
+referral,1,1. Website Visit,2506,100.0,100.0
+referral,2,2. Signup (Account Created),235,9.38,9.38
+referral,3,3. API Key Connected,149,63.4,5.95
+referral,4,4. Activation (First Monitoring Session),124,83.22,4.95
+newsletter,1,1. Website Visit,1845,100.0,100.0
+newsletter,2,2. Signup (Account Created),166,9.0,9.0
+newsletter,3,3. API Key Connected,123,74.1,6.67
+newsletter,4,4. Activation (First Monitoring Session),105,85.37,5.69
+paid_search,1,1. Website Visit,1746,100.0,100.0
+paid_search,2,2. Signup (Account Created),104,5.96,5.96
+paid_search,3,3. API Key Connected,79,75.96,4.52
+paid_search,4,4. Activation (First Monitoring Session),68,86.08,3.89

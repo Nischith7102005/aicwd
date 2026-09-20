@@ -1,0 +1,6 @@
+persona,feature_key,feature_name,feature_description,users_used,activated_users_in_scope,adoption_pct
+ALL,adversarial_test_used,Adversarial / Red-Team Tests,Probing models with uncensored LLM for bias & censorship detection,500,813,61.5
+ALL,batch_comparison_used,Batch Model Comparisons,Run same prompt across multiple providers and diff results,573,813,70.5
+ALL,csv_export_used,Telemetry CSV Export,Export raw telemetry for external analysis,613,813,75.4
+ALL,custom_alerts_used,Custom CRI Alerts,Threshold alerts on Cognitive Risk Index,536,813,65.9
+ALL,stress_test_used,Stress Test Suites,Structured stress-testing of connected models,488,813,60.0

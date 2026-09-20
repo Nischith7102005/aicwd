@@ -1,0 +1,2078 @@
+<?xml version='1.0' encoding='utf-8'?>
+<workbook source-build='20232.23.1120.1144' source-platform='any' version='18.1' xmlns:user='http://www.tableausoftware.com/xml/user'>
+  <preferences>
+    <preference name='ui.encoding.shelf.height' value='24'/>
+    <preference name='ui.shelf' value='show'/>
+    <preference name='ui.started.showing' value='welcome'/>
+  </preferences>
+  <datasources>
+  <datasource caption='P1 Web Visitors (GA4 landing-site analytics)' inline='true' name='web_visitors' version='18.1'>
+    <connection class='textfile' directory='data' filename='web_visitors.csv' password='' server=''>
+      <relation name='web_visitors.csv' table='[web_visitors#csv]' type='table'>
+        <columns character-set='UTF-8' header='yes' locale='en_US' separator=','>
+        <column datatype='string' name='visitor_id' ordinal='0'/>
+        <column datatype='date' name='first_visit_date' ordinal='1'/>
+        <column datatype='string' name='collection_location' ordinal='2'/>
+        <column datatype='string' name='acquisition_channel' ordinal='3'/>
+        <column datatype='string' name='utm_source' ordinal='4'/>
+        <column datatype='string' name='utm_medium' ordinal='5'/>
+        <column datatype='string' name='utm_campaign' ordinal='6'/>
+        <column datatype='string' name='landing_page' ordinal='7'/>
+        <column datatype='string' name='referrer_domain' ordinal='8'/>
+        <column datatype='string' name='device_category' ordinal='9'/>
+        <column datatype='string' name='device_os' ordinal='10'/>
+        <column datatype='string' name='browser' ordinal='11'/>
+        <column datatype='string' name='country' ordinal='12'/>
+        <column datatype='string' name='region' ordinal='13'/>
+        <column datatype='string' name='city' ordinal='14'/>
+        <column datatype='string' name='language' ordinal='15'/>
+        <column datatype='integer' name='visit_count' ordinal='16'/>
+        <column datatype='integer' name='is_returning_visitor' ordinal='17'/>
+        <column datatype='integer' name='pageviews_total' ordinal='18'/>
+        <column datatype='real' name='pages_per_session' ordinal='19'/>
+        <column datatype='integer' name='session_count' ordinal='20'/>
+        <column datatype='integer' name='avg_session_duration_sec' ordinal='21'/>
+        <column datatype='integer' name='total_time_on_site_sec' ordinal='22'/>
+        <column datatype='integer' name='bounced_flag' ordinal='23'/>
+        <column datatype='integer' name='viewed_pricing_flag' ordinal='24'/>
+        <column datatype='integer' name='viewed_docs_flag' ordinal='25'/>
+        <column datatype='integer' name='viewed_demo_flag' ordinal='26'/>
+        <column datatype='integer' name='cta_getstarted_clicked' ordinal='27'/>
+        <column datatype='integer' name='signed_up_flag' ordinal='28'/>
+        <column datatype='string' name='signup_user_id' ordinal='29'/>
+        <column datatype='integer' name='days_to_signup' ordinal='30'/>
+        <column datatype='string' name='cohort_week' ordinal='31'/>
+        </columns>
+      </relation>
+    </connection>
+    <aliases enabled='yes'/>
+    <column datatype='string' caption='visitor id' name='[visitor_id]' role='dimension' type='nominal'/>
+    <column datatype='date' caption='first visit date' name='[first_visit_date]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='collection location' name='[collection_location]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='acquisition channel' name='[acquisition_channel]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='utm source' name='[utm_source]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='utm medium' name='[utm_medium]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='utm campaign' name='[utm_campaign]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='landing page' name='[landing_page]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='referrer domain' name='[referrer_domain]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='device category' name='[device_category]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='device os' name='[device_os]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='browser' name='[browser]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='country' name='[country]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='region' name='[region]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='city' name='[city]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='language' name='[language]' role='dimension' type='nominal'/>
+    <column datatype='integer' caption='visit count' name='[visit_count]' role='measure' type='quantitative'/>
+    <column datatype='integer' caption='is returning visitor' name='[is_returning_visitor]' role='measure' type='quantitative'/>
+    <column datatype='integer' caption='pageviews total' name='[pageviews_total]' role='measure' type='quantitative'/>
+    <column datatype='real' caption='pages per session' name='[pages_per_session]' role='measure' type='quantitative'/>
+    <column datatype='integer' caption='session count' name='[session_count]' role='measure' type='quantitative'/>
+    <column datatype='integer' caption='avg session duration sec' name='[avg_session_duration_sec]' role='measure' type='quantitative'/>
+    <column datatype='integer' caption='total time on site sec' name='[total_time_on_site_sec]' role='measure' type='quantitative'/>
+    <column datatype='integer' caption='bounced flag' name='[bounced_flag]' role='measure' type='quantitative'/>
+    <column datatype='integer' caption='viewed pricing flag' name='[viewed_pricing_flag]' role='measure' type='quantitative'/>
+    <column datatype='integer' caption='viewed docs flag' name='[viewed_docs_flag]' role='measure' type='quantitative'/>
+    <column datatype='integer' caption='viewed demo flag' name='[viewed_demo_flag]' role='measure' type='quantitative'/>
+    <column datatype='integer' caption='cta getstarted clicked' name='[cta_getstarted_clicked]' role='measure' type='quantitative'/>
+    <column datatype='integer' caption='signed up flag' name='[signed_up_flag]' role='measure' type='quantitative'/>
+    <column datatype='string' caption='signup user id' name='[signup_user_id]' role='dimension' type='nominal'/>
+    <column datatype='integer' caption='days to signup' name='[days_to_signup]' role='measure' type='quantitative'/>
+    <column datatype='string' caption='cohort week' name='[cohort_week]' role='dimension' type='nominal'/>
+    <layout show-structure='true'/>
+  </datasource>
+  <datasource caption='P2 User Signups (Firebase auth records, free beta)' inline='true' name='user_signups' version='18.1'>
+    <connection class='textfile' directory='data' filename='user_signups.csv' password='' server=''>
+      <relation name='user_signups.csv' table='[user_signups#csv]' type='table'>
+        <columns character-set='UTF-8' header='yes' locale='en_US' separator=','>
+        <column datatype='string' name='user_id' ordinal='0'/>
+        <column datatype='string' name='anonymous_visitor_id' ordinal='1'/>
+        <column datatype='string' name='display_name' ordinal='2'/>
+        <column datatype='date' name='signup_date' ordinal='3'/>
+        <column datatype='string' name='signup_weekday' ordinal='4'/>
+        <column datatype='integer' name='signup_hour' ordinal='5'/>
+        <column datatype='string' name='cohort_month' ordinal='6'/>
+        <column datatype='string' name='email_domain_type' ordinal='7'/>
+        <column datatype='integer' name='email_verified_flag' ordinal='8'/>
+        <column datatype='string' name='persona' ordinal='9'/>
+        <column datatype='string' name='collection_location' ordinal='10'/>
+        <column datatype='string' name='signup_program' ordinal='11'/>
+        <column datatype='string' name='role_seniority' ordinal='12'/>
+        <column datatype='string' name='acquisition_channel' ordinal='13'/>
+        <column datatype='string' name='utm_source' ordinal='14'/>
+        <column datatype='string' name='utm_medium' ordinal='15'/>
+        <column datatype='string' name='utm_campaign' ordinal='16'/>
+        <column datatype='string' name='device_type_at_signup' ordinal='17'/>
+        <column datatype='string' name='country' ordinal='18'/>
+        <column datatype='string' name='region' ordinal='19'/>
+        <column datatype='string' name='industry' ordinal='20'/>
+        <column datatype='string' name='company_size' ordinal='21'/>
+        <column datatype='string' name='primary_use_case' ordinal='22'/>
+        <column datatype='integer' name='referral_flag' ordinal='23'/>
+        <column datatype='integer' name='invited_by_teammate_flag' ordinal='24'/>
+        <column datatype='integer' name='days_visit_to_signup' ordinal='25'/>
+        <column datatype='integer' name='onboarding_steps_completed' ordinal='26'/>
+        <column datatype='integer' name='onboarding_completed_flag' ordinal='27'/>
+        <column datatype='integer' name='api_key_connected_flag' ordinal='28'/>
+        <column datatype='date' name='first_config_date' ordinal='29'/>
+        <column datatype='integer' name='days_to_first_config' ordinal='30'/>
+        <column datatype='integer' name='activated_within_7d_flag' ordinal='31'/>
+        <column datatype='date' name='activation_date' ordinal='32'/>
+        <column datatype='integer' name='days_to_activate' ordinal='33'/>
+        <column datatype='integer' name='lifetime_days_active' ordinal='34'/>
+        <column datatype='integer' name='days_since_last_active' ordinal='35'/>
+        <column datatype='integer' name='inactive_30d_flag' ordinal='36'/>
+        <column datatype='integer' name='total_sessions' ordinal='37'/>
+        <column datatype='integer' name='total_tokens_used' ordinal='38'/>
+        <column datatype='real' name='total_llm_cost_usd' ordinal='39'/>
+        <column datatype='date' name='last_active_date' ordinal='40'/>
+        <column datatype='integer' name='power_user_flag' ordinal='41'/>
+        <column datatype='integer' name='nps_score' ordinal='42'/>
+        </columns>
+      </relation>
+    </connection>
+    <aliases enabled='yes'/>
+    <column datatype='string' caption='user id' name='[user_id]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='anonymous visitor id' name='[anonymous_visitor_id]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='display name' name='[display_name]' role='dimension' type='nominal'/>
+    <column datatype='date' caption='signup date' name='[signup_date]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='signup weekday' name='[signup_weekday]' role='dimension' type='nominal'/>
+    <column datatype='integer' caption='signup hour' name='[signup_hour]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='cohort month' name='[cohort_month]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='email domain type' name='[email_domain_type]' role='dimension' type='nominal'/>
+    <column datatype='integer' caption='email verified flag' name='[email_verified_flag]' role='measure' type='quantitative'/>
+    <column datatype='string' caption='persona' name='[persona]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='collection location' name='[collection_location]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='signup program' name='[signup_program]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='role seniority' name='[role_seniority]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='acquisition channel' name='[acquisition_channel]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='utm source' name='[utm_source]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='utm medium' name='[utm_medium]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='utm campaign' name='[utm_campaign]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='device type at signup' name='[device_type_at_signup]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='country' name='[country]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='region' name='[region]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='industry' name='[industry]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='company size' name='[company_size]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='primary use case' name='[primary_use_case]' role='dimension' type='nominal'/>
+    <column datatype='integer' caption='referral flag' name='[referral_flag]' role='measure' type='quantitative'/>
+    <column datatype='integer' caption='invited by teammate flag' name='[invited_by_teammate_flag]' role='measure' type='quantitative'/>
+    <column datatype='integer' caption='days visit to signup' name='[days_visit_to_signup]' role='measure' type='quantitative'/>
+    <column datatype='integer' caption='onboarding steps completed' name='[onboarding_steps_completed]' role='dimension' type='nominal'/>
+    <column datatype='integer' caption='onboarding completed flag' name='[onboarding_completed_flag]' role='measure' type='quantitative'/>
+    <column datatype='integer' caption='api key connected flag' name='[api_key_connected_flag]' role='measure' type='quantitative'/>
+    <column datatype='date' caption='first config date' name='[first_config_date]' role='dimension' type='nominal'/>
+    <column datatype='integer' caption='days to first config' name='[days_to_first_config]' role='measure' type='quantitative'/>
+    <column datatype='integer' caption='activated within 7d flag' name='[activated_within_7d_flag]' role='measure' type='quantitative'/>
+    <column datatype='date' caption='activation date' name='[activation_date]' role='dimension' type='nominal'/>
+    <column datatype='integer' caption='days to activate' name='[days_to_activate]' role='measure' type='quantitative'/>
+    <column datatype='integer' caption='lifetime days active' name='[lifetime_days_active]' role='measure' type='quantitative'/>
+    <column datatype='integer' caption='days since last active' name='[days_since_last_active]' role='measure' type='quantitative'/>
+    <column datatype='integer' caption='inactive 30d flag' name='[inactive_30d_flag]' role='measure' type='quantitative'/>
+    <column datatype='integer' caption='total sessions' name='[total_sessions]' role='measure' type='quantitative'/>
+    <column datatype='integer' caption='total tokens used' name='[total_tokens_used]' role='measure' type='quantitative'/>
+    <column datatype='real' caption='total llm cost usd' name='[total_llm_cost_usd]' role='measure' type='quantitative'/>
+    <column datatype='date' caption='last active date' name='[last_active_date]' role='dimension' type='nominal'/>
+    <column datatype='integer' caption='power user flag' name='[power_user_flag]' role='measure' type='quantitative'/>
+    <column datatype='integer' caption='nps score' name='[nps_score]' role='dimension' type='nominal'/>
+    <layout show-structure='true'/>
+  </datasource>
+  <datasource caption='P3 API Key Connections (Convex apiConfigs)' inline='true' name='api_key_configs' version='18.1'>
+    <connection class='textfile' directory='data' filename='api_key_configs.csv' password='' server=''>
+      <relation name='api_key_configs.csv' table='[api_key_configs#csv]' type='table'>
+        <columns character-set='UTF-8' header='yes' locale='en_US' separator=','>
+        <column datatype='string' name='config_id' ordinal='0'/>
+        <column datatype='string' name='user_id' ordinal='1'/>
+        <column datatype='string' name='collection_location' ordinal='2'/>
+        <column datatype='date' name='created_date' ordinal='3'/>
+        <column datatype='integer' name='days_since_signup' ordinal='4'/>
+        <column datatype='string' name='provider' ordinal='5'/>
+        <column datatype='string' name='model' ordinal='6'/>
+        <column datatype='string' name='connection_name' ordinal='7'/>
+        <column datatype='integer' name='is_primary_config' ordinal='8'/>
+        <column datatype='real' name='input_price_per_1m_usd' ordinal='9'/>
+        <column datatype='real' name='output_price_per_1m_usd' ordinal='10'/>
+        <column datatype='integer' name='monthly_budget_usd' ordinal='11'/>
+        <column datatype='integer' name='key_auto_detected_flag' ordinal='12'/>
+        <column datatype='integer' name='custom_base_url_flag' ordinal='13'/>
+        <column datatype='integer' name='validation_attempts' ordinal='14'/>
+        <column datatype='integer' name='validation_success_flag' ordinal='15'/>
+        <column datatype='integer' name='connection_latency_ms' ordinal='16'/>
+        <column datatype='string' name='config_status' ordinal='17'/>
+        <column datatype='integer' name='key_rotations' ordinal='18'/>
+        <column datatype='string' name='last_rotation_date' ordinal='19'/>
+        <column datatype='date' name='first_session_date' ordinal='20'/>
+        <column datatype='integer' name='days_to_first_session' ordinal='21'/>
+        <column datatype='integer' name='total_sessions' ordinal='22'/>
+        <column datatype='integer' name='total_interactions' ordinal='23'/>
+        <column datatype='integer' name='total_input_tokens' ordinal='24'/>
+        <column datatype='integer' name='total_output_tokens' ordinal='25'/>
+        <column datatype='real' name='total_llm_cost_usd' ordinal='26'/>
+        <column datatype='string' name='avg_efficiency_ratio' ordinal='27'/>
+        <column datatype='string' name='avg_waste_index' ordinal='28'/>
+        <column datatype='string' name='avg_cri' ordinal='29'/>
+        <column datatype='real' name='max_cri' ordinal='30'/>
+        <column datatype='integer' name='adversarial_tests_run' ordinal='31'/>
+        <column datatype='date' name='last_used_date' ordinal='32'/>
+        <column datatype='integer' name='config_age_days' ordinal='33'/>
+        </columns>
+      </relation>
+    </connection>
+    <aliases enabled='yes'/>
+    <column datatype='string' caption='config id' name='[config_id]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='user id' name='[user_id]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='collection location' name='[collection_location]' role='dimension' type='nominal'/>
+    <column datatype='date' caption='created date' name='[created_date]' role='dimension' type='nominal'/>
+    <column datatype='integer' caption='days since signup' name='[days_since_signup]' role='measure' type='quantitative'/>
+    <column datatype='string' caption='provider' name='[provider]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='model' name='[model]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='connection name' name='[connection_name]' role='dimension' type='nominal'/>
+    <column datatype='integer' caption='is primary config' name='[is_primary_config]' role='measure' type='quantitative'/>
+    <column datatype='real' caption='input price per 1m usd' name='[input_price_per_1m_usd]' role='measure' type='quantitative'/>
+    <column datatype='real' caption='output price per 1m usd' name='[output_price_per_1m_usd]' role='measure' type='quantitative'/>
+    <column datatype='integer' caption='monthly budget usd' name='[monthly_budget_usd]' role='measure' type='quantitative'/>
+    <column datatype='integer' caption='key auto detected flag' name='[key_auto_detected_flag]' role='measure' type='quantitative'/>
+    <column datatype='integer' caption='custom base url flag' name='[custom_base_url_flag]' role='measure' type='quantitative'/>
+    <column datatype='integer' caption='validation attempts' name='[validation_attempts]' role='measure' type='quantitative'/>
+    <column datatype='integer' caption='validation success flag' name='[validation_success_flag]' role='measure' type='quantitative'/>
+    <column datatype='integer' caption='connection latency ms' name='[connection_latency_ms]' role='measure' type='quantitative'/>
+    <column datatype='string' caption='config status' name='[config_status]' role='dimension' type='nominal'/>
+    <column datatype='integer' caption='key rotations' name='[key_rotations]' role='measure' type='quantitative'/>
+    <column datatype='string' caption='last rotation date' name='[last_rotation_date]' role='dimension' type='nominal'/>
+    <column datatype='date' caption='first session date' name='[first_session_date]' role='dimension' type='nominal'/>
+    <column datatype='integer' caption='days to first session' name='[days_to_first_session]' role='measure' type='quantitative'/>
+    <column datatype='integer' caption='total sessions' name='[total_sessions]' role='measure' type='quantitative'/>
+    <column datatype='integer' caption='total interactions' name='[total_interactions]' role='measure' type='quantitative'/>
+    <column datatype='integer' caption='total input tokens' name='[total_input_tokens]' role='measure' type='quantitative'/>
+    <column datatype='integer' caption='total output tokens' name='[total_output_tokens]' role='measure' type='quantitative'/>
+    <column datatype='real' caption='total llm cost usd' name='[total_llm_cost_usd]' role='measure' type='quantitative'/>
+    <column datatype='string' caption='avg efficiency ratio' name='[avg_efficiency_ratio]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='avg waste index' name='[avg_waste_index]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='avg cri' name='[avg_cri]' role='dimension' type='nominal'/>
+    <column datatype='real' caption='max cri' name='[max_cri]' role='measure' type='quantitative'/>
+    <column datatype='integer' caption='adversarial tests run' name='[adversarial_tests_run]' role='measure' type='quantitative'/>
+    <column datatype='date' caption='last used date' name='[last_used_date]' role='dimension' type='nominal'/>
+    <column datatype='integer' caption='config age days' name='[config_age_days]' role='measure' type='quantitative'/>
+    <layout show-structure='true'/>
+  </datasource>
+  <datasource caption='P4 Monitoring Sessions (Convex sessions + telemetry)' inline='true' name='monitoring_sessions' version='18.1'>
+    <connection class='textfile' directory='data' filename='monitoring_sessions.csv' password='' server=''>
+      <relation name='monitoring_sessions.csv' table='[monitoring_sessions#csv]' type='table'>
+        <columns character-set='UTF-8' header='yes' locale='en_US' separator=','>
+        <column datatype='string' name='session_id' ordinal='0'/>
+        <column datatype='string' name='user_id' ordinal='1'/>
+        <column datatype='string' name='config_id' ordinal='2'/>
+        <column datatype='string' name='collection_location' ordinal='3'/>
+        <column datatype='date' name='session_date' ordinal='4'/>
+        <column datatype='string' name='iso_week' ordinal='5'/>
+        <column datatype='string' name='weekday' ordinal='6'/>
+        <column datatype='integer' name='start_hour_utc' ordinal='7'/>
+        <column datatype='string' name='duration_minutes' ordinal='8'/>
+        <column datatype='string' name='provider' ordinal='9'/>
+        <column datatype='string' name='model' ordinal='10'/>
+        <column datatype='string' name='user_persona' ordinal='11'/>
+        <column datatype='string' name='signup_program' ordinal='12'/>
+        <column datatype='string' name='cohort_month' ordinal='13'/>
+        <column datatype='integer' name='interaction_count' ordinal='14'/>
+        <column datatype='integer' name='input_tokens' ordinal='15'/>
+        <column datatype='integer' name='output_tokens' ordinal='16'/>
+        <column datatype='integer' name='total_tokens' ordinal='17'/>
+        <column datatype='real' name='llm_cost_usd' ordinal='18'/>
+        <column datatype='integer' name='latency_avg_ms' ordinal='19'/>
+        <column datatype='integer' name='latency_p99_ms' ordinal='20'/>
+        <column datatype='real' name='tokens_per_second' ordinal='21'/>
+        <column datatype='real' name='efficiency_ratio' ordinal='22'/>
+        <column datatype='real' name='cognitive_waste_index' ordinal='23'/>
+        <column datatype='real' name='semantic_drift' ordinal='24'/>
+        <column datatype='real' name='hallucination_prob' ordinal='25'/>
+        <column datatype='real' name='censorship_score' ordinal='26'/>
+        <column datatype='real' name='bias_score' ordinal='27'/>
+        <column datatype='real' name='cri_avg' ordinal='28'/>
+        <column datatype='string' name='cri_peak' ordinal='29'/>
+        <column datatype='string' name='cri_level' ordinal='30'/>
+        <column datatype='string' name='injection_risk' ordinal='31'/>
+        <column datatype='real' name='leakage_risk' ordinal='32'/>
+        <column datatype='real' name='hallucination_risk' ordinal='33'/>
+        <column datatype='real' name='bias_risk' ordinal='34'/>
+        <column datatype='real' name='anomaly_risk' ordinal='35'/>
+        <column datatype='real' name='tool_misuse_risk' ordinal='36'/>
+        <column datatype='integer' name='security_events_count' ordinal='37'/>
+        <column datatype='integer' name='critical_events_count' ordinal='38'/>
+        <column datatype='integer' name='blocked_actions_count' ordinal='39'/>
+        <column datatype='integer' name='pii_detected_flag' ordinal='40'/>
+        <column datatype='integer' name='data_leakage_flag' ordinal='41'/>
+        <column datatype='string' name='trust_level_at_end' ordinal='42'/>
+        <column datatype='string' name='session_status' ordinal='43'/>
+        <column datatype='string' name='enforcement_action' ordinal='44'/>
+        <column datatype='integer' name='adversarial_test_used' ordinal='45'/>
+        <column datatype='integer' name='batch_comparison_used' ordinal='46'/>
+        <column datatype='integer' name='csv_export_used' ordinal='47'/>
+        <column datatype='integer' name='custom_alerts_used' ordinal='48'/>
+        <column datatype='integer' name='stress_test_used' ordinal='49'/>
+        <column datatype='integer' name='success_flag' ordinal='50'/>
+        <column datatype='string' name='error_type' ordinal='51'/>
+        </columns>
+      </relation>
+    </connection>
+    <aliases enabled='yes'/>
+    <column datatype='string' caption='session id' name='[session_id]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='user id' name='[user_id]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='config id' name='[config_id]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='collection location' name='[collection_location]' role='dimension' type='nominal'/>
+    <column datatype='date' caption='session date' name='[session_date]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='iso week' name='[iso_week]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='weekday' name='[weekday]' role='dimension' type='nominal'/>
+    <column datatype='integer' caption='start hour utc' name='[start_hour_utc]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='duration minutes' name='[duration_minutes]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='provider' name='[provider]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='model' name='[model]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='user persona' name='[user_persona]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='signup program' name='[signup_program]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='cohort month' name='[cohort_month]' role='dimension' type='nominal'/>
+    <column datatype='integer' caption='interaction count' name='[interaction_count]' role='measure' type='quantitative'/>
+    <column datatype='integer' caption='input tokens' name='[input_tokens]' role='measure' type='quantitative'/>
+    <column datatype='integer' caption='output tokens' name='[output_tokens]' role='measure' type='quantitative'/>
+    <column datatype='integer' caption='total tokens' name='[total_tokens]' role='measure' type='quantitative'/>
+    <column datatype='real' caption='llm cost usd' name='[llm_cost_usd]' role='measure' type='quantitative'/>
+    <column datatype='integer' caption='latency avg ms' name='[latency_avg_ms]' role='measure' type='quantitative'/>
+    <column datatype='integer' caption='latency p99 ms' name='[latency_p99_ms]' role='measure' type='quantitative'/>
+    <column datatype='real' caption='tokens per second' name='[tokens_per_second]' role='measure' type='quantitative'/>
+    <column datatype='real' caption='efficiency ratio' name='[efficiency_ratio]' role='measure' type='quantitative'/>
+    <column datatype='real' caption='cognitive waste index' name='[cognitive_waste_index]' role='measure' type='quantitative'/>
+    <column datatype='real' caption='semantic drift' name='[semantic_drift]' role='measure' type='quantitative'/>
+    <column datatype='real' caption='hallucination prob' name='[hallucination_prob]' role='measure' type='quantitative'/>
+    <column datatype='real' caption='censorship score' name='[censorship_score]' role='measure' type='quantitative'/>
+    <column datatype='real' caption='bias score' name='[bias_score]' role='measure' type='quantitative'/>
+    <column datatype='real' caption='cri avg' name='[cri_avg]' role='measure' type='quantitative'/>
+    <column datatype='string' caption='cri peak' name='[cri_peak]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='cri level' name='[cri_level]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='injection risk' name='[injection_risk]' role='dimension' type='nominal'/>
+    <column datatype='real' caption='leakage risk' name='[leakage_risk]' role='measure' type='quantitative'/>
+    <column datatype='real' caption='hallucination risk' name='[hallucination_risk]' role='measure' type='quantitative'/>
+    <column datatype='real' caption='bias risk' name='[bias_risk]' role='measure' type='quantitative'/>
+    <column datatype='real' caption='anomaly risk' name='[anomaly_risk]' role='measure' type='quantitative'/>
+    <column datatype='real' caption='tool misuse risk' name='[tool_misuse_risk]' role='measure' type='quantitative'/>
+    <column datatype='integer' caption='security events count' name='[security_events_count]' role='measure' type='quantitative'/>
+    <column datatype='integer' caption='critical events count' name='[critical_events_count]' role='measure' type='quantitative'/>
+    <column datatype='integer' caption='blocked actions count' name='[blocked_actions_count]' role='measure' type='quantitative'/>
+    <column datatype='integer' caption='pii detected flag' name='[pii_detected_flag]' role='measure' type='quantitative'/>
+    <column datatype='integer' caption='data leakage flag' name='[data_leakage_flag]' role='measure' type='quantitative'/>
+    <column datatype='string' caption='trust level at end' name='[trust_level_at_end]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='session status' name='[session_status]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='enforcement action' name='[enforcement_action]' role='dimension' type='nominal'/>
+    <column datatype='integer' caption='adversarial test used' name='[adversarial_test_used]' role='measure' type='quantitative'/>
+    <column datatype='integer' caption='batch comparison used' name='[batch_comparison_used]' role='measure' type='quantitative'/>
+    <column datatype='integer' caption='csv export used' name='[csv_export_used]' role='measure' type='quantitative'/>
+    <column datatype='integer' caption='custom alerts used' name='[custom_alerts_used]' role='measure' type='quantitative'/>
+    <column datatype='integer' caption='stress test used' name='[stress_test_used]' role='measure' type='quantitative'/>
+    <column datatype='integer' caption='success flag' name='[success_flag]' role='measure' type='quantitative'/>
+    <column datatype='string' caption='error type' name='[error_type]' role='dimension' type='nominal'/>
+    <layout show-structure='true'/>
+  </datasource>
+  <datasource caption='Users recorded at DSU Campus' inline='true' name='users_dsu_campus' version='18.1'>
+    <connection class='textfile' directory='data' filename='users_dsu_campus.csv' password='' server=''>
+      <relation name='users_dsu_campus.csv' table='[users_dsu_campus#csv]' type='table'>
+        <columns character-set='UTF-8' header='yes' locale='en_US' separator=','>
+        <column datatype='string' name='user_id' ordinal='0'/>
+        <column datatype='string' name='anonymous_visitor_id' ordinal='1'/>
+        <column datatype='string' name='display_name' ordinal='2'/>
+        <column datatype='date' name='signup_date' ordinal='3'/>
+        <column datatype='string' name='signup_weekday' ordinal='4'/>
+        <column datatype='integer' name='signup_hour' ordinal='5'/>
+        <column datatype='string' name='cohort_month' ordinal='6'/>
+        <column datatype='string' name='email_domain_type' ordinal='7'/>
+        <column datatype='integer' name='email_verified_flag' ordinal='8'/>
+        <column datatype='string' name='persona' ordinal='9'/>
+        <column datatype='string' name='collection_location' ordinal='10'/>
+        <column datatype='string' name='signup_program' ordinal='11'/>
+        <column datatype='string' name='role_seniority' ordinal='12'/>
+        <column datatype='string' name='acquisition_channel' ordinal='13'/>
+        <column datatype='string' name='utm_source' ordinal='14'/>
+        <column datatype='string' name='utm_medium' ordinal='15'/>
+        <column datatype='string' name='utm_campaign' ordinal='16'/>
+        <column datatype='string' name='device_type_at_signup' ordinal='17'/>
+        <column datatype='string' name='country' ordinal='18'/>
+        <column datatype='string' name='region' ordinal='19'/>
+        <column datatype='string' name='industry' ordinal='20'/>
+        <column datatype='string' name='company_size' ordinal='21'/>
+        <column datatype='string' name='primary_use_case' ordinal='22'/>
+        <column datatype='integer' name='referral_flag' ordinal='23'/>
+        <column datatype='integer' name='invited_by_teammate_flag' ordinal='24'/>
+        <column datatype='integer' name='days_visit_to_signup' ordinal='25'/>
+        <column datatype='integer' name='onboarding_steps_completed' ordinal='26'/>
+        <column datatype='integer' name='onboarding_completed_flag' ordinal='27'/>
+        <column datatype='integer' name='api_key_connected_flag' ordinal='28'/>
+        <column datatype='date' name='first_config_date' ordinal='29'/>
+        <column datatype='integer' name='days_to_first_config' ordinal='30'/>
+        <column datatype='integer' name='activated_within_7d_flag' ordinal='31'/>
+        <column datatype='date' name='activation_date' ordinal='32'/>
+        <column datatype='integer' name='days_to_activate' ordinal='33'/>
+        <column datatype='integer' name='lifetime_days_active' ordinal='34'/>
+        <column datatype='integer' name='days_since_last_active' ordinal='35'/>
+        <column datatype='integer' name='inactive_30d_flag' ordinal='36'/>
+        <column datatype='integer' name='total_sessions' ordinal='37'/>
+        <column datatype='integer' name='total_tokens_used' ordinal='38'/>
+        <column datatype='real' name='total_llm_cost_usd' ordinal='39'/>
+        <column datatype='date' name='last_active_date' ordinal='40'/>
+        <column datatype='integer' name='power_user_flag' ordinal='41'/>
+        <column datatype='integer' name='nps_score' ordinal='42'/>
+        </columns>
+      </relation>
+    </connection>
+    <aliases enabled='yes'/>
+    <column datatype='string' caption='user id' name='[user_id]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='anonymous visitor id' name='[anonymous_visitor_id]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='display name' name='[display_name]' role='dimension' type='nominal'/>
+    <column datatype='date' caption='signup date' name='[signup_date]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='signup weekday' name='[signup_weekday]' role='dimension' type='nominal'/>
+    <column datatype='integer' caption='signup hour' name='[signup_hour]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='cohort month' name='[cohort_month]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='email domain type' name='[email_domain_type]' role='dimension' type='nominal'/>
+    <column datatype='integer' caption='email verified flag' name='[email_verified_flag]' role='measure' type='quantitative'/>
+    <column datatype='string' caption='persona' name='[persona]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='collection location' name='[collection_location]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='signup program' name='[signup_program]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='role seniority' name='[role_seniority]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='acquisition channel' name='[acquisition_channel]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='utm source' name='[utm_source]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='utm medium' name='[utm_medium]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='utm campaign' name='[utm_campaign]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='device type at signup' name='[device_type_at_signup]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='country' name='[country]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='region' name='[region]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='industry' name='[industry]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='company size' name='[company_size]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='primary use case' name='[primary_use_case]' role='dimension' type='nominal'/>
+    <column datatype='integer' caption='referral flag' name='[referral_flag]' role='measure' type='quantitative'/>
+    <column datatype='integer' caption='invited by teammate flag' name='[invited_by_teammate_flag]' role='measure' type='quantitative'/>
+    <column datatype='integer' caption='days visit to signup' name='[days_visit_to_signup]' role='measure' type='quantitative'/>
+    <column datatype='integer' caption='onboarding steps completed' name='[onboarding_steps_completed]' role='dimension' type='nominal'/>
+    <column datatype='integer' caption='onboarding completed flag' name='[onboarding_completed_flag]' role='measure' type='quantitative'/>
+    <column datatype='integer' caption='api key connected flag' name='[api_key_connected_flag]' role='measure' type='quantitative'/>
+    <column datatype='date' caption='first config date' name='[first_config_date]' role='dimension' type='nominal'/>
+    <column datatype='integer' caption='days to first config' name='[days_to_first_config]' role='measure' type='quantitative'/>
+    <column datatype='integer' caption='activated within 7d flag' name='[activated_within_7d_flag]' role='measure' type='quantitative'/>
+    <column datatype='date' caption='activation date' name='[activation_date]' role='dimension' type='nominal'/>
+    <column datatype='integer' caption='days to activate' name='[days_to_activate]' role='measure' type='quantitative'/>
+    <column datatype='integer' caption='lifetime days active' name='[lifetime_days_active]' role='measure' type='quantitative'/>
+    <column datatype='integer' caption='days since last active' name='[days_since_last_active]' role='measure' type='quantitative'/>
+    <column datatype='integer' caption='inactive 30d flag' name='[inactive_30d_flag]' role='measure' type='quantitative'/>
+    <column datatype='integer' caption='total sessions' name='[total_sessions]' role='measure' type='quantitative'/>
+    <column datatype='integer' caption='total tokens used' name='[total_tokens_used]' role='measure' type='quantitative'/>
+    <column datatype='real' caption='total llm cost usd' name='[total_llm_cost_usd]' role='measure' type='quantitative'/>
+    <column datatype='date' caption='last active date' name='[last_active_date]' role='dimension' type='nominal'/>
+    <column datatype='integer' caption='power user flag' name='[power_user_flag]' role='measure' type='quantitative'/>
+    <column datatype='integer' caption='nps score' name='[nps_score]' role='dimension' type='nominal'/>
+    <layout show-structure='true'/>
+  </datasource>
+  <datasource caption='Users recorded Outside Campus' inline='true' name='users_outside_campus' version='18.1'>
+    <connection class='textfile' directory='data' filename='users_outside_campus.csv' password='' server=''>
+      <relation name='users_outside_campus.csv' table='[users_outside_campus#csv]' type='table'>
+        <columns character-set='UTF-8' header='yes' locale='en_US' separator=','>
+        <column datatype='string' name='user_id' ordinal='0'/>
+        <column datatype='string' name='anonymous_visitor_id' ordinal='1'/>
+        <column datatype='string' name='display_name' ordinal='2'/>
+        <column datatype='date' name='signup_date' ordinal='3'/>
+        <column datatype='string' name='signup_weekday' ordinal='4'/>
+        <column datatype='integer' name='signup_hour' ordinal='5'/>
+        <column datatype='string' name='cohort_month' ordinal='6'/>
+        <column datatype='string' name='email_domain_type' ordinal='7'/>
+        <column datatype='integer' name='email_verified_flag' ordinal='8'/>
+        <column datatype='string' name='persona' ordinal='9'/>
+        <column datatype='string' name='collection_location' ordinal='10'/>
+        <column datatype='string' name='signup_program' ordinal='11'/>
+        <column datatype='string' name='role_seniority' ordinal='12'/>
+        <column datatype='string' name='acquisition_channel' ordinal='13'/>
+        <column datatype='string' name='utm_source' ordinal='14'/>
+        <column datatype='string' name='utm_medium' ordinal='15'/>
+        <column datatype='string' name='utm_campaign' ordinal='16'/>
+        <column datatype='string' name='device_type_at_signup' ordinal='17'/>
+        <column datatype='string' name='country' ordinal='18'/>
+        <column datatype='string' name='region' ordinal='19'/>
+        <column datatype='string' name='industry' ordinal='20'/>
+        <column datatype='string' name='company_size' ordinal='21'/>
+        <column datatype='string' name='primary_use_case' ordinal='22'/>
+        <column datatype='integer' name='referral_flag' ordinal='23'/>
+        <column datatype='integer' name='invited_by_teammate_flag' ordinal='24'/>
+        <column datatype='integer' name='days_visit_to_signup' ordinal='25'/>
+        <column datatype='integer' name='onboarding_steps_completed' ordinal='26'/>
+        <column datatype='integer' name='onboarding_completed_flag' ordinal='27'/>
+        <column datatype='integer' name='api_key_connected_flag' ordinal='28'/>
+        <column datatype='date' name='first_config_date' ordinal='29'/>
+        <column datatype='integer' name='days_to_first_config' ordinal='30'/>
+        <column datatype='integer' name='activated_within_7d_flag' ordinal='31'/>
+        <column datatype='date' name='activation_date' ordinal='32'/>
+        <column datatype='integer' name='days_to_activate' ordinal='33'/>
+        <column datatype='integer' name='lifetime_days_active' ordinal='34'/>
+        <column datatype='integer' name='days_since_last_active' ordinal='35'/>
+        <column datatype='integer' name='inactive_30d_flag' ordinal='36'/>
+        <column datatype='integer' name='total_sessions' ordinal='37'/>
+        <column datatype='integer' name='total_tokens_used' ordinal='38'/>
+        <column datatype='real' name='total_llm_cost_usd' ordinal='39'/>
+        <column datatype='date' name='last_active_date' ordinal='40'/>
+        <column datatype='integer' name='power_user_flag' ordinal='41'/>
+        <column datatype='integer' name='nps_score' ordinal='42'/>
+        </columns>
+      </relation>
+    </connection>
+    <aliases enabled='yes'/>
+    <column datatype='string' caption='user id' name='[user_id]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='anonymous visitor id' name='[anonymous_visitor_id]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='display name' name='[display_name]' role='dimension' type='nominal'/>
+    <column datatype='date' caption='signup date' name='[signup_date]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='signup weekday' name='[signup_weekday]' role='dimension' type='nominal'/>
+    <column datatype='integer' caption='signup hour' name='[signup_hour]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='cohort month' name='[cohort_month]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='email domain type' name='[email_domain_type]' role='dimension' type='nominal'/>
+    <column datatype='integer' caption='email verified flag' name='[email_verified_flag]' role='measure' type='quantitative'/>
+    <column datatype='string' caption='persona' name='[persona]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='collection location' name='[collection_location]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='signup program' name='[signup_program]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='role seniority' name='[role_seniority]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='acquisition channel' name='[acquisition_channel]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='utm source' name='[utm_source]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='utm medium' name='[utm_medium]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='utm campaign' name='[utm_campaign]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='device type at signup' name='[device_type_at_signup]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='country' name='[country]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='region' name='[region]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='industry' name='[industry]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='company size' name='[company_size]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='primary use case' name='[primary_use_case]' role='dimension' type='nominal'/>
+    <column datatype='integer' caption='referral flag' name='[referral_flag]' role='measure' type='quantitative'/>
+    <column datatype='integer' caption='invited by teammate flag' name='[invited_by_teammate_flag]' role='measure' type='quantitative'/>
+    <column datatype='integer' caption='days visit to signup' name='[days_visit_to_signup]' role='measure' type='quantitative'/>
+    <column datatype='integer' caption='onboarding steps completed' name='[onboarding_steps_completed]' role='dimension' type='nominal'/>
+    <column datatype='integer' caption='onboarding completed flag' name='[onboarding_completed_flag]' role='measure' type='quantitative'/>
+    <column datatype='integer' caption='api key connected flag' name='[api_key_connected_flag]' role='measure' type='quantitative'/>
+    <column datatype='date' caption='first config date' name='[first_config_date]' role='dimension' type='nominal'/>
+    <column datatype='integer' caption='days to first config' name='[days_to_first_config]' role='measure' type='quantitative'/>
+    <column datatype='integer' caption='activated within 7d flag' name='[activated_within_7d_flag]' role='measure' type='quantitative'/>
+    <column datatype='date' caption='activation date' name='[activation_date]' role='dimension' type='nominal'/>
+    <column datatype='integer' caption='days to activate' name='[days_to_activate]' role='measure' type='quantitative'/>
+    <column datatype='integer' caption='lifetime days active' name='[lifetime_days_active]' role='measure' type='quantitative'/>
+    <column datatype='integer' caption='days since last active' name='[days_since_last_active]' role='measure' type='quantitative'/>
+    <column datatype='integer' caption='inactive 30d flag' name='[inactive_30d_flag]' role='measure' type='quantitative'/>
+    <column datatype='integer' caption='total sessions' name='[total_sessions]' role='measure' type='quantitative'/>
+    <column datatype='integer' caption='total tokens used' name='[total_tokens_used]' role='measure' type='quantitative'/>
+    <column datatype='real' caption='total llm cost usd' name='[total_llm_cost_usd]' role='measure' type='quantitative'/>
+    <column datatype='date' caption='last active date' name='[last_active_date]' role='dimension' type='nominal'/>
+    <column datatype='integer' caption='power user flag' name='[power_user_flag]' role='measure' type='quantitative'/>
+    <column datatype='integer' caption='nps score' name='[nps_score]' role='dimension' type='nominal'/>
+    <layout show-structure='true'/>
+  </datasource>
+  <datasource caption='Funnel - Overall (derived)' inline='true' name='funnel_overall' version='18.1'>
+    <connection class='textfile' directory='data' filename='funnel_overall.csv' password='' server=''>
+      <relation name='funnel_overall.csv' table='[funnel_overall#csv]' type='table'>
+        <columns character-set='UTF-8' header='yes' locale='en_US' separator=','>
+        <column datatype='integer' name='stage_order' ordinal='0'/>
+        <column datatype='string' name='stage_name' ordinal='1'/>
+        <column datatype='integer' name='users' ordinal='2'/>
+        <column datatype='string' name='description' ordinal='3'/>
+        <column datatype='real' name='conversion_from_previous_pct' ordinal='4'/>
+        <column datatype='real' name='conversion_from_top_pct' ordinal='5'/>
+        <column datatype='integer' name='median_days_from_previous' ordinal='6'/>
+        <column datatype='integer' name='dropoff_from_previous' ordinal='7'/>
+        </columns>
+      </relation>
+    </connection>
+    <aliases enabled='yes'/>
+    <column datatype='integer' caption='stage order' name='[stage_order]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='stage name' name='[stage_name]' role='dimension' type='nominal'/>
+    <column datatype='integer' caption='users' name='[users]' role='measure' type='quantitative'/>
+    <column datatype='string' caption='description' name='[description]' role='dimension' type='nominal'/>
+    <column datatype='real' caption='conversion from previous pct' name='[conversion_from_previous_pct]' role='measure' type='quantitative'/>
+    <column datatype='real' caption='conversion from top pct' name='[conversion_from_top_pct]' role='measure' type='quantitative'/>
+    <column datatype='integer' caption='median days from previous' name='[median_days_from_previous]' role='measure' type='quantitative'/>
+    <column datatype='integer' caption='dropoff from previous' name='[dropoff_from_previous]' role='measure' type='quantitative'/>
+    <layout show-structure='true'/>
+  </datasource>
+  <datasource caption='Funnel - By Channel (derived)' inline='true' name='funnel_by_channel' version='18.1'>
+    <connection class='textfile' directory='data' filename='funnel_by_channel.csv' password='' server=''>
+      <relation name='funnel_by_channel.csv' table='[funnel_by_channel#csv]' type='table'>
+        <columns character-set='UTF-8' header='yes' locale='en_US' separator=','>
+        <column datatype='string' name='acquisition_channel' ordinal='0'/>
+        <column datatype='integer' name='stage_order' ordinal='1'/>
+        <column datatype='string' name='stage_name' ordinal='2'/>
+        <column datatype='integer' name='users' ordinal='3'/>
+        <column datatype='real' name='conversion_from_previous_pct' ordinal='4'/>
+        <column datatype='real' name='conversion_from_top_pct' ordinal='5'/>
+        </columns>
+      </relation>
+    </connection>
+    <aliases enabled='yes'/>
+    <column datatype='string' caption='acquisition channel' name='[acquisition_channel]' role='dimension' type='nominal'/>
+    <column datatype='integer' caption='stage order' name='[stage_order]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='stage name' name='[stage_name]' role='dimension' type='nominal'/>
+    <column datatype='integer' caption='users' name='[users]' role='measure' type='quantitative'/>
+    <column datatype='real' caption='conversion from previous pct' name='[conversion_from_previous_pct]' role='measure' type='quantitative'/>
+    <column datatype='real' caption='conversion from top pct' name='[conversion_from_top_pct]' role='measure' type='quantitative'/>
+    <layout show-structure='true'/>
+  </datasource>
+  <datasource caption='Funnel - By Location (derived)' inline='true' name='funnel_by_location' version='18.1'>
+    <connection class='textfile' directory='data' filename='funnel_by_location.csv' password='' server=''>
+      <relation name='funnel_by_location.csv' table='[funnel_by_location#csv]' type='table'>
+        <columns character-set='UTF-8' header='yes' locale='en_US' separator=','>
+        <column datatype='string' name='collection_location' ordinal='0'/>
+        <column datatype='integer' name='stage_order' ordinal='1'/>
+        <column datatype='string' name='stage_name' ordinal='2'/>
+        <column datatype='integer' name='users' ordinal='3'/>
+        <column datatype='real' name='conversion_from_previous_pct' ordinal='4'/>
+        <column datatype='real' name='conversion_from_top_pct' ordinal='5'/>
+        </columns>
+      </relation>
+    </connection>
+    <aliases enabled='yes'/>
+    <column datatype='string' caption='collection location' name='[collection_location]' role='dimension' type='nominal'/>
+    <column datatype='integer' caption='stage order' name='[stage_order]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='stage name' name='[stage_name]' role='dimension' type='nominal'/>
+    <column datatype='integer' caption='users' name='[users]' role='measure' type='quantitative'/>
+    <column datatype='real' caption='conversion from previous pct' name='[conversion_from_previous_pct]' role='measure' type='quantitative'/>
+    <column datatype='real' caption='conversion from top pct' name='[conversion_from_top_pct]' role='measure' type='quantitative'/>
+    <layout show-structure='true'/>
+  </datasource>
+  <datasource caption='KPI Monthly Timeseries (derived)' inline='true' name='kpi_monthly' version='18.1'>
+    <connection class='textfile' directory='data' filename='kpi_monthly.csv' password='' server=''>
+      <relation name='kpi_monthly.csv' table='[kpi_monthly#csv]' type='table'>
+        <columns character-set='UTF-8' header='yes' locale='en_US' separator=','>
+        <column datatype='string' name='month' ordinal='0'/>
+        <column datatype='string' name='month_label' ordinal='1'/>
+        <column datatype='integer' name='days_in_month' ordinal='2'/>
+        <column datatype='integer' name='website_visitors' ordinal='3'/>
+        <column datatype='integer' name='new_signups' ordinal='4'/>
+        <column datatype='real' name='visitor_to_signup_cvr_pct' ordinal='5'/>
+        <column datatype='integer' name='api_keys_connected' ordinal='6'/>
+        <column datatype='integer' name='activations' ordinal='7'/>
+        <column datatype='real' name='activation_rate_pct' ordinal='8'/>
+        <column datatype='integer' name='invite_referral_signups' ordinal='9'/>
+        <column datatype='real' name='invite_referral_share_pct' ordinal='10'/>
+        <column datatype='real' name='campus_signup_share_pct' ordinal='11'/>
+        <column datatype='real' name='wau_avg' ordinal='12'/>
+        <column datatype='integer' name='mau' ordinal='13'/>
+        <column datatype='real' name='dau_avg' ordinal='14'/>
+        <column datatype='real' name='stickiness_dau_mau_pct' ordinal='15'/>
+        <column datatype='integer' name='total_sessions' ordinal='16'/>
+        <column datatype='real' name='sessions_per_active_user' ordinal='17'/>
+        <column datatype='integer' name='power_users' ordinal='18'/>
+        <column datatype='real' name='power_user_share_pct' ordinal='19'/>
+        <column datatype='real' name='next_month_return_rate_pct' ordinal='20'/>
+        <column datatype='real' name='total_tokens_millions' ordinal='21'/>
+        <column datatype='real' name='total_llm_cost_usd' ordinal='22'/>
+        <column datatype='real' name='avg_efficiency_ratio' ordinal='23'/>
+        <column datatype='real' name='avg_cognitive_waste_index' ordinal='24'/>
+        <column datatype='real' name='avg_cri' ordinal='25'/>
+        <column datatype='real' name='security_events_per_100_sessions' ordinal='26'/>
+        <column datatype='real' name='flagged_sessions_pct' ordinal='27'/>
+        <column datatype='real' name='w4_retention_pct' ordinal='28'/>
+        <column datatype='real' name='nps' ordinal='29'/>
+        </columns>
+      </relation>
+    </connection>
+    <aliases enabled='yes'/>
+    <column datatype='string' caption='month' name='[month]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='month label' name='[month_label]' role='dimension' type='nominal'/>
+    <column datatype='integer' caption='days in month' name='[days_in_month]' role='measure' type='quantitative'/>
+    <column datatype='integer' caption='website visitors' name='[website_visitors]' role='measure' type='quantitative'/>
+    <column datatype='integer' caption='new signups' name='[new_signups]' role='measure' type='quantitative'/>
+    <column datatype='real' caption='visitor to signup cvr pct' name='[visitor_to_signup_cvr_pct]' role='measure' type='quantitative'/>
+    <column datatype='integer' caption='api keys connected' name='[api_keys_connected]' role='measure' type='quantitative'/>
+    <column datatype='integer' caption='activations' name='[activations]' role='measure' type='quantitative'/>
+    <column datatype='real' caption='activation rate pct' name='[activation_rate_pct]' role='measure' type='quantitative'/>
+    <column datatype='integer' caption='invite referral signups' name='[invite_referral_signups]' role='measure' type='quantitative'/>
+    <column datatype='real' caption='invite referral share pct' name='[invite_referral_share_pct]' role='measure' type='quantitative'/>
+    <column datatype='real' caption='campus signup share pct' name='[campus_signup_share_pct]' role='measure' type='quantitative'/>
+    <column datatype='real' caption='wau avg' name='[wau_avg]' role='measure' type='quantitative'/>
+    <column datatype='integer' caption='mau' name='[mau]' role='measure' type='quantitative'/>
+    <column datatype='real' caption='dau avg' name='[dau_avg]' role='measure' type='quantitative'/>
+    <column datatype='real' caption='stickiness dau mau pct' name='[stickiness_dau_mau_pct]' role='measure' type='quantitative'/>
+    <column datatype='integer' caption='total sessions' name='[total_sessions]' role='measure' type='quantitative'/>
+    <column datatype='real' caption='sessions per active user' name='[sessions_per_active_user]' role='measure' type='quantitative'/>
+    <column datatype='integer' caption='power users' name='[power_users]' role='measure' type='quantitative'/>
+    <column datatype='real' caption='power user share pct' name='[power_user_share_pct]' role='measure' type='quantitative'/>
+    <column datatype='real' caption='next month return rate pct' name='[next_month_return_rate_pct]' role='measure' type='quantitative'/>
+    <column datatype='real' caption='total tokens millions' name='[total_tokens_millions]' role='measure' type='quantitative'/>
+    <column datatype='real' caption='total llm cost usd' name='[total_llm_cost_usd]' role='measure' type='quantitative'/>
+    <column datatype='real' caption='avg efficiency ratio' name='[avg_efficiency_ratio]' role='measure' type='quantitative'/>
+    <column datatype='real' caption='avg cognitive waste index' name='[avg_cognitive_waste_index]' role='measure' type='quantitative'/>
+    <column datatype='real' caption='avg cri' name='[avg_cri]' role='measure' type='quantitative'/>
+    <column datatype='real' caption='security events per 100 sessions' name='[security_events_per_100_sessions]' role='measure' type='quantitative'/>
+    <column datatype='real' caption='flagged sessions pct' name='[flagged_sessions_pct]' role='measure' type='quantitative'/>
+    <column datatype='real' caption='w4 retention pct' name='[w4_retention_pct]' role='measure' type='quantitative'/>
+    <column datatype='real' caption='nps' name='[nps]' role='measure' type='quantitative'/>
+    <layout show-structure='true'/>
+  </datasource>
+  <datasource caption='KPI Monthly By Location (derived)' inline='true' name='kpi_monthly_by_location' version='18.1'>
+    <connection class='textfile' directory='data' filename='kpi_monthly_by_location.csv' password='' server=''>
+      <relation name='kpi_monthly_by_location.csv' table='[kpi_monthly_by_location#csv]' type='table'>
+        <columns character-set='UTF-8' header='yes' locale='en_US' separator=','>
+        <column datatype='string' name='month' ordinal='0'/>
+        <column datatype='string' name='collection_location' ordinal='1'/>
+        <column datatype='integer' name='website_visitors' ordinal='2'/>
+        <column datatype='integer' name='new_signups' ordinal='3'/>
+        <column datatype='integer' name='activations' ordinal='4'/>
+        <column datatype='real' name='activation_rate_pct' ordinal='5'/>
+        <column datatype='integer' name='total_sessions' ordinal='6'/>
+        <column datatype='integer' name='mau' ordinal='7'/>
+        <column datatype='integer' name='power_users' ordinal='8'/>
+        <column datatype='real' name='sessions_per_active_user' ordinal='9'/>
+        <column datatype='real' name='avg_cognitive_waste_index' ordinal='10'/>
+        <column datatype='real' name='avg_cri' ordinal='11'/>
+        </columns>
+      </relation>
+    </connection>
+    <aliases enabled='yes'/>
+    <column datatype='string' caption='month' name='[month]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='collection location' name='[collection_location]' role='dimension' type='nominal'/>
+    <column datatype='integer' caption='website visitors' name='[website_visitors]' role='measure' type='quantitative'/>
+    <column datatype='integer' caption='new signups' name='[new_signups]' role='measure' type='quantitative'/>
+    <column datatype='integer' caption='activations' name='[activations]' role='measure' type='quantitative'/>
+    <column datatype='real' caption='activation rate pct' name='[activation_rate_pct]' role='measure' type='quantitative'/>
+    <column datatype='integer' caption='total sessions' name='[total_sessions]' role='measure' type='quantitative'/>
+    <column datatype='integer' caption='mau' name='[mau]' role='measure' type='quantitative'/>
+    <column datatype='integer' caption='power users' name='[power_users]' role='measure' type='quantitative'/>
+    <column datatype='real' caption='sessions per active user' name='[sessions_per_active_user]' role='measure' type='quantitative'/>
+    <column datatype='real' caption='avg cognitive waste index' name='[avg_cognitive_waste_index]' role='measure' type='quantitative'/>
+    <column datatype='real' caption='avg cri' name='[avg_cri]' role='measure' type='quantitative'/>
+    <layout show-structure='true'/>
+  </datasource>
+  <datasource caption='Retention Cohorts (derived)' inline='true' name='retention_cohorts' version='18.1'>
+    <connection class='textfile' directory='data' filename='retention_cohorts.csv' password='' server=''>
+      <relation name='retention_cohorts.csv' table='[retention_cohorts#csv]' type='table'>
+        <columns character-set='UTF-8' header='yes' locale='en_US' separator=','>
+        <column datatype='string' name='cohort_month' ordinal='0'/>
+        <column datatype='integer' name='week_number' ordinal='1'/>
+        <column datatype='integer' name='cohort_size' ordinal='2'/>
+        <column datatype='integer' name='active_users' ordinal='3'/>
+        <column datatype='real' name='retention_pct' ordinal='4'/>
+        </columns>
+      </relation>
+    </connection>
+    <aliases enabled='yes'/>
+    <column datatype='string' caption='cohort month' name='[cohort_month]' role='dimension' type='nominal'/>
+    <column datatype='integer' caption='week number' name='[week_number]' role='dimension' type='nominal'/>
+    <column datatype='integer' caption='cohort size' name='[cohort_size]' role='measure' type='quantitative'/>
+    <column datatype='integer' caption='active users' name='[active_users]' role='measure' type='quantitative'/>
+    <column datatype='real' caption='retention pct' name='[retention_pct]' role='measure' type='quantitative'/>
+    <layout show-structure='true'/>
+  </datasource>
+  <datasource caption='Feature Adoption - All Users (derived)' inline='true' name='feature_adoption_overall' version='18.1'>
+    <connection class='textfile' directory='data' filename='feature_adoption_overall.csv' password='' server=''>
+      <relation name='feature_adoption_overall.csv' table='[feature_adoption_overall#csv]' type='table'>
+        <columns character-set='UTF-8' header='yes' locale='en_US' separator=','>
+        <column datatype='string' name='persona' ordinal='0'/>
+        <column datatype='string' name='feature_key' ordinal='1'/>
+        <column datatype='string' name='feature_name' ordinal='2'/>
+        <column datatype='string' name='feature_description' ordinal='3'/>
+        <column datatype='integer' name='users_used' ordinal='4'/>
+        <column datatype='integer' name='activated_users_in_scope' ordinal='5'/>
+        <column datatype='real' name='adoption_pct' ordinal='6'/>
+        </columns>
+      </relation>
+    </connection>
+    <aliases enabled='yes'/>
+    <column datatype='string' caption='persona' name='[persona]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='feature key' name='[feature_key]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='feature name' name='[feature_name]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='feature description' name='[feature_description]' role='dimension' type='nominal'/>
+    <column datatype='integer' caption='users used' name='[users_used]' role='measure' type='quantitative'/>
+    <column datatype='integer' caption='activated users in scope' name='[activated_users_in_scope]' role='measure' type='quantitative'/>
+    <column datatype='real' caption='adoption pct' name='[adoption_pct]' role='measure' type='quantitative'/>
+    <layout show-structure='true'/>
+  </datasource>
+  <datasource caption='Feature Adoption - By Persona (derived)' inline='true' name='feature_adoption_by_persona' version='18.1'>
+    <connection class='textfile' directory='data' filename='feature_adoption_by_persona.csv' password='' server=''>
+      <relation name='feature_adoption_by_persona.csv' table='[feature_adoption_by_persona#csv]' type='table'>
+        <columns character-set='UTF-8' header='yes' locale='en_US' separator=','>
+        <column datatype='string' name='persona' ordinal='0'/>
+        <column datatype='string' name='feature_key' ordinal='1'/>
+        <column datatype='string' name='feature_name' ordinal='2'/>
+        <column datatype='string' name='feature_description' ordinal='3'/>
+        <column datatype='integer' name='users_used' ordinal='4'/>
+        <column datatype='integer' name='activated_users_in_scope' ordinal='5'/>
+        <column datatype='real' name='adoption_pct' ordinal='6'/>
+        </columns>
+      </relation>
+    </connection>
+    <aliases enabled='yes'/>
+    <column datatype='string' caption='persona' name='[persona]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='feature key' name='[feature_key]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='feature name' name='[feature_name]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='feature description' name='[feature_description]' role='dimension' type='nominal'/>
+    <column datatype='integer' caption='users used' name='[users_used]' role='measure' type='quantitative'/>
+    <column datatype='integer' caption='activated users in scope' name='[activated_users_in_scope]' role='measure' type='quantitative'/>
+    <column datatype='real' caption='adoption pct' name='[adoption_pct]' role='measure' type='quantitative'/>
+    <layout show-structure='true'/>
+  </datasource>
+  <datasource caption='KPI Definitions &amp; Formulas' inline='true' name='kpi_definitions' version='18.1'>
+    <connection class='textfile' directory='data' filename='kpi_definitions.csv' password='' server=''>
+      <relation name='kpi_definitions.csv' table='[kpi_definitions#csv]' type='table'>
+        <columns character-set='UTF-8' header='yes' locale='en_US' separator=','>
+        <column datatype='string' name='kpi_category' ordinal='0'/>
+        <column datatype='string' name='kpi_name' ordinal='1'/>
+        <column datatype='string' name='definition' ordinal='2'/>
+        <column datatype='string' name='measurement_formula' ordinal='3'/>
+        <column datatype='string' name='current_value_aug_2026' ordinal='4'/>
+        <column datatype='string' name='target_benchmark' ordinal='5'/>
+        <column datatype='string' name='status' ordinal='6'/>
+        <column datatype='string' name='significance_interpretation' ordinal='7'/>
+        </columns>
+      </relation>
+    </connection>
+    <aliases enabled='yes'/>
+    <column datatype='string' caption='kpi category' name='[kpi_category]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='kpi name' name='[kpi_name]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='definition' name='[definition]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='measurement formula' name='[measurement_formula]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='current value aug 2026' name='[current_value_aug_2026]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='target benchmark' name='[target_benchmark]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='status' name='[status]' role='dimension' type='nominal'/>
+    <column datatype='string' caption='significance interpretation' name='[significance_interpretation]' role='dimension' type='nominal'/>
+    <layout show-structure='true'/>
+  </datasource>
+  </datasources>
+  <worksheets>
+  <worksheet name='KPI MAU Trend'>
+    <table>
+      <view>
+        <datasource-dependencies datasource='kpi_monthly'>
+        <column datatype='integer' name='[mau]' role='measure' type='quantitative'/>
+        <column datatype='string' name='[month]' role='dimension' type='nominal'/>
+        </datasource-dependencies>
+        <aggregation value='DatatypeSpecific'/>
+      </view>
+      <style/>
+      <panes>
+        <pane selection-relaxation-option='selection-relaxation-allow'>
+          <view>
+            <breakdown value='auto'/>
+          </view>
+          <mark class='Bar'/>
+    <encodings>
+      <text column='SUM([kpi_monthly].[mau])'/>
+    </encodings>
+          <style/>
+        </pane>
+      </panes>
+      <rows>SUM([kpi_monthly].[mau])</rows>
+      <cols>[kpi_monthly].[month]</cols>
+    </table>
+    <simple-id uuid='{4b832ef3-6d72-4fee-ba7b-3df7871e9834}'/>
+  </worksheet>
+  <worksheet name='KPI North Star WOU Trend'>
+    <table>
+      <view>
+        <datasource-dependencies datasource='kpi_monthly'>
+        <column datatype='string' name='[month]' role='dimension' type='nominal'/>
+        <column datatype='real' name='[wau_avg]' role='measure' type='quantitative'/>
+        </datasource-dependencies>
+        <aggregation value='DatatypeSpecific'/>
+      </view>
+      <style/>
+      <panes>
+        <pane selection-relaxation-option='selection-relaxation-allow'>
+          <view>
+            <breakdown value='auto'/>
+          </view>
+          <mark class='Bar'/>
+    <encodings>
+      <text column='SUM([kpi_monthly].[wau_avg])'/>
+    </encodings>
+          <style/>
+        </pane>
+      </panes>
+      <rows>SUM([kpi_monthly].[wau_avg])</rows>
+      <cols>[kpi_monthly].[month]</cols>
+    </table>
+    <simple-id uuid='{fd50d52f-912f-45e5-96ae-a8483de61d4f}'/>
+  </worksheet>
+  <worksheet name='KPI Key Connections Trend'>
+    <table>
+      <view>
+        <datasource-dependencies datasource='kpi_monthly'>
+        <column datatype='integer' name='[api_keys_connected]' role='measure' type='quantitative'/>
+        <column datatype='string' name='[month]' role='dimension' type='nominal'/>
+        </datasource-dependencies>
+        <aggregation value='DatatypeSpecific'/>
+      </view>
+      <style/>
+      <panes>
+        <pane selection-relaxation-option='selection-relaxation-allow'>
+          <view>
+            <breakdown value='auto'/>
+          </view>
+          <mark class='Bar'/>
+    <encodings>
+      <text column='SUM([kpi_monthly].[api_keys_connected])'/>
+    </encodings>
+          <style/>
+        </pane>
+      </panes>
+      <rows>SUM([kpi_monthly].[api_keys_connected])</rows>
+      <cols>[kpi_monthly].[month]</cols>
+    </table>
+    <simple-id uuid='{fa16cfaa-32ea-4c7e-901c-a1c3bee4794c}'/>
+  </worksheet>
+  <worksheet name='KPI Power Users Trend'>
+    <table>
+      <view>
+        <datasource-dependencies datasource='kpi_monthly'>
+        <column datatype='string' name='[month]' role='dimension' type='nominal'/>
+        <column datatype='integer' name='[power_users]' role='measure' type='quantitative'/>
+        </datasource-dependencies>
+        <aggregation value='DatatypeSpecific'/>
+      </view>
+      <style/>
+      <panes>
+        <pane selection-relaxation-option='selection-relaxation-allow'>
+          <view>
+            <breakdown value='auto'/>
+          </view>
+          <mark class='Bar'/>
+    <encodings>
+      <text column='SUM([kpi_monthly].[power_users])'/>
+    </encodings>
+          <style/>
+        </pane>
+      </panes>
+      <rows>SUM([kpi_monthly].[power_users])</rows>
+      <cols>[kpi_monthly].[month]</cols>
+    </table>
+    <simple-id uuid='{c092203a-4645-46b1-90a5-3d83154a6ad9}'/>
+  </worksheet>
+  <worksheet name='KPI Sessions Trend'>
+    <table>
+      <view>
+        <datasource-dependencies datasource='kpi_monthly'>
+        <column datatype='string' name='[month]' role='dimension' type='nominal'/>
+        <column datatype='integer' name='[total_sessions]' role='measure' type='quantitative'/>
+        </datasource-dependencies>
+        <aggregation value='DatatypeSpecific'/>
+      </view>
+      <style/>
+      <panes>
+        <pane selection-relaxation-option='selection-relaxation-allow'>
+          <view>
+            <breakdown value='auto'/>
+          </view>
+          <mark class='Bar'/>
+    <encodings>
+      <text column='SUM([kpi_monthly].[total_sessions])'/>
+    </encodings>
+          <style/>
+        </pane>
+      </panes>
+      <rows>SUM([kpi_monthly].[total_sessions])</rows>
+      <cols>[kpi_monthly].[month]</cols>
+    </table>
+    <simple-id uuid='{2338df19-5054-45a9-a0d0-9ef1c02cf3f2}'/>
+  </worksheet>
+  <worksheet name='KPI Tokens Monitored Trend'>
+    <table>
+      <view>
+        <datasource-dependencies datasource='kpi_monthly'>
+        <column datatype='string' name='[month]' role='dimension' type='nominal'/>
+        <column datatype='real' name='[total_tokens_millions]' role='measure' type='quantitative'/>
+        </datasource-dependencies>
+        <aggregation value='DatatypeSpecific'/>
+      </view>
+      <style/>
+      <panes>
+        <pane selection-relaxation-option='selection-relaxation-allow'>
+          <view>
+            <breakdown value='auto'/>
+          </view>
+          <mark class='Bar'/>
+    <encodings>
+      <text column='SUM([kpi_monthly].[total_tokens_millions])'/>
+    </encodings>
+          <style/>
+        </pane>
+      </panes>
+      <rows>SUM([kpi_monthly].[total_tokens_millions])</rows>
+      <cols>[kpi_monthly].[month]</cols>
+    </table>
+    <simple-id uuid='{91760f92-a7dd-4485-83f2-042c8ed694e1}'/>
+  </worksheet>
+  <worksheet name='KPI Activation Rate Trend'>
+    <table>
+      <view>
+        <datasource-dependencies datasource='kpi_monthly'>
+        <column datatype='real' name='[activation_rate_pct]' role='measure' type='quantitative'/>
+        <column datatype='string' name='[month]' role='dimension' type='nominal'/>
+        </datasource-dependencies>
+        <aggregation value='DatatypeSpecific'/>
+      </view>
+      <style/>
+      <panes>
+        <pane selection-relaxation-option='selection-relaxation-allow'>
+          <view>
+            <breakdown value='auto'/>
+          </view>
+          <mark class='Line'/>
+    <encodings>
+      <text column='AVG([kpi_monthly].[activation_rate_pct])'/>
+    </encodings>
+          <style/>
+        </pane>
+      </panes>
+      <rows>AVG([kpi_monthly].[activation_rate_pct])</rows>
+      <cols>[kpi_monthly].[month]</cols>
+    </table>
+    <simple-id uuid='{ca43c7ba-1b63-42a8-9842-07122339e053}'/>
+  </worksheet>
+  <worksheet name='KPI Visitor to Signup CVR Trend'>
+    <table>
+      <view>
+        <datasource-dependencies datasource='kpi_monthly'>
+        <column datatype='string' name='[month]' role='dimension' type='nominal'/>
+        <column datatype='real' name='[visitor_to_signup_cvr_pct]' role='measure' type='quantitative'/>
+        </datasource-dependencies>
+        <aggregation value='DatatypeSpecific'/>
+      </view>
+      <style/>
+      <panes>
+        <pane selection-relaxation-option='selection-relaxation-allow'>
+          <view>
+            <breakdown value='auto'/>
+          </view>
+          <mark class='Line'/>
+    <encodings>
+      <text column='AVG([kpi_monthly].[visitor_to_signup_cvr_pct])'/>
+    </encodings>
+          <style/>
+        </pane>
+      </panes>
+      <rows>AVG([kpi_monthly].[visitor_to_signup_cvr_pct])</rows>
+      <cols>[kpi_monthly].[month]</cols>
+    </table>
+    <simple-id uuid='{f7271706-8aba-454d-8b97-835ac8ddbe83}'/>
+  </worksheet>
+  <worksheet name='KPI W4 Retention Trend'>
+    <table>
+      <view>
+        <datasource-dependencies datasource='kpi_monthly'>
+        <column datatype='string' name='[month]' role='dimension' type='nominal'/>
+        <column datatype='real' name='[w4_retention_pct]' role='measure' type='quantitative'/>
+        </datasource-dependencies>
+        <aggregation value='DatatypeSpecific'/>
+      </view>
+      <style/>
+      <panes>
+        <pane selection-relaxation-option='selection-relaxation-allow'>
+          <view>
+            <breakdown value='auto'/>
+          </view>
+          <mark class='Line'/>
+    <encodings>
+      <text column='AVG([kpi_monthly].[w4_retention_pct])'/>
+    </encodings>
+          <style/>
+        </pane>
+      </panes>
+      <rows>AVG([kpi_monthly].[w4_retention_pct])</rows>
+      <cols>[kpi_monthly].[month]</cols>
+    </table>
+    <simple-id uuid='{f4279171-110d-4ca2-93f7-44043a48d6c2}'/>
+  </worksheet>
+  <worksheet name='KPI Next Month Return Rate Trend'>
+    <table>
+      <view>
+        <datasource-dependencies datasource='kpi_monthly'>
+        <column datatype='string' name='[month]' role='dimension' type='nominal'/>
+        <column datatype='real' name='[next_month_return_rate_pct]' role='measure' type='quantitative'/>
+        </datasource-dependencies>
+        <aggregation value='DatatypeSpecific'/>
+      </view>
+      <style/>
+      <panes>
+        <pane selection-relaxation-option='selection-relaxation-allow'>
+          <view>
+            <breakdown value='auto'/>
+          </view>
+          <mark class='Line'/>
+    <encodings>
+      <text column='AVG([kpi_monthly].[next_month_return_rate_pct])'/>
+    </encodings>
+          <style/>
+        </pane>
+      </panes>
+      <rows>AVG([kpi_monthly].[next_month_return_rate_pct])</rows>
+      <cols>[kpi_monthly].[month]</cols>
+    </table>
+    <simple-id uuid='{d56eabe9-628c-4f82-bcfb-ddccf64ce226}'/>
+  </worksheet>
+  <worksheet name='KPI Invite Referral Share Trend'>
+    <table>
+      <view>
+        <datasource-dependencies datasource='kpi_monthly'>
+        <column datatype='real' name='[invite_referral_share_pct]' role='measure' type='quantitative'/>
+        <column datatype='string' name='[month]' role='dimension' type='nominal'/>
+        </datasource-dependencies>
+        <aggregation value='DatatypeSpecific'/>
+      </view>
+      <style/>
+      <panes>
+        <pane selection-relaxation-option='selection-relaxation-allow'>
+          <view>
+            <breakdown value='auto'/>
+          </view>
+          <mark class='Line'/>
+    <encodings>
+      <text column='AVG([kpi_monthly].[invite_referral_share_pct])'/>
+    </encodings>
+          <style/>
+        </pane>
+      </panes>
+      <rows>AVG([kpi_monthly].[invite_referral_share_pct])</rows>
+      <cols>[kpi_monthly].[month]</cols>
+    </table>
+    <simple-id uuid='{4609f9f7-3e0b-418c-a662-bd6b2ecf2c73}'/>
+  </worksheet>
+  <worksheet name='KPI Signups Trend'>
+    <table>
+      <view>
+        <datasource-dependencies datasource='kpi_monthly'>
+        <column datatype='string' name='[month]' role='dimension' type='nominal'/>
+        <column datatype='integer' name='[new_signups]' role='measure' type='quantitative'/>
+        </datasource-dependencies>
+        <aggregation value='DatatypeSpecific'/>
+      </view>
+      <style/>
+      <panes>
+        <pane selection-relaxation-option='selection-relaxation-allow'>
+          <view>
+            <breakdown value='auto'/>
+          </view>
+          <mark class='Bar'/>
+    <encodings>
+      <text column='SUM([kpi_monthly].[new_signups])'/>
+    </encodings>
+          <style/>
+        </pane>
+      </panes>
+      <rows>SUM([kpi_monthly].[new_signups])</rows>
+      <cols>[kpi_monthly].[month]</cols>
+    </table>
+    <simple-id uuid='{15bfeb27-197e-4835-ae68-fb45058338e1}'/>
+  </worksheet>
+  <worksheet name='KPI Sessions By Location'>
+    <table>
+      <view>
+        <datasource-dependencies datasource='kpi_monthly_by_location'>
+        <column datatype='string' name='[collection_location]' role='dimension' type='nominal'/>
+        <column datatype='string' name='[month]' role='dimension' type='nominal'/>
+        <column datatype='integer' name='[total_sessions]' role='measure' type='quantitative'/>
+        </datasource-dependencies>
+        <aggregation value='DatatypeSpecific'/>
+      </view>
+      <style/>
+      <panes>
+        <pane selection-relaxation-option='selection-relaxation-allow'>
+          <view>
+            <breakdown value='auto'/>
+          </view>
+          <mark class='Bar'/>
+    <encodings>
+      <color column='[kpi_monthly_by_location].[collection_location]'/>
+    </encodings>
+          <style/>
+        </pane>
+      </panes>
+      <rows>SUM([kpi_monthly_by_location].[total_sessions])</rows>
+      <cols>[kpi_monthly_by_location].[month]</cols>
+    </table>
+    <simple-id uuid='{ac2f996d-e674-466c-b1e9-6293cdedef05}'/>
+  </worksheet>
+  <worksheet name='KPI Activation By Location'>
+    <table>
+      <view>
+        <datasource-dependencies datasource='kpi_monthly_by_location'>
+        <column datatype='real' name='[activation_rate_pct]' role='measure' type='quantitative'/>
+        <column datatype='string' name='[collection_location]' role='dimension' type='nominal'/>
+        <column datatype='string' name='[month]' role='dimension' type='nominal'/>
+        </datasource-dependencies>
+        <aggregation value='DatatypeSpecific'/>
+      </view>
+      <style/>
+      <panes>
+        <pane selection-relaxation-option='selection-relaxation-allow'>
+          <view>
+            <breakdown value='auto'/>
+          </view>
+          <mark class='Line'/>
+    <encodings>
+      <color column='[kpi_monthly_by_location].[collection_location]'/>
+    </encodings>
+          <style/>
+        </pane>
+      </panes>
+      <rows>AVG([kpi_monthly_by_location].[activation_rate_pct])</rows>
+      <cols>[kpi_monthly_by_location].[month]</cols>
+    </table>
+    <simple-id uuid='{7774dfc4-3947-49a1-b4cc-bdc30326e7af}'/>
+  </worksheet>
+  <worksheet name='KPI MAU By Location'>
+    <table>
+      <view>
+        <datasource-dependencies datasource='kpi_monthly_by_location'>
+        <column datatype='string' name='[collection_location]' role='dimension' type='nominal'/>
+        <column datatype='integer' name='[mau]' role='measure' type='quantitative'/>
+        <column datatype='string' name='[month]' role='dimension' type='nominal'/>
+        </datasource-dependencies>
+        <aggregation value='DatatypeSpecific'/>
+      </view>
+      <style/>
+      <panes>
+        <pane selection-relaxation-option='selection-relaxation-allow'>
+          <view>
+            <breakdown value='auto'/>
+          </view>
+          <mark class='Bar'/>
+    <encodings>
+      <color column='[kpi_monthly_by_location].[collection_location]'/>
+    </encodings>
+          <style/>
+        </pane>
+      </panes>
+      <rows>SUM([kpi_monthly_by_location].[mau])</rows>
+      <cols>[kpi_monthly_by_location].[month]</cols>
+    </table>
+    <simple-id uuid='{d668113a-44e4-4add-a95b-4ac36657b8e8}'/>
+  </worksheet>
+  <worksheet name='Funnel Stage Volumes'>
+    <table>
+      <view>
+        <datasource-dependencies datasource='funnel_overall'>
+        <column datatype='string' name='[stage_name]' role='dimension' type='nominal'/>
+        <column datatype='integer' name='[users]' role='measure' type='quantitative'/>
+        </datasource-dependencies>
+        <aggregation value='DatatypeSpecific'/>
+      </view>
+      <style/>
+      <panes>
+        <pane selection-relaxation-option='selection-relaxation-allow'>
+          <view>
+            <breakdown value='auto'/>
+          </view>
+          <mark class='Bar'/>
+    <encodings>
+      <text column='SUM([funnel_overall].[users])'/>
+    </encodings>
+          <style/>
+        </pane>
+      </panes>
+      <rows>SUM([funnel_overall].[users])</rows>
+      <cols>[funnel_overall].[stage_name]</cols>
+    </table>
+    <simple-id uuid='{1bbeee32-a3ab-44d0-bd71-3991eac04f79}'/>
+  </worksheet>
+  <worksheet name='Funnel Conversion From Previous'>
+    <table>
+      <view>
+        <datasource-dependencies datasource='funnel_overall'>
+        <column datatype='real' name='[conversion_from_previous_pct]' role='measure' type='quantitative'/>
+        <column datatype='string' name='[stage_name]' role='dimension' type='nominal'/>
+        </datasource-dependencies>
+        <aggregation value='DatatypeSpecific'/>
+      </view>
+      <style/>
+      <panes>
+        <pane selection-relaxation-option='selection-relaxation-allow'>
+          <view>
+            <breakdown value='auto'/>
+          </view>
+          <mark class='Bar'/>
+    <encodings>
+      <text column='AVG([funnel_overall].[conversion_from_previous_pct])'/>
+    </encodings>
+          <style/>
+        </pane>
+      </panes>
+      <rows>AVG([funnel_overall].[conversion_from_previous_pct])</rows>
+      <cols>[funnel_overall].[stage_name]</cols>
+    </table>
+    <simple-id uuid='{0efd7748-14e2-4f6f-9246-196a8e4e330d}'/>
+  </worksheet>
+  <worksheet name='Funnel Median Days Between Stages'>
+    <table>
+      <view>
+        <datasource-dependencies datasource='funnel_overall'>
+        <column datatype='integer' name='[median_days_from_previous]' role='measure' type='quantitative'/>
+        <column datatype='string' name='[stage_name]' role='dimension' type='nominal'/>
+        </datasource-dependencies>
+        <aggregation value='DatatypeSpecific'/>
+      </view>
+      <style/>
+      <panes>
+        <pane selection-relaxation-option='selection-relaxation-allow'>
+          <view>
+            <breakdown value='auto'/>
+          </view>
+          <mark class='Bar'/>
+    <encodings>
+      <text column='AVG([funnel_overall].[median_days_from_previous])'/>
+    </encodings>
+          <style/>
+        </pane>
+      </panes>
+      <rows>AVG([funnel_overall].[median_days_from_previous])</rows>
+      <cols>[funnel_overall].[stage_name]</cols>
+    </table>
+    <simple-id uuid='{2d8d9995-9d3f-4dfe-af63-7a8e1ebd3840}'/>
+  </worksheet>
+  <worksheet name='Funnel By Channel'>
+    <table>
+      <view>
+        <datasource-dependencies datasource='funnel_by_channel'>
+        <column datatype='string' name='[acquisition_channel]' role='dimension' type='nominal'/>
+        <column datatype='string' name='[stage_name]' role='dimension' type='nominal'/>
+        <column datatype='integer' name='[users]' role='measure' type='quantitative'/>
+        </datasource-dependencies>
+        <aggregation value='DatatypeSpecific'/>
+      </view>
+      <style/>
+      <panes>
+        <pane selection-relaxation-option='selection-relaxation-allow'>
+          <view>
+            <breakdown value='auto'/>
+          </view>
+          <mark class='Bar'/>
+    <encodings>
+      <color column='[funnel_by_channel].[acquisition_channel]'/>
+    </encodings>
+          <style/>
+        </pane>
+      </panes>
+      <rows>SUM([funnel_by_channel].[users])</rows>
+      <cols>[funnel_by_channel].[stage_name]</cols>
+    </table>
+    <simple-id uuid='{eb41c352-ce19-4e05-9e28-91d879d8fe36}'/>
+  </worksheet>
+  <worksheet name='Funnel By Location'>
+    <table>
+      <view>
+        <datasource-dependencies datasource='funnel_by_location'>
+        <column datatype='string' name='[collection_location]' role='dimension' type='nominal'/>
+        <column datatype='string' name='[stage_name]' role='dimension' type='nominal'/>
+        <column datatype='integer' name='[users]' role='measure' type='quantitative'/>
+        </datasource-dependencies>
+        <aggregation value='DatatypeSpecific'/>
+      </view>
+      <style/>
+      <panes>
+        <pane selection-relaxation-option='selection-relaxation-allow'>
+          <view>
+            <breakdown value='auto'/>
+          </view>
+          <mark class='Bar'/>
+    <encodings>
+      <color column='[funnel_by_location].[collection_location]'/>
+    </encodings>
+          <style/>
+        </pane>
+      </panes>
+      <rows>SUM([funnel_by_location].[users])</rows>
+      <cols>[funnel_by_location].[stage_name]</cols>
+    </table>
+    <simple-id uuid='{4bf7e343-19fb-4058-ae50-4c0af9ad956b}'/>
+  </worksheet>
+  <worksheet name='Behaviour Signups By Channel'>
+    <table>
+      <view>
+        <datasource-dependencies datasource='user_signups'>
+        <column datatype='string' name='[acquisition_channel]' role='dimension' type='nominal'/>
+        <column datatype='string' name='[user_id]' role='dimension' type='nominal'/>
+        </datasource-dependencies>
+        <aggregation value='DatatypeSpecific'/>
+      </view>
+      <style/>
+      <panes>
+        <pane selection-relaxation-option='selection-relaxation-allow'>
+          <view>
+            <breakdown value='auto'/>
+          </view>
+          <mark class='Bar'/>
+    <encodings>
+      <text column='COUNT([user_signups].[user_id])'/>
+    </encodings>
+          <style/>
+        </pane>
+      </panes>
+      <rows>COUNT([user_signups].[user_id])</rows>
+      <cols>[user_signups].[acquisition_channel]</cols>
+    </table>
+    <simple-id uuid='{8bb229d2-f8bf-44b7-964e-e8ed14aee997}'/>
+  </worksheet>
+  <worksheet name='Behaviour Users By Persona'>
+    <table>
+      <view>
+        <datasource-dependencies datasource='user_signups'>
+        <column datatype='string' name='[persona]' role='dimension' type='nominal'/>
+        <column datatype='string' name='[user_id]' role='dimension' type='nominal'/>
+        </datasource-dependencies>
+        <aggregation value='DatatypeSpecific'/>
+      </view>
+      <style/>
+      <panes>
+        <pane selection-relaxation-option='selection-relaxation-allow'>
+          <view>
+            <breakdown value='auto'/>
+          </view>
+          <mark class='Bar'/>
+    <encodings>
+      <text column='COUNT([user_signups].[user_id])'/>
+    </encodings>
+          <style/>
+        </pane>
+      </panes>
+      <rows>COUNT([user_signups].[user_id])</rows>
+      <cols>[user_signups].[persona]</cols>
+    </table>
+    <simple-id uuid='{9ea9ec7a-c5fd-41b0-b8e1-6868755ba3a2}'/>
+  </worksheet>
+  <worksheet name='Behaviour Activation Rate By Persona'>
+    <table>
+      <view>
+        <datasource-dependencies datasource='user_signups'>
+        <column datatype='integer' name='[activated_within_7d_flag]' role='measure' type='quantitative'/>
+        <column datatype='string' name='[persona]' role='dimension' type='nominal'/>
+        </datasource-dependencies>
+        <aggregation value='DatatypeSpecific'/>
+      </view>
+      <style/>
+      <panes>
+        <pane selection-relaxation-option='selection-relaxation-allow'>
+          <view>
+            <breakdown value='auto'/>
+          </view>
+          <mark class='Bar'/>
+    <encodings>
+      <text column='AVG([user_signups].[activated_within_7d_flag])'/>
+    </encodings>
+          <style/>
+        </pane>
+      </panes>
+      <rows>AVG([user_signups].[activated_within_7d_flag])</rows>
+      <cols>[user_signups].[persona]</cols>
+    </table>
+    <simple-id uuid='{b482d5e1-eeb3-4646-9a94-c3ec8462a39d}'/>
+  </worksheet>
+  <worksheet name='Behaviour Signups By Use Case'>
+    <table>
+      <view>
+        <datasource-dependencies datasource='user_signups'>
+        <column datatype='string' name='[primary_use_case]' role='dimension' type='nominal'/>
+        <column datatype='string' name='[user_id]' role='dimension' type='nominal'/>
+        </datasource-dependencies>
+        <aggregation value='DatatypeSpecific'/>
+      </view>
+      <style/>
+      <panes>
+        <pane selection-relaxation-option='selection-relaxation-allow'>
+          <view>
+            <breakdown value='auto'/>
+          </view>
+          <mark class='Bar'/>
+    <encodings>
+      <text column='COUNT([user_signups].[user_id])'/>
+    </encodings>
+          <style/>
+        </pane>
+      </panes>
+      <rows>COUNT([user_signups].[user_id])</rows>
+      <cols>[user_signups].[primary_use_case]</cols>
+    </table>
+    <simple-id uuid='{18a46c66-69bc-4df9-bc2b-9114917f140d}'/>
+  </worksheet>
+  <worksheet name='Behaviour Signups By Program'>
+    <table>
+      <view>
+        <datasource-dependencies datasource='user_signups'>
+        <column datatype='string' name='[signup_program]' role='dimension' type='nominal'/>
+        <column datatype='string' name='[user_id]' role='dimension' type='nominal'/>
+        </datasource-dependencies>
+        <aggregation value='DatatypeSpecific'/>
+      </view>
+      <style/>
+      <panes>
+        <pane selection-relaxation-option='selection-relaxation-allow'>
+          <view>
+            <breakdown value='auto'/>
+          </view>
+          <mark class='Bar'/>
+    <encodings>
+      <text column='COUNT([user_signups].[user_id])'/>
+    </encodings>
+          <style/>
+        </pane>
+      </panes>
+      <rows>COUNT([user_signups].[user_id])</rows>
+      <cols>[user_signups].[signup_program]</cols>
+    </table>
+    <simple-id uuid='{924a8ba0-753a-4392-bdf5-bfb8ec0316d2}'/>
+  </worksheet>
+  <worksheet name='Behaviour Users By Location'>
+    <table>
+      <view>
+        <datasource-dependencies datasource='user_signups'>
+        <column datatype='string' name='[collection_location]' role='dimension' type='nominal'/>
+        <column datatype='string' name='[user_id]' role='dimension' type='nominal'/>
+        </datasource-dependencies>
+        <aggregation value='DatatypeSpecific'/>
+      </view>
+      <style/>
+      <panes>
+        <pane selection-relaxation-option='selection-relaxation-allow'>
+          <view>
+            <breakdown value='auto'/>
+          </view>
+          <mark class='Bar'/>
+    <encodings>
+      <text column='COUNT([user_signups].[user_id])'/>
+    </encodings>
+          <style/>
+        </pane>
+      </panes>
+      <rows>COUNT([user_signups].[user_id])</rows>
+      <cols>[user_signups].[collection_location]</cols>
+    </table>
+    <simple-id uuid='{9e50b788-b7df-41e3-abc8-629f70833285}'/>
+  </worksheet>
+  <worksheet name='Behaviour Activation Rate By Location'>
+    <table>
+      <view>
+        <datasource-dependencies datasource='user_signups'>
+        <column datatype='integer' name='[activated_within_7d_flag]' role='measure' type='quantitative'/>
+        <column datatype='string' name='[collection_location]' role='dimension' type='nominal'/>
+        </datasource-dependencies>
+        <aggregation value='DatatypeSpecific'/>
+      </view>
+      <style/>
+      <panes>
+        <pane selection-relaxation-option='selection-relaxation-allow'>
+          <view>
+            <breakdown value='auto'/>
+          </view>
+          <mark class='Bar'/>
+    <encodings>
+      <text column='AVG([user_signups].[activated_within_7d_flag])'/>
+    </encodings>
+          <style/>
+        </pane>
+      </panes>
+      <rows>AVG([user_signups].[activated_within_7d_flag])</rows>
+      <cols>[user_signups].[collection_location]</cols>
+    </table>
+    <simple-id uuid='{0a66ca62-ab1c-40b2-af1d-81ee7943297a}'/>
+  </worksheet>
+  <worksheet name='Behaviour Onboarding Rate By Location'>
+    <table>
+      <view>
+        <datasource-dependencies datasource='user_signups'>
+        <column datatype='string' name='[collection_location]' role='dimension' type='nominal'/>
+        <column datatype='integer' name='[onboarding_completed_flag]' role='measure' type='quantitative'/>
+        </datasource-dependencies>
+        <aggregation value='DatatypeSpecific'/>
+      </view>
+      <style/>
+      <panes>
+        <pane selection-relaxation-option='selection-relaxation-allow'>
+          <view>
+            <breakdown value='auto'/>
+          </view>
+          <mark class='Bar'/>
+    <encodings>
+      <text column='AVG([user_signups].[onboarding_completed_flag])'/>
+    </encodings>
+          <style/>
+        </pane>
+      </panes>
+      <rows>AVG([user_signups].[onboarding_completed_flag])</rows>
+      <cols>[user_signups].[collection_location]</cols>
+    </table>
+    <simple-id uuid='{1310e956-ece0-47e7-98bf-a10e5172e61b}'/>
+  </worksheet>
+  <worksheet name='Behaviour Inactivity Rate By Location'>
+    <table>
+      <view>
+        <datasource-dependencies datasource='user_signups'>
+        <column datatype='string' name='[collection_location]' role='dimension' type='nominal'/>
+        <column datatype='integer' name='[inactive_30d_flag]' role='measure' type='quantitative'/>
+        </datasource-dependencies>
+        <aggregation value='DatatypeSpecific'/>
+      </view>
+      <style/>
+      <panes>
+        <pane selection-relaxation-option='selection-relaxation-allow'>
+          <view>
+            <breakdown value='auto'/>
+          </view>
+          <mark class='Bar'/>
+    <encodings>
+      <text column='AVG([user_signups].[inactive_30d_flag])'/>
+    </encodings>
+          <style/>
+        </pane>
+      </panes>
+      <rows>AVG([user_signups].[inactive_30d_flag])</rows>
+      <cols>[user_signups].[collection_location]</cols>
+    </table>
+    <simple-id uuid='{ebc10738-668b-4e0a-8df3-017215789a5f}'/>
+  </worksheet>
+  <worksheet name='Behaviour Feature Adoption All'>
+    <table>
+      <view>
+        <datasource-dependencies datasource='feature_adoption_overall'>
+        <column datatype='real' name='[adoption_pct]' role='measure' type='quantitative'/>
+        <column datatype='string' name='[feature_name]' role='dimension' type='nominal'/>
+        </datasource-dependencies>
+        <aggregation value='DatatypeSpecific'/>
+      </view>
+      <style/>
+      <panes>
+        <pane selection-relaxation-option='selection-relaxation-allow'>
+          <view>
+            <breakdown value='auto'/>
+          </view>
+          <mark class='Bar'/>
+    <encodings>
+      <text column='SUM([feature_adoption_overall].[adoption_pct])'/>
+    </encodings>
+          <style/>
+        </pane>
+      </panes>
+      <rows>SUM([feature_adoption_overall].[adoption_pct])</rows>
+      <cols>[feature_adoption_overall].[feature_name]</cols>
+    </table>
+    <simple-id uuid='{50e6dc59-6b7a-41d5-9dcb-d5af3217a854}'/>
+  </worksheet>
+  <worksheet name='Behaviour Feature Adoption By Persona'>
+    <table>
+      <view>
+        <datasource-dependencies datasource='feature_adoption_by_persona'>
+        <column datatype='real' name='[adoption_pct]' role='measure' type='quantitative'/>
+        <column datatype='string' name='[feature_name]' role='dimension' type='nominal'/>
+        <column datatype='string' name='[persona]' role='dimension' type='nominal'/>
+        </datasource-dependencies>
+        <aggregation value='DatatypeSpecific'/>
+      </view>
+      <style/>
+      <panes>
+        <pane selection-relaxation-option='selection-relaxation-allow'>
+          <view>
+            <breakdown value='auto'/>
+          </view>
+          <mark class='Bar'/>
+          <style/>
+        </pane>
+      </panes>
+      <rows>SUM([feature_adoption_by_persona].[adoption_pct])</rows>
+      <cols>[feature_adoption_by_persona].[feature_name] / [feature_adoption_by_persona].[persona]</cols>
+    </table>
+    <simple-id uuid='{a42b8d68-d004-4f29-9d72-77e7ebd16db5}'/>
+  </worksheet>
+  <worksheet name='Behaviour Sessions By Hour'>
+    <table>
+      <view>
+        <datasource-dependencies datasource='monitoring_sessions'>
+        <column datatype='string' name='[session_id]' role='dimension' type='nominal'/>
+        <column datatype='integer' name='[start_hour_utc]' role='dimension' type='nominal'/>
+        </datasource-dependencies>
+        <aggregation value='DatatypeSpecific'/>
+      </view>
+      <style/>
+      <panes>
+        <pane selection-relaxation-option='selection-relaxation-allow'>
+          <view>
+            <breakdown value='auto'/>
+          </view>
+          <mark class='Line'/>
+          <style/>
+        </pane>
+      </panes>
+      <rows>COUNT([monitoring_sessions].[session_id])</rows>
+      <cols>[monitoring_sessions].[start_hour_utc]</cols>
+    </table>
+    <simple-id uuid='{7a2a63ce-bffc-4464-a9d9-c000951f6d8a}'/>
+  </worksheet>
+  <worksheet name='Behaviour Retention Cohort Heatmap'>
+    <table>
+      <view>
+        <datasource-dependencies datasource='retention_cohorts'>
+        <column datatype='string' name='[cohort_month]' role='dimension' type='nominal'/>
+        <column datatype='real' name='[retention_pct]' role='measure' type='quantitative'/>
+        <column datatype='integer' name='[week_number]' role='dimension' type='nominal'/>
+        </datasource-dependencies>
+        <aggregation value='DatatypeSpecific'/>
+      </view>
+      <style/>
+      <panes>
+        <pane selection-relaxation-option='selection-relaxation-allow'>
+          <view>
+            <breakdown value='auto'/>
+          </view>
+          <mark class='Square'/>
+    <encodings>
+      <color column='AVG([retention_cohorts].[retention_pct])'/>
+      <text column='AVG([retention_cohorts].[retention_pct])'/>
+    </encodings>
+          <style/>
+        </pane>
+      </panes>
+      <rows>[retention_cohorts].[cohort_month]</rows>
+      <cols>[retention_cohorts].[week_number]</cols>
+    </table>
+    <simple-id uuid='{a1756575-714b-4eff-b698-b472294f2432}'/>
+  </worksheet>
+  <worksheet name='Quality Provider Token Mix'>
+    <table>
+      <view>
+        <datasource-dependencies datasource='monitoring_sessions'>
+        <column datatype='string' name='[provider]' role='dimension' type='nominal'/>
+        <column datatype='integer' name='[total_tokens]' role='measure' type='quantitative'/>
+        </datasource-dependencies>
+        <aggregation value='DatatypeSpecific'/>
+      </view>
+      <style/>
+      <panes>
+        <pane selection-relaxation-option='selection-relaxation-allow'>
+          <view>
+            <breakdown value='auto'/>
+          </view>
+          <mark class='Bar'/>
+    <encodings>
+      <text column='SUM([monitoring_sessions].[total_tokens])'/>
+    </encodings>
+          <style/>
+        </pane>
+      </panes>
+      <rows>SUM([monitoring_sessions].[total_tokens])</rows>
+      <cols>[monitoring_sessions].[provider]</cols>
+    </table>
+    <simple-id uuid='{4fde3973-3df0-4964-80b4-7594215e7808}'/>
+  </worksheet>
+  <worksheet name='Quality CRI Level Mix'>
+    <table>
+      <view>
+        <datasource-dependencies datasource='monitoring_sessions'>
+        <column datatype='string' name='[cri_level]' role='dimension' type='nominal'/>
+        <column datatype='string' name='[session_id]' role='dimension' type='nominal'/>
+        </datasource-dependencies>
+        <aggregation value='DatatypeSpecific'/>
+      </view>
+      <style/>
+      <panes>
+        <pane selection-relaxation-option='selection-relaxation-allow'>
+          <view>
+            <breakdown value='auto'/>
+          </view>
+          <mark class='Bar'/>
+    <encodings>
+      <text column='COUNT([monitoring_sessions].[session_id])'/>
+    </encodings>
+          <style/>
+        </pane>
+      </panes>
+      <rows>COUNT([monitoring_sessions].[session_id])</rows>
+      <cols>[monitoring_sessions].[cri_level]</cols>
+    </table>
+    <simple-id uuid='{a6df988c-9ce1-4b6d-8951-2d1f9e662d1d}'/>
+  </worksheet>
+  <worksheet name='Quality Waste Index Trend'>
+    <table>
+      <view>
+        <datasource-dependencies datasource='kpi_monthly'>
+        <column datatype='real' name='[avg_cognitive_waste_index]' role='measure' type='quantitative'/>
+        <column datatype='string' name='[month]' role='dimension' type='nominal'/>
+        </datasource-dependencies>
+        <aggregation value='DatatypeSpecific'/>
+      </view>
+      <style/>
+      <panes>
+        <pane selection-relaxation-option='selection-relaxation-allow'>
+          <view>
+            <breakdown value='auto'/>
+          </view>
+          <mark class='Line'/>
+    <encodings>
+      <text column='AVG([kpi_monthly].[avg_cognitive_waste_index])'/>
+    </encodings>
+          <style/>
+        </pane>
+      </panes>
+      <rows>AVG([kpi_monthly].[avg_cognitive_waste_index])</rows>
+      <cols>[kpi_monthly].[month]</cols>
+    </table>
+    <simple-id uuid='{d11ecae0-319a-4ed7-b995-ee4602444909}'/>
+  </worksheet>
+  <worksheet name='Quality CRI Trend'>
+    <table>
+      <view>
+        <datasource-dependencies datasource='kpi_monthly'>
+        <column datatype='real' name='[avg_cri]' role='measure' type='quantitative'/>
+        <column datatype='string' name='[month]' role='dimension' type='nominal'/>
+        </datasource-dependencies>
+        <aggregation value='DatatypeSpecific'/>
+      </view>
+      <style/>
+      <panes>
+        <pane selection-relaxation-option='selection-relaxation-allow'>
+          <view>
+            <breakdown value='auto'/>
+          </view>
+          <mark class='Line'/>
+    <encodings>
+      <text column='AVG([kpi_monthly].[avg_cri])'/>
+    </encodings>
+          <style/>
+        </pane>
+      </panes>
+      <rows>AVG([kpi_monthly].[avg_cri])</rows>
+      <cols>[kpi_monthly].[month]</cols>
+    </table>
+    <simple-id uuid='{c95e6f29-fbe1-4f9a-b5d1-c57ba4e396e5}'/>
+  </worksheet>
+  <worksheet name='Quality Security Events Trend'>
+    <table>
+      <view>
+        <datasource-dependencies datasource='kpi_monthly'>
+        <column datatype='string' name='[month]' role='dimension' type='nominal'/>
+        <column datatype='real' name='[security_events_per_100_sessions]' role='measure' type='quantitative'/>
+        </datasource-dependencies>
+        <aggregation value='DatatypeSpecific'/>
+      </view>
+      <style/>
+      <panes>
+        <pane selection-relaxation-option='selection-relaxation-allow'>
+          <view>
+            <breakdown value='auto'/>
+          </view>
+          <mark class='Line'/>
+    <encodings>
+      <text column='AVG([kpi_monthly].[security_events_per_100_sessions])'/>
+    </encodings>
+          <style/>
+        </pane>
+      </panes>
+      <rows>AVG([kpi_monthly].[security_events_per_100_sessions])</rows>
+      <cols>[kpi_monthly].[month]</cols>
+    </table>
+    <simple-id uuid='{21729a54-6c06-411d-bfba-da8beec78ed1}'/>
+  </worksheet>
+  <worksheet name='Quality Efficiency Ratio Trend'>
+    <table>
+      <view>
+        <datasource-dependencies datasource='kpi_monthly'>
+        <column datatype='real' name='[avg_efficiency_ratio]' role='measure' type='quantitative'/>
+        <column datatype='string' name='[month]' role='dimension' type='nominal'/>
+        </datasource-dependencies>
+        <aggregation value='DatatypeSpecific'/>
+      </view>
+      <style/>
+      <panes>
+        <pane selection-relaxation-option='selection-relaxation-allow'>
+          <view>
+            <breakdown value='auto'/>
+          </view>
+          <mark class='Line'/>
+    <encodings>
+      <text column='AVG([kpi_monthly].[avg_efficiency_ratio])'/>
+    </encodings>
+          <style/>
+        </pane>
+      </panes>
+      <rows>AVG([kpi_monthly].[avg_efficiency_ratio])</rows>
+      <cols>[kpi_monthly].[month]</cols>
+    </table>
+    <simple-id uuid='{880b337f-6d3e-42e8-961b-a00d55d98ba6}'/>
+  </worksheet>
+  </worksheets>
+  <dashboards>
+  <dashboard name='monitr-ai Product Analytics' type='devicemocked'>
+    <style/>
+    <size maxheight='2400' maxwidth='1600' minheight='2400' minwidth='1600' type='fixed' sizing-initially-hidden='true'/>
+    <zones>
+      <zone h='100000' id='2' type-v2='layout-basic' w='100000' x='0' y='0'>
+      <zone h='2800' id='11' type-v2='text' w='100000' x='0' y='0'>
+      <formatted-text>
+        <run bold='true' fontsize='16' fontcolor='#0B5C46'>monitr-ai  |  PRODUCT ANALYTICS DASHBOARD  (PRE-LAUNCH / FREE BETA - usage data only, no payments)  |  Mar-Sep 2026  |  20,731 visitors -&gt; 1,440 signups -&gt; 964 key connections -&gt; 813 activated  |  recorded at DSU Campus (452) &amp; Outside Campus (988)</run>
+      </formatted-text>
+      </zone>
+      <zone h='6000' id='12' type-v2='text' w='100000' x='0' y='2800'>
+      <formatted-text>
+        <run bold='true' fontsize='13' fontcolor='#173A5E'>KPI SCORECARD (latest complete month: Aug 2026)</run>
+        <run fontsize='11' fontcolor='#173A5E'>  North Star - Weekly Observing Users: 231.7   |   MAU: 429   |   Stickiness DAU/MAU: 20.1%   |   Activation rate: 56.4%   |   NPS: 28.4</run>
+        <run fontsize='11' fontcolor='#173A5E'>  Power users (&gt;=8 sessions/mo): 202   |   Next-month return: 77.4%   |   W4 retention: 48.4%   |   Invite/referral share: 33.0%</run>
+        <run fontsize='11' fontcolor='#173A5E'>  Sessions: 3,195   |   Tokens monitored: 278.47M   |   Avg Cognitive Waste Index: 0.429 (lower=better)   |   Avg CRI: 0.205</run>
+      </formatted-text>
+      </zone>
+      <zone h='1100' id='13' type-v2='text' w='100000' x='0' y='8800'>
+      <formatted-text>
+        <run bold='true' fontsize='12' fontcolor='#8A3B12'>KPI IDENTIFICATION &amp; ANALYSIS - monthly trends</run>
+      </formatted-text>
+      </zone>
+      <zone h='9200' id='14' param='KPI North Star WOU Trend' type-v2='worksheet' w='25000' x='0' y='9900'/>
+      <zone h='9200' id='15' param='KPI MAU Trend' type-v2='worksheet' w='25000' x='25000' y='9900'/>
+      <zone h='9200' id='16' param='KPI Power Users Trend' type-v2='worksheet' w='25000' x='50000' y='9900'/>
+      <zone h='9200' id='17' param='KPI Next Month Return Rate Trend' type-v2='worksheet' w='25000' x='75000' y='9900'/>
+      <zone h='9200' id='18' param='KPI Activation Rate Trend' type-v2='worksheet' w='25000' x='0' y='19100'/>
+      <zone h='9200' id='19' param='KPI Invite Referral Share Trend' type-v2='worksheet' w='25000' x='25000' y='19100'/>
+      <zone h='9200' id='20' param='KPI W4 Retention Trend' type-v2='worksheet' w='25000' x='50000' y='19100'/>
+      <zone h='9200' id='21' param='KPI Sessions Trend' type-v2='worksheet' w='25000' x='75000' y='19100'/>
+      <zone h='9200' id='22' param='Quality Waste Index Trend' type-v2='worksheet' w='25000' x='0' y='28300'/>
+      <zone h='9200' id='23' param='Quality CRI Trend' type-v2='worksheet' w='25000' x='25000' y='28300'/>
+      <zone h='9200' id='24' param='KPI Tokens Monitored Trend' type-v2='worksheet' w='25000' x='50000' y='28300'/>
+      <zone h='9200' id='25' param='KPI Visitor to Signup CVR Trend' type-v2='worksheet' w='25000' x='75000' y='28300'/>
+      <zone h='5800' id='26' type-v2='text' w='100000' x='0' y='37500'>
+      <formatted-text>
+        <run bold='true' fontsize='12' fontcolor='#173A5E'>KPI FRAMEWORK (formulas - full catalogue in kpi_definitions.csv):  North Star WOU = COUNTD(user_id) with &gt;=1 monitored session per ISO week  |  Signup-&gt;Key = users with apiConfigs row / signups  |  Activation = first session &lt;=7d after key / signups  |  Stickiness = avg(DAU)/MAU  |  Pre-launch churn = inactivity: next-month return = active(m) INTERSECT active(m+1) / active(m); 30d-inactive overall = 36.3%  |  Growth (pre-launch) = invite+referral share = 35.4%  |  Product value = avg Cognitive Waste Index &amp; Efficiency Ratio; Product safety = avg CRI &amp; security events/100 sessions.</run>
+      </formatted-text>
+      </zone>
+      <zone h='1100' id='27' type-v2='text' w='100000' x='0' y='43300'>
+      <formatted-text>
+        <run bold='true' fontsize='12' fontcolor='#8A3B12'>FUNNEL ANALYSIS - visit -&gt; signup -&gt; API key -&gt; activation</run>
+      </formatted-text>
+      </zone>
+      <zone h='9500' id='28' param='Funnel Stage Volumes' type-v2='worksheet' w='44000' x='0' y='44400'/>
+      <zone h='9500' id='29' param='Funnel Conversion From Previous' type-v2='worksheet' w='30000' x='44000' y='44400'/>
+      <zone h='9500' id='30' param='Funnel Median Days Between Stages' type-v2='worksheet' w='26000' x='74000' y='44400'/>
+      <zone h='9000' id='31' param='Funnel By Channel' type-v2='worksheet' w='52000' x='0' y='53900'/>
+      <zone h='9000' id='32' param='Funnel By Location' type-v2='worksheet' w='48000' x='52000' y='53900'/>
+      <zone h='5500' id='33' type-v2='text' w='100000' x='0' y='62900'>
+      <formatted-text>
+        <run bold='true' fontsize='12' fontcolor='#8A3B12'>FUNNEL INSIGHTS:  * Visit-&gt;Signup (6.95%) is the biggest leak: newsletter (63.3% activation), referral &amp; HN are best-fit channels; organic/paid traffic needs an interactive demo + docs deep-links.  * Signup-&gt;Key (66.9%) is the biggest intentional friction (API-key anxiety): auto-detect UX, read-only-scope guidance, OAuth.  * Key-&gt;Activation (84.3% &lt;=7d, median TTA 1d): activated users return next month at 77.4% - activation is the retention gateway.  * DSU Campus: workshop floods (51.1%) convert to keys but stall before activation (50.0% vs 59.4%) - add day-2 nudges &amp; lab follow-ups.</run>
+      </formatted-text>
+      </zone>
+      <zone h='1100' id='34' type-v2='text' w='100000' x='0' y='68400'>
+      <formatted-text>
+        <run bold='true' fontsize='12' fontcolor='#8A3B12'>USER BEHAVIOUR ANALYSIS - segments, programs, features, cohorts</run>
+      </formatted-text>
+      </zone>
+      <zone h='9000' id='35' param='Behaviour Signups By Channel' type-v2='worksheet' w='25000' x='0' y='69500'/>
+      <zone h='9000' id='36' param='Behaviour Users By Location' type-v2='worksheet' w='25000' x='25000' y='69500'/>
+      <zone h='9000' id='37' param='Behaviour Users By Persona' type-v2='worksheet' w='25000' x='50000' y='69500'/>
+      <zone h='9000' id='38' param='Behaviour Activation Rate By Persona' type-v2='worksheet' w='25000' x='75000' y='69500'/>
+      <zone h='9000' id='39' param='Behaviour Signups By Program' type-v2='worksheet' w='25000' x='0' y='78500'/>
+      <zone h='9000' id='40' param='Behaviour Activation Rate By Location' type-v2='worksheet' w='25000' x='25000' y='78500'/>
+      <zone h='9000' id='41' param='Behaviour Onboarding Rate By Location' type-v2='worksheet' w='25000' x='50000' y='78500'/>
+      <zone h='9000' id='42' param='Behaviour Sessions By Hour' type-v2='worksheet' w='25000' x='75000' y='78500'/>
+      <zone h='9000' id='43' param='Behaviour Feature Adoption All' type-v2='worksheet' w='50000' x='0' y='87500'/>
+      <zone h='9000' id='44' param='Behaviour Retention Cohort Heatmap' type-v2='worksheet' w='50000' x='50000' y='87500'/>
+      <zone h='3500' id='45' type-v2='text' w='100000' x='0' y='96500'>
+      <formatted-text>
+        <run bold='true' fontsize='12' fontcolor='#173A5E'>BEHAVIOUR INSIGHTS: * Power engineers (Security 67.3%, ML 64.1% activation) drive 1.3-2x sessions - build beta community around them; PMs/Founders (36.2/34.8%) need guided first sessions.  * DSU Campus: 15.7 sessions/user, 35.8% 30d-inactive (post-workshop drift) vs Outside 36.5% - semester-start re-engagement pushes.  * Weekday-heavy usage, peak 11:00 UTC - digests at 08-10 UTC.  * Alerts lag in adoption but alert users retain ~2x better - prompt alert setup in the first session.  * Cohorts flatten after wk3 at ~40-50% of activated - durable habit pocket in Security &amp; Compliance use-cases.</run>
+      </formatted-text>
+      </zone>
+      </zone>
+    </zones>
+    <devicelayouts/>
+    <simple-id uuid='{7adb1a70-1cd9-4560-92f8-b68375827e96}'/>
+  </dashboard>
+  <dashboard name='Data Collection and Methodology' type='devicemocked'>
+    <style/>
+    <size maxheight='1400' maxwidth='1600' minheight='1400' minwidth='1600' type='fixed' sizing-initially-hidden='true'/>
+    <zones>
+      <zone h='100000' id='2' type-v2='layout-basic' w='100000' x='0' y='0'>
+      <zone h='5000' id='46' type-v2='text' w='100000' x='0' y='0'>
+      <formatted-text>
+        <run bold='true' fontsize='16' fontcolor='#0B5C46'>DATA COLLECTION - SOURCES, METHODS &amp; RELEVANCE (one CSV per product recording place + one per collection location)</run>
+        <run fontsize='14' fontcolor='#0B5C46'>PRE-LAUNCH NOTE: product is in free beta. Datasets carry ZERO billing/payment fields - pure usage, funnel, engagement &amp; product-quality analytics.</run>
+      </formatted-text>
+      </zone>
+      <zone h='45000' id='47' type-v2='text' w='50000' x='0' y='5000'>
+      <formatted-text>
+        <run bold='true' fontsize='13' fontcolor='#173A5E'>P1  WEB_VISITORS.CSV  - 20,731 rows, one per unique visitor</run>
+        <run fontsize='11' fontcolor='#173A5E'>Source: Google Analytics 4 (gtag.js G-FK3PF0KZ2R) embedded in frontend/index.html with user-id stitching via localStorage firebase_uid.</run>
+        <run fontsize='11' fontcolor='#173A5E'>Method: passive event collection (page_view, cta_click) + UTM attribution + device/geo from request headers.</run>
+        <run fontsize='11' fontcolor='#173A5E'>Relevance: top of funnel. visit-&gt;signup CVR, channel/campaign effectiveness, content views (pricing/docs/demo) that predict conversion.</run>
+        <run fontsize='11' fontcolor='#173A5E'></run>
+        <run fontsize='11' fontcolor='#173A5E'>P2  USER_SIGNUPS.CSV  - 1,440 rows, one per account</run>
+        <run fontsize='11' fontcolor='#173A5E'>Source: Firebase Authentication records created by frontend/auth.html; enriched with signup_program (open_beta / waitlist / invite_code / campus_workshop) and onboarding state. NO billing data exists.</run>
+        <run fontsize='11' fontcolor='#173A5E'>Method: authoritative transactional store (account_created event); joined back to P1 via anonymous_visitor_id (identity resolution).</run>
+        <run fontsize='11' fontcolor='#173A5E'>Relevance: the 'who'. Segments (persona, industry, company size, use case, collection_location, program), cohort_month for retention, activation &amp; engagement flags defining funnel stages 2-4.</run>
+      </formatted-text>
+      </zone>
+      <zone h='45000' id='48' type-v2='text' w='50000' x='50000' y='5000'>
+      <formatted-text>
+        <run bold='true' fontsize='13' fontcolor='#173A5E'>P3  API_KEY_CONFIGS.CSV  - 1,194 rows, one per provider key connection</run>
+        <run fontsize='11' fontcolor='#173A5E'>Source: Convex apiConfigs table, populated by frontend/key.html (provider auto-detect, key validation ping, model select, provider token prices for the USER'S OWN LLM spend estimate).</run>
+        <run fontsize='11' fontcolor='#173A5E'>Method: direct database export of the connection entity; validation attempts/latency captured during the connect UX.</run>
+        <run fontsize='11' fontcolor='#173A5E'>Relevance: the critical middle funnel stage (signup -&gt; key -&gt; value). Provider/model mix, days-to-connect, validation friction locate onboarding drop-off causes.</run>
+        <run fontsize='11' fontcolor='#173A5E'></run>
+        <run fontsize='11' fontcolor='#173A5E'>P4  MONITORING_SESSIONS.CSV  - 13,385 rows, one per monitoring session</run>
+        <run fontsize='11' fontcolor='#173A5E'>Source: Convex real-time telemetry schema (sessions, metrics, cognitiveRiskIndex, securityEvents, auditLog) powering frontend/dashboard.html &amp; telemetry.html; mirrored to Postgres via etl/webhook.ts + dbt models.</run>
+        <run fontsize='11' fontcolor='#173A5E'>Method: server-side event logging on every observed LLM interaction: tokens, latency, monitored LLM cost, efficiency, waste index, CRI components, security events, feature flags.</run>
+        <run fontsize='11' fontcolor='#173A5E'>Relevance: the behavioral truth set. Powers engagement (MAU/WAU/stickiness/power users), cohort retention, product-value (waste, efficiency) and safety (CRI, security events) KPIs.</run>
+      </formatted-text>
+      </zone>
+      <zone h='50000' id='49' type-v2='text' w='55000' x='0' y='50000'>
+      <formatted-text>
+        <run bold='true' fontsize='13' fontcolor='#173A5E'>COLLECTION LOCATIONS (one user file each)</run>
+        <run fontsize='11' fontcolor='#173A5E'>* USERS_DSU_CAMPUS.CSV  - 452 rows, one per user recorded at DSU Campus (Bengaluru).</run>
+        <run fontsize='11' fontcolor='#173A5E'>    Collection method: on-campus collection - users recorded on the campus network &amp; devices (labs, class demos, workshops). Profile: students &amp; researchers; 44.0% .edu emails, mobile-heavy, 51.1% via campus_workshop program.</run>
+        <run fontsize='11' fontcolor='#173A5E'>    Relevance: education/adoption channel. Explains signup volume, exploratory behaviour (red-team &amp; stress tests) and post-workshop engagement decay; measures the student pipeline.</run>
+        <run fontsize='11' fontcolor='#173A5E'>* USERS_OUTSIDE_CAMPUS.CSV  - 988 rows, one per user recorded outside campus.</run>
+        <run fontsize='11' fontcolor='#173A5E'>    Collection method: organic global traffic - GA4 geo/device signals + professional personas, company emails; 31.6% arrive via invites/referrals.</run>
+        <run fontsize='11' fontcolor='#173A5E'>    Relevance: the professional beta base. Higher activation (59.4%), deeper sustained engagement (16.8 sessions/user); the segment PMF decisions should be tuned on.</run>
+        <run fontsize='11' fontcolor='#173A5E'>* Field schema is IDENTICAL in both location files (and matches user_signups.csv) so they stack/union 1:1 and join onward to P3/P4 via user_id.</run>
+      </formatted-text>
+      </zone>
+      <zone h='50000' id='50' type-v2='text' w='45000' x='55000' y='50000'>
+      <formatted-text>
+        <run bold='true' fontsize='13' fontcolor='#173A5E'>COLLECTION &amp; GOVERNANCE NOTES</run>
+        <run fontsize='11' fontcolor='#173A5E'>* Identity chain: anonymous_visitor_id (GA) == anonymous_visitor_id (signup) -&gt; user_id -&gt; config_id -&gt; session_id; collection_location stamped at first recording, denormalized downstream.</run>
+        <run fontsize='11' fontcolor='#173A5E'>* Period: 2026-03-01 .. 2026-09-20 (synthetic, seeded generator - fully reproducible).</run>
+        <run fontsize='11' fontcolor='#173A5E'>* Flags stored as 0/1 integers so AVG(field) in Tableau = rate (e.g. AVG(activated_within_7d_flag) = activation rate).</run>
+        <run fontsize='11' fontcolor='#173A5E'>* No raw prompts/responses/PII exported - only structured risk scores &amp; counts (mirrors the product's zero-trust stance).</run>
+        <run fontsize='11' fontcolor='#173A5E'>* Derived sets (funnel_*, kpi_monthly*, retention_cohorts, feature_adoption_*) computed from P1-P4 - the same SQL you'd write in the dbt layer.</run>
+      </formatted-text>
+      </zone>
+      </zone>
+    </zones>
+    <devicelayouts/>
+    <simple-id uuid='{6dc2e9e1-72d2-47f8-a77a-514eda5ecdc2}'/>
+  </dashboard>
+  </dashboards>
+  <windows source-height='36'>
+    <window class='worksheet' name='KPI MAU Trend'/>
+    <window class='worksheet' name='KPI North Star WOU Trend'/>
+    <window class='worksheet' name='KPI Key Connections Trend'/>
+    <window class='worksheet' name='KPI Power Users Trend'/>
+    <window class='worksheet' name='KPI Sessions Trend'/>
+    <window class='worksheet' name='KPI Tokens Monitored Trend'/>
+    <window class='worksheet' name='KPI Activation Rate Trend'/>
+    <window class='worksheet' name='KPI Visitor to Signup CVR Trend'/>
+    <window class='worksheet' name='KPI W4 Retention Trend'/>
+    <window class='worksheet' name='KPI Next Month Return Rate Trend'/>
+    <window class='worksheet' name='KPI Invite Referral Share Trend'/>
+    <window class='worksheet' name='KPI Signups Trend'/>
+    <window class='worksheet' name='KPI Sessions By Location'/>
+    <window class='worksheet' name='KPI Activation By Location'/>
+    <window class='worksheet' name='KPI MAU By Location'/>
+    <window class='worksheet' name='Funnel Stage Volumes'/>
+    <window class='worksheet' name='Funnel Conversion From Previous'/>
+    <window class='worksheet' name='Funnel Median Days Between Stages'/>
+    <window class='worksheet' name='Funnel By Channel'/>
+    <window class='worksheet' name='Funnel By Location'/>
+    <window class='worksheet' name='Behaviour Signups By Channel'/>
+    <window class='worksheet' name='Behaviour Users By Persona'/>
+    <window class='worksheet' name='Behaviour Activation Rate By Persona'/>
+    <window class='worksheet' name='Behaviour Signups By Use Case'/>
+    <window class='worksheet' name='Behaviour Signups By Program'/>
+    <window class='worksheet' name='Behaviour Users By Location'/>
+    <window class='worksheet' name='Behaviour Activation Rate By Location'/>
+    <window class='worksheet' name='Behaviour Onboarding Rate By Location'/>
+    <window class='worksheet' name='Behaviour Inactivity Rate By Location'/>
+    <window class='worksheet' name='Behaviour Feature Adoption All'/>
+    <window class='worksheet' name='Behaviour Feature Adoption By Persona'/>
+    <window class='worksheet' name='Behaviour Sessions By Hour'/>
+    <window class='worksheet' name='Behaviour Retention Cohort Heatmap'/>
+    <window class='worksheet' name='Quality Provider Token Mix'/>
+    <window class='worksheet' name='Quality CRI Level Mix'/>
+    <window class='worksheet' name='Quality Waste Index Trend'/>
+    <window class='worksheet' name='Quality CRI Trend'/>
+    <window class='worksheet' name='Quality Security Events Trend'/>
+    <window class='worksheet' name='Quality Efficiency Ratio Trend'/>
+    <window class='dashboard' name='monitr-ai Product Analytics'/>
+    <window class='dashboard' name='Data Collection and Methodology'/>
+  </windows>
+</workbook>

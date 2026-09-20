@@ -1,0 +1,31 @@
+persona,feature_key,feature_name,feature_description,users_used,activated_users_in_scope,adoption_pct
+ML Engineer,adversarial_test_used,Adversarial / Red-Team Tests,Probing models with uncensored LLM for bias & censorship detection,170,293,58.0
+ML Engineer,batch_comparison_used,Batch Model Comparisons,Run same prompt across multiple providers and diff results,222,293,75.8
+ML Engineer,csv_export_used,Telemetry CSV Export,Export raw telemetry for external analysis,228,293,77.8
+ML Engineer,custom_alerts_used,Custom CRI Alerts,Threshold alerts on Cognitive Risk Index,204,293,69.6
+ML Engineer,stress_test_used,Stress Test Suites,Structured stress-testing of connected models,222,293,75.8
+Data Scientist,adversarial_test_used,Adversarial / Red-Team Tests,Probing models with uncensored LLM for bias & censorship detection,113,205,55.1
+Data Scientist,batch_comparison_used,Batch Model Comparisons,Run same prompt across multiple providers and diff results,140,205,68.3
+Data Scientist,csv_export_used,Telemetry CSV Export,Export raw telemetry for external analysis,158,205,77.1
+Data Scientist,custom_alerts_used,Custom CRI Alerts,Threshold alerts on Cognitive Risk Index,137,205,66.8
+Data Scientist,stress_test_used,Stress Test Suites,Structured stress-testing of connected models,109,205,53.2
+Product Manager,adversarial_test_used,Adversarial / Red-Team Tests,Probing models with uncensored LLM for bias & censorship detection,21,59,35.6
+Product Manager,batch_comparison_used,Batch Model Comparisons,Run same prompt across multiple providers and diff results,33,59,55.9
+Product Manager,csv_export_used,Telemetry CSV Export,Export raw telemetry for external analysis,37,59,62.7
+Product Manager,custom_alerts_used,Custom CRI Alerts,Threshold alerts on Cognitive Risk Index,30,59,50.8
+Product Manager,stress_test_used,Stress Test Suites,Structured stress-testing of connected models,19,59,32.2
+Founder / Exec,adversarial_test_used,Adversarial / Red-Team Tests,Probing models with uncensored LLM for bias & censorship detection,15,39,38.5
+Founder / Exec,batch_comparison_used,Batch Model Comparisons,Run same prompt across multiple providers and diff results,15,39,38.5
+Founder / Exec,csv_export_used,Telemetry CSV Export,Export raw telemetry for external analysis,17,39,43.6
+Founder / Exec,custom_alerts_used,Custom CRI Alerts,Threshold alerts on Cognitive Risk Index,14,39,35.9
+Founder / Exec,stress_test_used,Stress Test Suites,Structured stress-testing of connected models,12,39,30.8
+Security Engineer,adversarial_test_used,Adversarial / Red-Team Tests,Probing models with uncensored LLM for bias & censorship detection,97,107,90.7
+Security Engineer,batch_comparison_used,Batch Model Comparisons,Run same prompt across multiple providers and diff results,86,107,80.4
+Security Engineer,csv_export_used,Telemetry CSV Export,Export raw telemetry for external analysis,88,107,82.2
+Security Engineer,custom_alerts_used,Custom CRI Alerts,Threshold alerts on Cognitive Risk Index,72,107,67.3
+Security Engineer,stress_test_used,Stress Test Suites,Structured stress-testing of connected models,84,107,78.5
+Researcher,adversarial_test_used,Adversarial / Red-Team Tests,Probing models with uncensored LLM for bias & censorship detection,84,110,76.4
+Researcher,batch_comparison_used,Batch Model Comparisons,Run same prompt across multiple providers and diff results,77,110,70.0
+Researcher,csv_export_used,Telemetry CSV Export,Export raw telemetry for external analysis,85,110,77.3
+Researcher,custom_alerts_used,Custom CRI Alerts,Threshold alerts on Cognitive Risk Index,79,110,71.8
+Researcher,stress_test_used,Stress Test Suites,Structured stress-testing of connected models,42,110,38.2
