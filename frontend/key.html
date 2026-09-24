@@ -279,7 +279,7 @@
                 <p class="form-subtitle">Connect any AI provider to get started</p>
             </div>
 
-            <form id="api-form">
+            <form id="api-form" novalidate>
                 <!-- Provider Selector -->
                 <div class="input-group">
                     <label class="input-label" for="provider-select">Provider</label>
@@ -321,7 +321,6 @@
                             class="input-field"
                             id="api-key"
                             placeholder="Enter your API key"
-                            required
                             autocomplete="off"
                         >
                         <button type="button" class="toggle-visibility" id="toggle-key">
@@ -363,7 +362,7 @@
                     </div>
                 </div>
 
-                <button type="submit" class="btn-primary" id="submit-btn" disabled>
+                <button type="submit" class="btn-primary" id="submit-btn">
                     <span class="btn-text">
                         Connect & Launch
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -377,20 +376,7 @@
         </div>
     </div>
 
-    <script type="module">
-        // Convex is imported dynamically: the connect flow must still work when
-        // the CDN or the backend is unreachable (the save is only best-effort
-        // in demo mode, and a strict-mode failure reports a readable error
-        // instead of killing the whole page script).
-        const CONVEX_URL = "https://neat-chameleon-935.convex.cloud";
-        let client = null;
-        try {
-            const { ConvexClient } = await import("https://esm.sh/convex@1.17.4/browser");
-            client = new ConvexClient(CONVEX_URL);
-        } catch (err) {
-            console.warn("[key] Convex client unavailable — continuing without backend:", err.message);
-        }
-
+    <script>
         // ─── Provider Database ───
         const providerDB = {
             anthropic: {
@@ -598,12 +584,9 @@
 
         let resolvedProvider = null;
 
-        // ─── Demo (lenient) validation ───────────────────────────────────
-        // DEMO_MODE = true: *anything* typed in the key field is accepted, a
-        // provider and model are filled in automatically, and the connect step
-        // always lands on dashboard.html. Useful for demos, previews and
-        // screenshots where no real provider key is available.
-        // Set to false to restore strict format/length validation.
+        // ─── Local (lenient) configuration ──────────────────────────────
+        // The provider and model controls are optional display settings. Any
+        // input, including an empty key field, can continue to dashboard.html.
         const DEMO_MODE = true;
 
         // Provider used when a typed key matches no known provider format.
@@ -624,7 +607,9 @@
             keyIndicator.classList.remove('show');
             apiKeyInput.classList.add('error');
             apiKeyInput.classList.remove('success');
-            submitBtn.disabled = true;
+            // Connecting is intentionally always available. The page is a
+            // local demo entry point and never needs a remote configuration
+            // service to continue to the dashboard.
         }
 
         function hideError() {
@@ -668,15 +653,9 @@
         }
 
         function updateSubmitState() {
-            const model = getSelectedModel();
-            const key = apiKeyInput.value.trim();
-            if (DEMO_MODE) {
-                // Lenient: one character is enough, and a provider + model are
-                // auto-filled, so the button enables as soon as anything is typed.
-                submitBtn.disabled = !(resolvedProvider && key.length > 0 && model);
-                return;
-            }
-            submitBtn.disabled = !(resolvedProvider && key.length >= 5 && model);
+            // The connect action is a local navigation action. Keep it enabled
+            // even when the optional provider fields are empty.
+            submitBtn.disabled = false;
         }
 
         // ─── Toggle Key Visibility ───
@@ -798,134 +777,67 @@
         customModel.addEventListener('input', updateSubmitState);
 
         // ─── Form Submit ───
-        form.addEventListener('submit', async (e) => {
+        form.addEventListener('submit', (e) => {
             e.preventDefault();
             hideError();
-
-            const apiKey = apiKeyInput.value.trim();
-            const selectedModel = getSelectedModel();
-
-            if (!apiKey) { showError('Please enter your API key'); return; }
-            if (!DEMO_MODE && apiKey.length < 5) { showError('API key seems too short'); return; }
-            if (!resolvedProvider) { showError('Please select a provider'); return; }
-            if (!selectedModel) { showError('Please select or enter a model'); return; }
-
             submitBtn.classList.add('loading');
 
+            // Keep the dashboard self-contained. The fields remain useful for
+            // displaying a selected provider/model, but no network request is
+            // required and no credential is sent anywhere.
+            const apiKey = apiKeyInput.value.trim() || 'local-demo-key';
+            const provider = resolvedProvider || (
+                providerSelect.value !== 'auto' ? providerSelect.value : FALLBACK_PROVIDER
+            );
+            const selectedModel = getSelectedModel() || firstModelId(provider) || 'gpt-4o';
             const modelName = modelSelect.value === '__custom__'
                 ? selectedModel
-                : modelSelect.options[modelSelect.selectedIndex]?.text || selectedModel;
-            const bucket = window.keyLengthBucket ? window.keyLengthBucket(apiKey.length) : 'n/a';
-
-            // ── GA4: funnel step 2 — what was submitted. NEVER the key: only
-            //    provider/model metadata and a coarse length bucket go out. ──
-            track('key_submitted', {
-                provider: resolvedProvider,
-                provider_name: providerDB[resolvedProvider]?.name || resolvedProvider,
-                model: selectedModel,
-                source: 'key',
-                key_length: apiKey.length,
-                key_length_bucket: bucket,
-                provider_mode: providerSelect.value === 'auto' ? 'auto' : 'manual',
-                demo_mode: DEMO_MODE,
-            });
+                : modelSelect.value
+                    ? (modelSelect.options[modelSelect.selectedIndex]?.text || selectedModel)
+                    : selectedModel;
 
             const credentials = {
-                provider: resolvedProvider,
-                providerName: providerDB[resolvedProvider]?.name || resolvedProvider,
+                provider,
+                providerName: providerDB[provider]?.name || provider,
                 apiKey,
                 model: selectedModel,
                 modelName,
-                demoMode: DEMO_MODE,
+                demoMode: true,
                 timestamp: Date.now(),
             };
 
-            if (DEMO_MODE) {
-                // The configuration is stored in the app's own backend on a
-                // best-effort basis: a placeholder key must never block the
-                // connect flow, so a rejected save just logs and moves on.
-                try {
-                    await client?.mutation("api:saveApiConfig", {
-                        provider: resolvedProvider,
-                        apiKey,
-                        model: selectedModel,
-                    });
-                } catch (err) {
-                    console.warn('[demo] backend save skipped:', err.message);
-                }
-                localStorage.setItem('target_config', JSON.stringify(credentials));
-                apiKeyInput.classList.add('success');
-                submitBtn.classList.remove('loading');
-                track('key_accepted', {
-                    provider: resolvedProvider,
-                    provider_name: credentials.providerName,
-                    model: selectedModel,
-                    result: 'accepted_demo',
-                    key_length: apiKey.length,
-                    key_length_bucket: bucket,
-                    demo_mode: true,
-                });
-                // Standard GA4 lead event so the step is usable as a conversion.
-                track('generate_lead', { method: 'api_key', provider: resolvedProvider, model: selectedModel });
-                if (typeof window.trackUser === 'function') {
-                    window.trackUser({ target_provider: resolvedProvider, demo_mode: true, has_api_key: true });
-                }
-                setTimeout(() => { window.location.href = 'dashboard.html'; }, 300);
-                return;
-            }
-
-            if (!client) {
-                // Strict mode only: without a backend the configuration was not
-                // stored, so report it instead of pretending it connected.
-                showError('Unable to reach the configuration service. Please try again.');
-                submitBtn.classList.remove('loading');
-                track('key_rejected', {
-                    provider: resolvedProvider,
-                    model: selectedModel,
-                    result: 'save_failed',
-                    reason: 'backend_unavailable',
-                    demo_mode: false,
-                });
-                return;
-            }
+            track('key_submitted', {
+                provider,
+                provider_name: credentials.providerName,
+                model: selectedModel,
+                source: 'key',
+                key_length: apiKeyInput.value.trim().length,
+                key_length_bucket: window.keyLengthBucket
+                    ? window.keyLengthBucket(apiKeyInput.value.trim().length)
+                    : 'none',
+                provider_mode: providerSelect.value === 'auto' ? 'auto' : 'manual',
+                demo_mode: true,
+            });
+            track('key_accepted', {
+                provider,
+                provider_name: credentials.providerName,
+                model: selectedModel,
+                result: 'local_navigation',
+                demo_mode: true,
+            });
 
             try {
-                await client.mutation("api:saveApiConfig", {
-                    provider: resolvedProvider,
-                    apiKey,
-                    model: selectedModel,
-                });
-
                 localStorage.setItem('target_config', JSON.stringify(credentials));
-                apiKeyInput.classList.add('success');
-                submitBtn.classList.remove('loading');
-
-                track('key_accepted', {
-                    provider: resolvedProvider,
-                    provider_name: credentials.providerName,
-                    model: selectedModel,
-                    result: 'accepted',
-                    key_length: apiKey.length,
-                    key_length_bucket: bucket,
-                    demo_mode: false,
-                });
-                track('generate_lead', { method: 'api_key', provider: resolvedProvider, model: selectedModel });
-                if (typeof window.trackUser === 'function') {
-                    window.trackUser({ target_provider: resolvedProvider, demo_mode: false, has_api_key: true });
-                }
-
-                setTimeout(() => { window.location.href = 'dashboard.html'; }, 500);
-            } catch (error) {
-                showError('Failed to save API configuration: ' + error.message);
-                submitBtn.classList.remove('loading');
-                track('key_rejected', {
-                    provider: resolvedProvider,
-                    model: selectedModel,
-                    result: 'save_failed',
-                    reason: 'backend_error',
-                    demo_mode: false,
-                });
+            } catch (storageError) {
+                // Navigation must still work when browser storage is blocked.
+                console.warn('Local configuration could not be saved:', storageError);
             }
+            if (typeof window.trackUser === 'function') {
+                window.trackUser({ target_provider: provider, demo_mode: true, has_api_key: Boolean(apiKeyInput.value.trim()) });
+            }
+
+            // Navigate immediately after the click; there is no backend wait.
+            window.location.href = 'dashboard.html';
         });
 
         // ─── Restore Saved Config ───

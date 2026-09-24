@@ -493,7 +493,7 @@
                 <div class="corner corner-bl"></div><div class="corner corner-br"></div>
                 <h3 class="card-title">Adversarial Log Stream</h3>
                 <div class="log-console" id="logConsole">
-                    <div class="log-entry log-default">Connecting to telemetry stream...</div>
+                    <div class="log-entry log-default">Local telemetry preview ready</div>
                 </div>
             </div>
 
@@ -660,20 +660,7 @@
         <div class="status-item"><span id="current-time">00:00:00</span></div>
     </div>
 
-    <script type="module">
-    // ── Convex ───────────────────────────────────────────────────────
-    // Imported dynamically so the dashboard still renders (charts, layout,
-    // provider theme) when the CDN or the backend is unreachable — live data
-    // and live telemetry simply stay inactive in that case.
-    const CONVEX_URL = "https://neat-chameleon-935.convex.cloud";
-    let client = null;
-    try {
-        const { ConvexClient } = await import("https://esm.sh/convex@1.17.4/browser");
-        client = new ConvexClient(CONVEX_URL);
-    } catch (err) {
-        console.warn("[dashboard] Convex client unavailable — continuing without live data:", err.message);
-    }
-
+    <script>
     // ── Provider Display Database ────────────────────────────────────
     const providerInfo = {
         anthropic:   { name: 'Anthropic',    color: '#d97706' },
@@ -693,23 +680,23 @@
         openrouter:  { name: 'OpenRouter',   color: '#818cf8' },
     };
 
-    // ── Load Config ──────────────────────────────────────────────────
-    const configRaw = localStorage.getItem("target_config");
-    if (!configRaw) {
-        // The dashboard needs the configuration saved by key.html. Use replace so
-        // a stale history entry cannot leave the user on a broken dashboard URL.
-        window.location.replace("key.html");
-        throw new Error("No target configuration");
-    }
-
-    let config;
+    // ── Load Local Config ────────────────────────────────────────────
+    // A default keeps the dashboard available even when browser storage is
+    // disabled or the page is opened directly.
+    const defaultConfig = {
+        provider: 'openai',
+        providerName: 'OpenAI',
+        apiKey: 'local-demo-key',
+        model: 'gpt-4o',
+        modelName: 'GPT-4o',
+        demoMode: true,
+    };
+    let config = defaultConfig;
     try {
-        config = JSON.parse(configRaw);
+        const configRaw = localStorage.getItem("target_config");
+        if (configRaw) config = { ...defaultConfig, ...JSON.parse(configRaw) };
     } catch (error) {
-        console.error("Invalid target configuration:", error);
-        localStorage.removeItem("target_config");
-        window.location.replace("key.html");
-        throw new Error("Invalid target configuration");
+        console.warn("Using local dashboard defaults:", error);
     }
 
     const provider   = config.provider || "unknown";
@@ -987,8 +974,10 @@
         }
     });
 
-    // ── Real-Time Subscriptions ──────────────────────────────────────
-    client?.onUpdate("queries:getMetricsHistory", { limit: 30 }, (metrics) => {
+    // ── Local dashboard data ─────────────────────────────────────────
+    // The dashboard is intentionally self-contained. A small local sample
+    // keeps the observatory populated without a remote data connection.
+    function renderMetrics(metrics) {
         if (!metrics || metrics.length === 0) return;
 
         // Drift chart
@@ -1064,26 +1053,20 @@
         const bias = latest.biasScore ?? 0;
         document.getElementById("biasVal").innerText = bias.toFixed(2);
         document.getElementById("biasBar").style.width = (bias * 100) + "%";
-    });
+    }
 
-    // ── Logs ─────────────────────────────────────────────────────────
-    client?.onUpdate("queries:getLogs", { limit: 15 }, (logs) => {
-        if (!logs) return;
-        const logConsole = document.getElementById("logConsole");
-        logConsole.innerHTML = "";
-
-        for (const log of logs) {
-            const div = document.createElement("div");
-            const cls =
-                log.level === "ALERT" ? "log-alert" :
-                log.level === "INFO" ? "log-info" :
-                "log-default";
-            div.className = `log-entry ${cls}`;
-            div.innerText = `[${new Date(log.timestamp).toLocaleTimeString()}] ${log.message}`;
-            logConsole.appendChild(div);
-        }
-        logConsole.scrollTop = logConsole.scrollHeight;
-    });
+    const demoMetrics = Array.from({ length: 12 }, (_, index) => ({
+        semanticDrift: 0.06 + ((index % 4) * 0.018),
+        inputTokens: 720 + index * 34,
+        outputTokens: 420 + index * 18,
+        latencyMs: 180 + index * 11,
+        efficiencyRatio: 1.65 + ((index % 3) * 0.08),
+        wasteIndex: 0.18 + ((index % 5) * 0.025),
+        hallucinationProb: 0.04 + ((index % 4) * 0.012),
+        censorshipScore: 0.08 + ((index % 3) * 0.02),
+        biasScore: 0.06 + ((index % 4) * 0.015),
+    }));
+    renderMetrics(demoMetrics);
 
     // ── Continuous Monitoring State ───────────────────────────────────
     let isMonitoring = false;
@@ -1110,10 +1093,7 @@
             indicator.style.background = "var(--accent-purple)";
             indicator.style.boxShadow = "0 0 10px var(--glow-purple)";
 
-            await client?.mutation("mutations:addLog", {
-                level: "INFO",
-                message: `[${config.provider}] Monitoring stopped. Total tests: ${testCount}`,
-            });
+            addLogEntry(`[${config.provider}] Local monitoring stopped. Total tests: ${testCount}`, 'INFO');
         } else {
             // START monitoring
             isMonitoring = true;
@@ -1126,11 +1106,7 @@
             indicator.style.background = "var(--accent-green)";
             indicator.style.boxShadow = "0 0 15px var(--glow-green)";
 
-            await client?.mutation("mutations:addLog", {
-                level: "INFO",
-                message: `[${config.provider}] Continuous monitoring started. Session: ${sessionId}`,
-            });
-
+            addLogEntry(`[${config.provider}] Local monitoring started. Session: ${sessionId}`, 'INFO');
             runMonitoringLoop();
         }
     };
@@ -1141,22 +1117,9 @@
 
         try {
             testCount++;
-            const result = await client?.action("telemetry:runSingleTest", {
-                apiKey: config.apiKey,
-                provider: config.provider,
-                model: config.model,
-                sessionId: sessionId,
-            });
-
-            if (!result) {
-                // No Convex client (offline / CDN blocked) — keep the UI alive.
-                console.warn("No backend connection — telemetry test skipped");
-            } else if (result.success) {
-                // Metrics are automatically saved by the backend
-                console.log(`Test #${testCount}: ${result.categoryName} completed`);
-            } else {
-                console.error(`Test #${testCount} failed:`, result.error);
-            }
+            // Local-only monitoring: update the console without making a
+            // provider or backend request.
+            addLogEntry(`Local analysis check #${testCount} complete`, 'INFO');
         } catch (e) {
             console.error("Monitoring iteration error:", e);
         }

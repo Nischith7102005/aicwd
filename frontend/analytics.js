@@ -22,8 +22,8 @@
  *   3. string values longer than 64 chars are dropped.
  *
  * Describe a submitted key with `key_length` / `key_length_bucket` instead —
- * those are on the allowlist. The raw key itself belongs in your own backend
- * (the Convex api_configs table), never in an analytics payload.
+ * those are on the allowlist. The raw key itself is never sent to analytics.
+ * This local demo flow does not send credentials to a remote configuration service.
  */
 (function () {
     'use strict';
