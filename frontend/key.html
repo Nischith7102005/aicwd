@@ -15,6 +15,9 @@
             gtag('config', 'G-FK3PF0KZ2R');
         }
     </script>
+    <!-- Shared GA4 helpers: funnel events for the key -> dashboard flow.
+         Key material is filtered out of every payload (see analytics.js). -->
+    <script src="analytics.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>API Configuration | Observability</title>
@@ -375,10 +378,18 @@
     </div>
 
     <script type="module">
-        import { ConvexClient } from "https://esm.sh/convex@1.17.4/browser";
-
+        // Convex is imported dynamically: the connect flow must still work when
+        // the CDN or the backend is unreachable (the save is only best-effort
+        // in demo mode, and a strict-mode failure reports a readable error
+        // instead of killing the whole page script).
         const CONVEX_URL = "https://neat-chameleon-935.convex.cloud";
-        const client = new ConvexClient(CONVEX_URL);
+        let client = null;
+        try {
+            const { ConvexClient } = await import("https://esm.sh/convex@1.17.4/browser");
+            client = new ConvexClient(CONVEX_URL);
+        } catch (err) {
+            console.warn("[key] Convex client unavailable — continuing without backend:", err.message);
+        }
 
         // ─── Provider Database ───
         const providerDB = {
@@ -587,6 +598,25 @@
 
         let resolvedProvider = null;
 
+        // ─── Demo (lenient) validation ───────────────────────────────────
+        // DEMO_MODE = true: *anything* typed in the key field is accepted, a
+        // provider and model are filled in automatically, and the connect step
+        // always lands on dashboard.html. Useful for demos, previews and
+        // screenshots where no real provider key is available.
+        // Set to false to restore strict format/length validation.
+        const DEMO_MODE = true;
+
+        // Provider used when a typed key matches no known provider format.
+        const FALLBACK_PROVIDER = 'openai';
+
+        // Safe wrapper: never let a missing analytics.js break the flow.
+        const track = (name, params) => {
+            if (typeof window.trackEvent === 'function') window.trackEvent(name, params);
+        };
+
+        let entryTracked = false;
+        let trackedProvider = null;
+
         // ─── Helpers ───
         function showError(message) {
             errorText.textContent = message;
@@ -632,9 +662,21 @@
             return val;
         }
 
+        function firstModelId(provider) {
+            const data = providerDB[provider];
+            return data && data.models.length ? data.models[0].id : '';
+        }
+
         function updateSubmitState() {
             const model = getSelectedModel();
-            submitBtn.disabled = !(resolvedProvider && apiKeyInput.value.trim().length >= 5 && model);
+            const key = apiKeyInput.value.trim();
+            if (DEMO_MODE) {
+                // Lenient: one character is enough, and a provider + model are
+                // auto-filled, so the button enables as soon as anything is typed.
+                submitBtn.disabled = !(resolvedProvider && key.length > 0 && model);
+                return;
+            }
+            submitBtn.disabled = !(resolvedProvider && key.length >= 5 && model);
         }
 
         // ─── Toggle Key Visibility ───
@@ -672,15 +714,48 @@
             const key = apiKeyInput.value.trim();
             const isAutoMode = providerSelect.value === 'auto';
 
+            if (key && !entryTracked) {
+                // Funnel step 1 — fired once per page, never with the key itself.
+                entryTracked = true;
+                track('key_entry_started', { page: 'key', source: 'api_key_field' });
+            }
+
             if (isAutoMode) {
-                const detected = detectProvider(key);
-                if (detected && providerDB[detected]) {
-                    resolvedProvider = detected;
-                    keyTypeText.textContent = `${providerDB[detected].name} key detected`;
+                const detected = key ? detectProvider(key) : null;
+                // DEMO_MODE: an unrecognised key falls back to a default provider
+                // instead of being rejected, so every input is accepted.
+                const provider = (detected && providerDB[detected])
+                    ? detected
+                    : (DEMO_MODE && key ? FALLBACK_PROVIDER : null);
+
+                if (provider) {
+                    const wasDetected = detected === provider;
+                    if (!wasDetected && DEMO_MODE) {
+                        console.info('[demo] key format not recognised — accepted anyway');
+                    }
+                    resolvedProvider = provider;
+                    keyTypeText.textContent = wasDetected
+                        ? `${providerDB[provider].name} key detected`
+                        : `${providerDB[provider].name} key accepted`;
                     keyIndicator.classList.add('show');
                     apiKeyInput.classList.add('success');
-                    populateModels(detected);
-                } else if (key.length >= 20) {
+                    populateModels(provider);
+                    if (!getSelectedModel()) {
+                        const auto = firstModelId(provider);
+                        if (auto) modelSelect.value = auto;
+                    }
+                    if (trackedProvider !== provider) {
+                        trackedProvider = provider;
+                        track('key_provider_resolved', {
+                            provider,
+                            provider_name: providerDB[provider].name,
+                            auto_detected: wasDetected,
+                            key_length: key.length,
+                            key_length_bucket: window.keyLengthBucket ? window.keyLengthBucket(key.length) : 'n/a',
+                            demo_mode: DEMO_MODE,
+                        });
+                    }
+                } else if (!DEMO_MODE && key.length >= 20) {
                     // Key is long enough but can't auto-detect — prompt manual selection
                     resolvedProvider = null;
                     keyTypeText.textContent = 'Key detected — select provider above';
@@ -698,7 +773,7 @@
                 }
             } else {
                 // Manual mode — just validate key length
-                if (key.length >= 5) {
+                if (key.length >= (DEMO_MODE ? 1 : 5)) {
                     apiKeyInput.classList.add('success');
                     apiKeyInput.classList.remove('error');
                 } else {
@@ -731,11 +806,88 @@
             const selectedModel = getSelectedModel();
 
             if (!apiKey) { showError('Please enter your API key'); return; }
-            if (apiKey.length < 5) { showError('API key seems too short'); return; }
+            if (!DEMO_MODE && apiKey.length < 5) { showError('API key seems too short'); return; }
             if (!resolvedProvider) { showError('Please select a provider'); return; }
             if (!selectedModel) { showError('Please select or enter a model'); return; }
 
             submitBtn.classList.add('loading');
+
+            const modelName = modelSelect.value === '__custom__'
+                ? selectedModel
+                : modelSelect.options[modelSelect.selectedIndex]?.text || selectedModel;
+            const bucket = window.keyLengthBucket ? window.keyLengthBucket(apiKey.length) : 'n/a';
+
+            // ── GA4: funnel step 2 — what was submitted. NEVER the key: only
+            //    provider/model metadata and a coarse length bucket go out. ──
+            track('key_submitted', {
+                provider: resolvedProvider,
+                provider_name: providerDB[resolvedProvider]?.name || resolvedProvider,
+                model: selectedModel,
+                source: 'key',
+                key_length: apiKey.length,
+                key_length_bucket: bucket,
+                provider_mode: providerSelect.value === 'auto' ? 'auto' : 'manual',
+                demo_mode: DEMO_MODE,
+            });
+
+            const credentials = {
+                provider: resolvedProvider,
+                providerName: providerDB[resolvedProvider]?.name || resolvedProvider,
+                apiKey,
+                model: selectedModel,
+                modelName,
+                demoMode: DEMO_MODE,
+                timestamp: Date.now(),
+            };
+
+            if (DEMO_MODE) {
+                // The configuration is stored in the app's own backend on a
+                // best-effort basis: a placeholder key must never block the
+                // connect flow, so a rejected save just logs and moves on.
+                try {
+                    await client?.mutation("api:saveApiConfig", {
+                        provider: resolvedProvider,
+                        apiKey,
+                        model: selectedModel,
+                    });
+                } catch (err) {
+                    console.warn('[demo] backend save skipped:', err.message);
+                }
+                localStorage.setItem('target_config', JSON.stringify(credentials));
+                apiKeyInput.classList.add('success');
+                submitBtn.classList.remove('loading');
+                track('key_accepted', {
+                    provider: resolvedProvider,
+                    provider_name: credentials.providerName,
+                    model: selectedModel,
+                    result: 'accepted_demo',
+                    key_length: apiKey.length,
+                    key_length_bucket: bucket,
+                    demo_mode: true,
+                });
+                // Standard GA4 lead event so the step is usable as a conversion.
+                track('generate_lead', { method: 'api_key', provider: resolvedProvider, model: selectedModel });
+                if (typeof window.trackUser === 'function') {
+                    window.trackUser({ target_provider: resolvedProvider, demo_mode: true, has_api_key: true });
+                }
+                setTimeout(() => { window.location.href = 'dashboard.html'; }, 300);
+                return;
+            }
+
+            if (!client) {
+                // Strict mode only: without a backend the configuration was not
+                // stored, so report it instead of pretending it connected.
+                showError('Unable to reach the configuration service. Please try again.');
+                submitBtn.classList.remove('loading');
+                track('key_rejected', {
+                    provider: resolvedProvider,
+                    model: selectedModel,
+                    result: 'save_failed',
+                    reason: 'backend_unavailable',
+                    demo_mode: false,
+                });
+                return;
+            }
 
             try {
                 await client.mutation("api:saveApiConfig", {
@@ -744,25 +896,35 @@
                     model: selectedModel,
                 });
 
-                const credentials = {
-                    provider: resolvedProvider,
-                    providerName: providerDB[resolvedProvider]?.name || resolvedProvider,
-                    apiKey,
-                    model: selectedModel,
-                    modelName: modelSelect.value === '__custom__'
-                        ? selectedModel
-                        : modelSelect.options[modelSelect.selectedIndex]?.text || selectedModel,
-                    timestamp: Date.now(),
-                };
-
                 localStorage.setItem('target_config', JSON.stringify(credentials));
                 apiKeyInput.classList.add('success');
                 submitBtn.classList.remove('loading');
+
+                track('key_accepted', {
+                    provider: resolvedProvider,
+                    provider_name: credentials.providerName,
+                    model: selectedModel,
+                    result: 'accepted',
+                    key_length: apiKey.length,
+                    key_length_bucket: bucket,
+                    demo_mode: false,
+                });
+                track('generate_lead', { method: 'api_key', provider: resolvedProvider, model: selectedModel });
+                if (typeof window.trackUser === 'function') {
+                    window.trackUser({ target_provider: resolvedProvider, demo_mode: false, has_api_key: true });
+                }
 
                 setTimeout(() => { window.location.href = 'dashboard.html'; }, 500);
             } catch (error) {
                 showError('Failed to save API configuration: ' + error.message);
                 submitBtn.classList.remove('loading');
+                track('key_rejected', {
+                    provider: resolvedProvider,
+                    model: selectedModel,
+                    result: 'save_failed',
+                    reason: 'backend_error',
+                    demo_mode: false,
+                });
             }
         });
 
