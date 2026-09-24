@@ -30,6 +30,38 @@ npx convex dev
 npm run dev
 ```
 
+## Connect Flow (`index → auth → key → dashboard`)
+
+The API-key step is runnable in **demo mode** — see `DEMO_MODE` in
+`frontend/key.html`:
+
+- anything typed into the key field is accepted; if the format matches no known
+  provider, a provider and model are filled in automatically and the flow always
+  lands on `dashboard.html`;
+- the configuration is still written to `localStorage.target_config` and sent to
+  Convex (`api:saveApiConfig`) on a best-effort basis, so a placeholder key can
+  never block the flow;
+- set `DEMO_MODE = false` to restore strict format/length validation.
+
+### GA4 events
+
+`frontend/analytics.js` wraps gtag (measurement ID `G-FK3PF0KZ2R`) for the funnel:
+
+| Event | Fired when | Parameters |
+| --- | --- | --- |
+| `key_entry_started` | first character typed into the key field | `page` |
+| `key_provider_resolved` | provider detected (or accepted) | `provider`, `auto_detected`, `key_length_bucket` |
+| `key_submitted` | connect is pressed | `provider`, `model`, `provider_mode`, `demo_mode` |
+| `key_accepted` / `key_rejected` | configuration saved, or failed | `result`, `reason` |
+| `generate_lead` | successful connect (usable as a GA4 conversion) | `method`, `provider` |
+| `dashboard_opened` | dashboard loaded from a submitted key | `provider`, `model`, `demo_mode` |
+| `key_change_requested` | "CHANGE KEY" clicked | `source` |
+
+API keys are **never** sent to Google Analytics, raw or masked. The helper
+allowlists the parameter names above and drops secret-looking values, so only
+metadata (provider, model, key-length bucket) reaches GA4. The key itself belongs
+in the app's own backend (`api_configs` in Convex).
+
 ## ETL Pipeline
 
 The ETL pipeline exports telemetry data from Convex to Postgres for advanced analytics.

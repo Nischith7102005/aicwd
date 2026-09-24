@@ -15,6 +15,9 @@
             gtag('config', 'G-FK3PF0KZ2R');
         }
     </script>
+    <!-- Shared GA4 helpers: funnel events for the key -> dashboard flow.
+         Key material is filtered out of every payload (see analytics.js). -->
+    <script src="analytics.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard | Target Key</title>
@@ -442,7 +445,7 @@
             </div>
             <div class="header-actions">
                 <button class="btn btn-success" id="monitoring-btn" onclick="toggleMonitoring()">▶ START_MONITORING</button>
-                <button class="btn btn-ghost" onclick="window.location.href='key.html'">CHANGE KEY</button>
+                <button class="btn btn-ghost" onclick="if (window.trackEvent) window.trackEvent('key_change_requested', { source: 'dashboard' }); window.location.href='key.html'">CHANGE KEY</button>
             </div>
         </header>
 
@@ -658,11 +661,18 @@
     </div>
 
     <script type="module">
-    import { ConvexClient } from "https://esm.sh/convex@1.17.4/browser";
-
     // ── Convex ───────────────────────────────────────────────────────
+    // Imported dynamically so the dashboard still renders (charts, layout,
+    // provider theme) when the CDN or the backend is unreachable — live data
+    // and live telemetry simply stay inactive in that case.
     const CONVEX_URL = "https://neat-chameleon-935.convex.cloud";
-    const client = new ConvexClient(CONVEX_URL);
+    let client = null;
+    try {
+        const { ConvexClient } = await import("https://esm.sh/convex@1.17.4/browser");
+        client = new ConvexClient(CONVEX_URL);
+    } catch (err) {
+        console.warn("[dashboard] Convex client unavailable — continuing without live data:", err.message);
+    }
 
     // ── Provider Display Database ────────────────────────────────────
     const providerInfo = {
@@ -712,6 +722,30 @@
             ? `${config.apiKey.slice(0, 4)}${"•".repeat(Math.min(8, config.apiKey.length - 8))}${config.apiKey.slice(-4)}`
             : `${config.apiKey.slice(0, 2)}••${config.apiKey.slice(-2)}`
         : "UNKNOWN";
+
+    // ── GA4: funnel step 3 — the dashboard loaded from a submitted key.
+    //    Only metadata goes out; the key itself (and maskedKey above) is
+    //    deliberately never forwarded to analytics. ──
+    if (typeof window.trackEvent === 'function') {
+        window.trackEvent('dashboard_opened', {
+            provider,
+            provider_name: pInfo.name,
+            model: config.model || 'unknown',
+            source: 'key',
+            demo_mode: config.demoMode === true,
+            key_length: config.apiKey ? config.apiKey.length : 0,
+            key_length_bucket: window.keyLengthBucket && config.apiKey
+                ? window.keyLengthBucket(config.apiKey.length)
+                : 'none',
+        });
+        if (typeof window.trackUser === 'function') {
+            window.trackUser({
+                target_provider: provider,
+                demo_mode: config.demoMode === true,
+                has_api_key: Boolean(config.apiKey),
+            });
+        }
+    }
 
     // Apply provider theme color
     document.documentElement.style.setProperty('--provider-color', pInfo.color);
@@ -954,7 +988,7 @@
     });
 
     // ── Real-Time Subscriptions ──────────────────────────────────────
-    client.onUpdate("queries:getMetricsHistory", { limit: 30 }, (metrics) => {
+    client?.onUpdate("queries:getMetricsHistory", { limit: 30 }, (metrics) => {
         if (!metrics || metrics.length === 0) return;
 
         // Drift chart
@@ -1033,7 +1067,7 @@
     });
 
     // ── Logs ─────────────────────────────────────────────────────────
-    client.onUpdate("queries:getLogs", { limit: 15 }, (logs) => {
+    client?.onUpdate("queries:getLogs", { limit: 15 }, (logs) => {
         if (!logs) return;
         const logConsole = document.getElementById("logConsole");
         logConsole.innerHTML = "";
@@ -1076,7 +1110,7 @@
             indicator.style.background = "var(--accent-purple)";
             indicator.style.boxShadow = "0 0 10px var(--glow-purple)";
 
-            await client.mutation("mutations:addLog", {
+            await client?.mutation("mutations:addLog", {
                 level: "INFO",
                 message: `[${config.provider}] Monitoring stopped. Total tests: ${testCount}`,
             });
@@ -1092,7 +1126,7 @@
             indicator.style.background = "var(--accent-green)";
             indicator.style.boxShadow = "0 0 15px var(--glow-green)";
 
-            await client.mutation("mutations:addLog", {
+            await client?.mutation("mutations:addLog", {
                 level: "INFO",
                 message: `[${config.provider}] Continuous monitoring started. Session: ${sessionId}`,
             });
@@ -1107,14 +1141,17 @@
 
         try {
             testCount++;
-            const result = await client.action("telemetry:runSingleTest", {
+            const result = await client?.action("telemetry:runSingleTest", {
                 apiKey: config.apiKey,
                 provider: config.provider,
                 model: config.model,
                 sessionId: sessionId,
             });
 
-            if (result.success) {
+            if (!result) {
+                // No Convex client (offline / CDN blocked) — keep the UI alive.
+                console.warn("No backend connection — telemetry test skipped");
+            } else if (result.success) {
                 // Metrics are automatically saved by the backend
                 console.log(`Test #${testCount}: ${result.categoryName} completed`);
             } else {
