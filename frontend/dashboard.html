@@ -686,16 +686,31 @@
     // ── Load Config ──────────────────────────────────────────────────
     const configRaw = localStorage.getItem("target_config");
     if (!configRaw) {
-        window.location.href = "key.html";
-        throw new Error("No config");
+        // The dashboard needs the configuration saved by key.html. Use replace so
+        // a stale history entry cannot leave the user on a broken dashboard URL.
+        window.location.replace("key.html");
+        throw new Error("No target configuration");
     }
-    const config = JSON.parse(configRaw);
+
+    let config;
+    try {
+        config = JSON.parse(configRaw);
+    } catch (error) {
+        console.error("Invalid target configuration:", error);
+        localStorage.removeItem("target_config");
+        window.location.replace("key.html");
+        throw new Error("Invalid target configuration");
+    }
 
     const provider   = config.provider || "unknown";
     const pInfo      = providerInfo[provider] || { name: provider.toUpperCase(), color: '#a855f7' };
     const modelLabel = (config.modelName || config.model || "UNKNOWN").toUpperCase();
+    // API keys shorter than eight characters are accepted by key.html for
+    // development/testing. Avoid String.repeat() receiving a negative count.
     const maskedKey  = config.apiKey
-        ? `${config.apiKey.slice(0, 4)}${"•".repeat(Math.min(8, config.apiKey.length - 8))}${config.apiKey.slice(-4)}`
+        ? config.apiKey.length > 8
+            ? `${config.apiKey.slice(0, 4)}${"•".repeat(Math.min(8, config.apiKey.length - 8))}${config.apiKey.slice(-4)}`
+            : `${config.apiKey.slice(0, 2)}••${config.apiKey.slice(-2)}`
         : "UNKNOWN";
 
     // Apply provider theme color
@@ -721,6 +736,9 @@
     const canvas = document.getElementById("dither-canvas");
     const gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
 
+    // WebGL is unavailable in some browsers, privacy modes, and embedded
+    // previews. The dashboard must still load without its decorative canvas.
+    if (gl) {
     const vertexShaderSource = `attribute vec2 a_position; void main() { gl_Position = vec4(a_position, 0.0, 1.0); }`;
     const fragmentShaderSource = `
         precision highp float;
@@ -836,6 +854,9 @@
         requestAnimationFrame(renderBg);
     }
     requestAnimationFrame(renderBg);
+    } else {
+        canvas.style.display = "none";
+    }
 
     // ── Charts ───────────────────────────────────────────────────────
     const providerAccent = pInfo.color;
