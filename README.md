@@ -38,10 +38,10 @@ The API-key step is runnable in **demo mode** — see `DEMO_MODE` in
 - anything typed into the key field is accepted; if the format matches no known
   provider, a provider and model are filled in automatically and the flow always
   lands on `dashboard.html`;
-- the configuration is still written to `localStorage.target_config` and sent to
-  Convex (`api:saveApiConfig`) on a best-effort basis, so a placeholder key can
-  never block the flow;
-- set `DEMO_MODE = false` to restore strict format/length validation.
+- the configuration is written to `localStorage.target_config` and the flow
+  continues locally; no remote configuration service is contacted, so a
+  placeholder key can never block the flow;
+- the provider and model controls are optional; pressing **Connect & Launch** always navigates to the local dashboard.
 
 ### GA4 events
 
@@ -59,8 +59,8 @@ The API-key step is runnable in **demo mode** — see `DEMO_MODE` in
 
 API keys are **never** sent to Google Analytics, raw or masked. The helper
 allowlists the parameter names above and drops secret-looking values, so only
-metadata (provider, model, key-length bucket) reaches GA4. The key itself belongs
-in the app's own backend (`api_configs` in Convex).
+metadata (provider, model, key-length bucket) reaches GA4. The connect flow is
+local-only and does not send the key to a remote configuration backend.
 
 ## ETL Pipeline
 

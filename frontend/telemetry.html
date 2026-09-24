@@ -640,12 +640,7 @@
         </section>
     </main>
 
-    <script type="module">
-    import { ConvexClient } from "https://esm.sh/convex@1.17.4/browser";
-
-    const CONVEX_URL = "https://neat-chameleon-935.convex.cloud";
-    const client = new ConvexClient(CONVEX_URL);
-
+    <script>
     // ═══════════════════════════════════════════════════════════════════════════
     // CRI COLOR HELPERS
     // ═══════════════════════════════════════════════════════════════════════════
@@ -817,11 +812,12 @@
     });
 
     // ═══════════════════════════════════════════════════════════════════════════
-    // REAL-TIME SUBSCRIPTIONS
+    // LOCAL SAMPLE DATA
     // ═══════════════════════════════════════════════════════════════════════════
 
-    // Subscribe to CRI updates
-    client.onUpdate("queries:getRecentCRIHistory", { limit: 30 }, (records) => {
+    // The telemetry view is a static preview and does not require a remote
+    // database connection. Render a representative local snapshot instead.
+    function renderCRIHistory(records) {
         if (!records || records.length === 0) return;
         
         // Update chart
@@ -848,10 +844,10 @@
                 toolMisuse: latest.toolMisuseRisk,
             });
         }
-    });
+    }
 
-    // Subscribe to security events
-    client.onUpdate("queries:getRecentSecurityEvents", { limit: 15 }, (events) => {
+    // Render local security events
+    function renderSecurityEvents(events) {
         if (!events) return;
         
         document.getElementById('eventCount').textContent = events.length;
@@ -864,10 +860,10 @@
         const stream = document.getElementById('eventStream');
         stream.innerHTML = '';
         events.reverse().forEach(event => addEvent(event));
-    });
+    }
 
-    // Subscribe to injection patterns
-    client.onUpdate("queries:getInjectionPatternStats", { hours: 24 }, (stats) => {
+    // Render local injection pattern counts
+    function renderInjectionPatterns(stats) {
         if (!stats) return;
         
         // Map pattern types to chart indices
@@ -887,7 +883,32 @@
         
         injectionChart.data.datasets[0].data = data;
         injectionChart.update('none');
-    });
+    }
+
+    const now = Date.now();
+    const localCRIHistory = Array.from({ length: 12 }, (_, index) => ({
+        timestamp: now - (11 - index) * 300000,
+        cri: 0.12 + ((index % 5) * 0.035),
+        injectionRisk: 0.08 + ((index % 3) * 0.025),
+        leakageRisk: 0.06 + ((index % 4) * 0.018),
+        hallucinationRisk: 0.05 + ((index % 3) * 0.02),
+        biasRisk: 0.07 + ((index % 4) * 0.015),
+        anomalyRisk: 0.04 + ((index % 3) * 0.02),
+        toolMisuseRisk: 0.03 + ((index % 2) * 0.02),
+    }));
+    renderCRIHistory(localCRIHistory);
+
+    const localSecurityEvents = [
+        { timestamp: now - 120000, severity: 'low', eventType: 'Local preview', description: 'Telemetry stream is running locally' },
+        { timestamp: now - 480000, severity: 'info', eventType: 'Baseline ready', description: 'Security indicators initialized' },
+    ];
+    renderSecurityEvents(localSecurityEvents);
+
+    renderInjectionPatterns([
+        { patternType: 'instructionOverride', count: 2 },
+        { patternType: 'jailbreak', count: 1 },
+        { patternType: 'dataExfiltration', count: 1 },
+    ]);
 
     // ═══════════════════════════════════════════════════════════════════════════
     // CLOCK
