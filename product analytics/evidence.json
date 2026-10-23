@@ -1,0 +1,62 @@
+{
+  "data_kind": "synthetic",
+  "as_of": "2026-09-20",
+  "visitors": 20731,
+  "signups": 1440,
+  "config_rows": 1194,
+  "connected_users": 964,
+  "activation_flags": 813,
+  "session_observed_users": 804,
+  "activation_flags_without_sessions": 9,
+  "sessions": 13385,
+  "inactive_flag_count": 295,
+  "inactivity_denominator": 813,
+  "inactivity_pct": 36.29,
+  "mature_w4_by_signup_cohort": [
+    {
+      "month": "2026-03",
+      "eligible": 80,
+      "retained": 48,
+      "rate": 60.0
+    },
+    {
+      "month": "2026-04",
+      "eligible": 79,
+      "retained": 41,
+      "rate": 51.9
+    },
+    {
+      "month": "2026-05",
+      "eligible": 110,
+      "retained": 72,
+      "rate": 65.5
+    },
+    {
+      "month": "2026-06",
+      "eligible": 115,
+      "retained": 65,
+      "rate": 56.5
+    },
+    {
+      "month": "2026-07",
+      "eligible": 156,
+      "retained": 113,
+      "rate": 72.4
+    },
+    {
+      "month": "2026-08",
+      "eligible": 63,
+      "retained": 46,
+      "rate": 73.0
+    }
+  ],
+  "ab_test_status": "proposed, not executed",
+  "ab_planning_signups_per_arm": 586,
+  "model_training_status": "source inspected; not executed or independently validated",
+  "checks": {
+    "unique_primary_ids": true,
+    "session_user_and_config_references": true,
+    "session_totals_reconcile": true
+  },
+  "figures": 10
+}

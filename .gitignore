@@ -42,3 +42,6 @@ etl/ml-service/notebooks/.ipynb_checkpoints/
 # Jupyter
 .ipynb_checkpoints/
 *.ipynb_checkpoints
+
+# Local report-generation environment
+.venv/
