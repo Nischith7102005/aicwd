@@ -1,0 +1,385 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>monitr-ai | Implementation</title><style>
+body{font-family:system-ui,sans-serif;max-width:1000px;margin:48px auto;padding:0 24px;color:#142b49;line-height:1.65;background:#fbfdff}h1{font-size:40px}h2{border-bottom:2px solid #008c95;padding-bottom:12px;margin-top:48px}img{width:100%;height:auto;border:1px solid #e0e8f0;border-radius:8px}table{border-collapse:collapse;width:100%;font-size:14px;margin:24px 0}th{background:#142b49;color:white}th,td{padding:12px;text-align:left;border:1px solid #dfe6ed}tr:nth-child(even){background:#eff5fa}blockquote{border-left:5px solid #df8735;background:#fff4e8;padding:16px 24px;margin:24px 0}code{overflow-wrap:anywhere}@media print{h2{break-before:page}img{break-inside:avoid}body{margin:0;max-width:none}}
+</style><main><h1>Chapter 4 | Implementation</h1>
+<h2>Project: monitr-ai - LLM Observability Platform</h2>
+<p>Prepared 23 October 2026 | Dataset window: 1 March - 20 September 2026</p>
+<blockquote>
+<p>Evidence notice: All supplied product-analytics records are SYNTHETIC. Charts are not real customer results. Existing code, descriptive calculations, illustrative arithmetic and proposed work are identified separately. No A/B uplift or trained-model performance is invented.</p>
+</blockquote>
+<p>This chapter addresses Sections 4.1-4.10 with ten reusable figures. It is based on the repository README, analytics CSVs and generator, frontend event/demo code, ETL implementation and ML-service source.</p>
+<h2>Contents</h2>
+<ul>
+<li>4.1 Funnel Analysis</li>
+<li>4.2 Churn Analysis</li>
+<li>4.3 Data Generators &amp; Import</li>
+<li>4.4 Analysis and Identifying the Issue(s) and Solution(s) for the Same (With Data Evidence)</li>
+<li>4.5 Arrive at Strategy and Implement</li>
+<li>4.6 Synthetic Data Generation</li>
+<li>4.7 A/B Test</li>
+<li>4.8 Identify the Right Model and Train</li>
+<li>4.9 Model Predictions and Recommendations</li>
+<li>4.10 Observations/Results</li>
+</ul>
+<h2>4.1 Funnel Analysis</h2>
+<p>Funnel analysis examines how users move from discovering monitr-ai to receiving monitoring value. The supplied synthetic data covers 1 March to 20 September 2026. The funnel uses unique visitors and unique users; multiple API-key configuration rows must not be counted as separate users.</p>
+<table>
+<thead>
+<tr>
+<th>Stage</th>
+<th>Count</th>
+<th>Conversion from previous stage</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Website visit</td>
+<td>20,731</td>
+<td>100.00% (starting population)</td>
+</tr>
+<tr>
+<td>Account signup</td>
+<td>1,440</td>
+<td>6.95%</td>
+</tr>
+<tr>
+<td>API key connected</td>
+<td>964</td>
+<td>66.94%</td>
+</tr>
+<tr>
+<td>Activation flag</td>
+<td>813</td>
+<td>84.34%</td>
+</tr>
+</tbody>
+</table>
+<p>The largest absolute drop is visitor to signup: 19,291 visitors do not create an account. After signup, 476 users do not connect a key, and 151 connected users lack an activation flag. End-to-end flagged activation is 3.92% of visitors; 56.46% of signups receive the activation flag. The dataset reports a one-day median signup-to-configuration delay.</p>
+<p>Interpretation: improve landing-page value communication and the provider-connection experience. These are hypotheses supported by simulated drop-offs, not proven reasons for abandonment. The generator defines activation within seven days of key connection, not signup. Importantly, only 804 of the 813 flagged users have any session record: nine synthetic flags are inconsistent with observed activation. Therefore the report calls this an activation-flag funnel, not a verified first-session funnel.</p>
+<p><img alt="Figure 4.1. Synthetic acquisition funnel. Counts use the supplied flags, including the nine flagged users without a recorded session." src="images/4_1_funnel.png" /></p>
+<p><em>Figure 4.1. Synthetic acquisition funnel. Counts use the supplied flags, including the nine flagged users without a recorded session.</em></p>
+<p>Evidence: analytics/data/funnel_overall.csv; user_signups.csv; monitoring_sessions.csv; analytics/generate_data.py (signup and session generation).</p>
+<h2>4.2 Churn Analysis</h2>
+<p>monitr-ai is described as a pre-launch, free-beta product. Subscription cancellations, paid churn and revenue churn are therefore not appropriate measures. This analysis uses the existing inactivity proxy: an activated user with more than 30 days since the last recorded monitoring session as of 20 September 2026.</p>
+<table>
+<thead>
+<tr>
+<th>Segment</th>
+<th>Inactive / activation flags</th>
+<th>Inactivity rate</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Overall</td>
+<td>295 / 813</td>
+<td>36.3%</td>
+</tr>
+<tr>
+<td>DSU Campus</td>
+<td>81 / 226</td>
+<td>35.8%</td>
+</tr>
+<tr>
+<td>Outside Campus</td>
+<td>214 / 587</td>
+<td>36.5%</td>
+</tr>
+</tbody>
+</table>
+<p>The campus and outside-campus inactivity rates differ by only 0.7 percentage points. The data does not support a claim that campus users churn substantially more. Outside-campus users activate more often, but their snapshot inactivity is not lower. Usage-history length, recent activation and incident-driven use may affect this proxy; the snapshot denominator is not exposure-adjusted and the nine flagged users without sessions are not identified as inactive by the generator.</p>
+<p>A separate retention measure checks whether a user has a session in activation days [28,35). To avoid right-censoring, this report requires the full 35-day observation window. In the August signup cohort, 46 of 63 eligible users return in week four (73.0%). The supplied monthly CSV instead reports 48.4%, using an incompletely observed cohort denominator. These values answer different calculations and must not be silently interchanged. August-to-September return of 77.4% is also provisional because September stops on the 20th.</p>
+<p><img alt="Figure 4.2. Snapshot inactivity rates using the existing all-activation-flags denominator." src="images/4_2_inactivity.png" /></p>
+<p><em>Figure 4.2. Snapshot inactivity rates using the existing all-activation-flags denominator.</em></p>
+<p>Recommended retention actions: opt-in weekly insight summaries, meaningful CRI alerts and first-session support. Evaluate them using mature cohorts rather than treating a synthetic correlation as causation.</p>
+<h2>4.3 Data Generators &amp; Import</h2>
+<p>The repository has two distinct data-generation paths: a product-analytics generator and a security-training generator. analytics/generate_data.py creates linked CSVs with random seed 42. These files feed the Tableau analytics pack and the figures in this report. They are not exports of real visitors or real campus participants.</p>
+<table>
+<thead>
+<tr>
+<th>Dataset / component</th>
+<th>Purpose</th>
+<th>Rows / mechanism</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>web_visitors.csv</td>
+<td>Acquisition and visitor-to-signup joins</td>
+<td>20,731 rows</td>
+</tr>
+<tr>
+<td>user_signups.csv</td>
+<td>User attributes, onboarding and flags</td>
+<td>1,440 rows</td>
+</tr>
+<tr>
+<td>api_key_configs.csv</td>
+<td>Provider configuration attempts / records</td>
+<td>1,194 rows; 964 users</td>
+</tr>
+<tr>
+<td>monitoring_sessions.csv</td>
+<td>Usage, quality and safety telemetry</td>
+<td>13,385 rows</td>
+</tr>
+<tr>
+<td>users_dsu_campus / users_outside_campus</td>
+<td>Location partitions of signups</td>
+<td>452 + 988 = 1,440</td>
+</tr>
+</tbody>
+</table>
+<p>For the intended live pipeline, Convex exports telemetry to etl/webhook.ts, which writes to PostgreSQL. dbt staging models standardize raw events; marts aggregate daily metrics, provider comparisons and cognitive waste. The frontend GA4 helper records allowlisted onboarding metadata. The current key-connection demo saves configuration locally, so it should not be described as a verified live API-key validation import. CSV analytics are a separate offline analysis path.</p>
+<p>Import validation in this report checks unique visitor/user/session IDs, session-to-user and session-to-config references, and agreement between user session totals and 13,385 session rows. These checks pass. A separate semantic check identifies the nine activation flags without sessions. Before live ingestion, also validate timestamps, duplicate event IDs, redaction, schema versions and webhook authentication.</p>
+<p><img alt="Figure 4.3. Conceptual data architecture. It does not assert that external services were deployed or contacted." src="images/4_3_import_pipeline.png" /></p>
+<p><em>Figure 4.3. Conceptual data architecture. It does not assert that external services were deployed or contacted.</em></p>
+<p>Evidence: analytics/generate_data.py; analytics/build_workbook.py; convex/etlExport.ts; etl/webhook.ts; etl/models/; frontend/analytics.js.</p>
+<h2>4.4 Analysis and Identifying the Issue(s) and Solution(s) for the Same (With Data Evidence)</h2>
+<p>The following issues are grounded in the supplied synthetic records or inspected code. Proposed causes remain hypotheses until tested on observed product activity.</p>
+<table>
+<thead>
+<tr>
+<th>Issue and evidence</th>
+<th>Interpretation / proposed solution</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Only 6.95% of visitors sign up; 19,291 drop off.</td>
+<td>Test clearer value propositions, sample insights and a concise demo CTA.</td>
+</tr>
+<tr>
+<td>476 of 1,440 signups lack a connected key (33.1%).</td>
+<td>Offer provider guidance and an explicit demo path; measure actual connection success separately.</td>
+</tr>
+<tr>
+<td>Campus activation 50.0% vs outside-campus 59.4%: a 9.4-point gap.</td>
+<td>Test a workshop follow-through checklist; do not infer that location causes low activation.</td>
+</tr>
+<tr>
+<td>Campus inactivity 35.8% vs outside-campus 36.5%.</td>
+<td>Treat inactivity as a shared issue; do not claim disproportionate campus churn.</td>
+</tr>
+<tr>
+<td>August CWI 0.429 vs the repo target &lt;=0.25; efficiency 0.774 vs &gt;=0.80.</td>
+<td>Investigate prompt length, repeated context and provider/model fit; validate changes against quality.</td>
+</tr>
+<tr>
+<td>Nine activation flags have no session; immature retention cohorts enter some denominators.</td>
+<td>Derive observed activation from sessions and require complete retention windows.</td>
+</tr>
+<tr>
+<td>Synthetic security training repeats benign prompts and uses template-derived labels.</td>
+<td>Deduplicate; hold out attack families; obtain independently reviewed labels before deployment.</td>
+</tr>
+</tbody>
+</table>
+<p><img alt="Figure 4.4. Location activation and inactivity use different denominators. Location differences are descriptive, not causal." src="images/4_4_segment_evidence.png" /></p>
+<p><em>Figure 4.4. Location activation and inactivity use different denominators. Location differences are descriptive, not causal.</em></p>
+<p>Targets are internal values from kpi_definitions.csv, not externally validated industry benchmarks. Its prefilled status labels are not reliable evidence of target attainment; the numeric comparison above takes precedence.</p>
+<h2>4.5 Arrive at Strategy and Implement</h2>
+<p>The recommended strategy is to shorten time-to-value, make repeated monitoring useful, and validate security scoring before enforcement. The repository already contains parts of this strategy, but code presence is not proof of production deployment or improved outcomes.</p>
+<table>
+<thead>
+<tr>
+<th>Workstream</th>
+<th>Current evidence</th>
+<th>Next implementation / acceptance criterion</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Instrument onboarding</td>
+<td>analytics.js records key-entry, submission, acceptance and dashboard events with safe metadata.</td>
+<td>Add a server-confirmed first monitoring-session event, deduplication and a defined activation window.</td>
+</tr>
+<tr>
+<td>Remove demo friction</td>
+<td>key.html has DEMO_MODE, provider fallback and local dashboard navigation.</td>
+<td>Keep demo vs validated-provider success separate; verify a real provider only in the production flow.</td>
+</tr>
+<tr>
+<td>Enable recurring value</td>
+<td>Feature flags show 65.9% synthetic custom-alert adoption.</td>
+<td>Test an opt-in weekly insights digest and useful threshold alerts; monitor opt-outs and false alerts.</td>
+</tr>
+<tr>
+<td>Make risk scoring safe</td>
+<td>ML service contains six-risk scoring and CRI-based actions.</td>
+<td>Use shadow mode and independent labels before allowing automated restrictions.</td>
+</tr>
+</tbody>
+</table>
+<p>Priority order: repair metric definitions first; validate the first-session event next; then test onboarding and retention changes. Product analytics owners should track activation, while security owners audit model errors and threshold decisions. This report and ten reproducible figures are implemented deliverables; new product features and live experiments are not claimed as completed.</p>
+<p><img alt="Figure 4.5. Strategy roadmap explicitly distinguishes existing code from recommended work." src="images/4_5_strategy.png" /></p>
+<p><em>Figure 4.5. Strategy roadmap explicitly distinguishes existing code from recommended work.</em></p>
+<p>Privacy requirement: never place API-key material in analytics events or reports. Existing GA4 safeguards allowlist parameter names and filter secret-looking values. Real credentials should not rely on the demo localStorage mechanism for production security.</p>
+<h2>4.6 Synthetic Data Generation</h2>
+<p>Synthetic data enables reproducible analytics demonstrations without exposing customer activity. The product generator fixes random.seed(42), uses dates from 1 March to 20 September 2026, and simulates acquisition channels, personas, campus/outside-campus segments, provider setups, usage lifetimes, telemetry and feature adoption.</p>
+<p>Primary join paths are anonymous_visitor_id to visitor_id, user_id across signup/config/session tables, and config_id from sessions to configurations. Location-specific user CSVs partition the signup table and must be unioned rather than counted as extra users. Derived funnel, monthly KPI, cohort and feature-adoption CSVs summarize these records.</p>
+<p>A second generator in etl/ml-service/processor.py builds security-training examples: five benign prompt templates repeated ten times (50 examples), plus the first three phrases from each of nine attack categories (27 examples). This produces 77 rows, many of which are duplicate or closely related examples. Risk labels are hand-assigned templates, not expert judgments of real attacks.</p>
+<p>Generation limitations matter: location, persona and onboarding effects are deliberately encoded in probabilities. Their apparent relationships are simulation assumptions, not discovered behavioral laws. Security labels mainly cover low-risk ranges; they do not adequately validate high or critical risk. Expand scenarios, diversify providers and language, and split by template family before using this data for model evaluation.</p>
+<p><img alt="Figure 4.6. Row counts of the primary product-analytics datasets. These are not human participant counts." src="images/4_6_synthetic_data.png" /></p>
+<p><em>Figure 4.6. Row counts of the primary product-analytics datasets. These are not human participant counts.</em></p>
+<p>Rebuild original data only when needed: python3 analytics/generate_data.py; python3 analytics/build_workbook.py. This report reads existing CSVs and does not regenerate or overwrite the original analytics pack.</p>
+<h2>4.7 A/B Test</h2>
+<p>No recorded randomized experiment, treatment assignments or A/B outcomes were found in the inspected project. This section presents a proposed experiment, not a completed test. Hypothesis: guided onboarding with a first-session checklist increases observed activation compared with the current flow.</p>
+<table>
+<thead>
+<tr>
+<th>Design element</th>
+<th>Proposed specification</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Unit and assignment</td>
+<td>New signup; stable 50:50 assignment, stratified by collection location; exclude internal/test accounts.</td>
+</tr>
+<tr>
+<td>Control A</td>
+<td>Current onboarding flow.</td>
+</tr>
+<tr>
+<td>Treatment B</td>
+<td>Same flow plus provider guidance, a first-session checklist and one follow-up nudge.</td>
+</tr>
+<tr>
+<td>Primary outcome</td>
+<td>At least one real monitoring session within seven days of signup; intention-to-treat denominator.</td>
+</tr>
+<tr>
+<td>Secondary / guardrails</td>
+<td>Connection success, session quality, mature W4 retention, setup errors, opt-outs and safety alerts.</td>
+</tr>
+<tr>
+<td>Decision rule</td>
+<td>Pre-register sample size and analysis; report absolute uplift and 95% confidence interval after all follow-up windows close.</td>
+</tr>
+</tbody>
+</table>
+<p>Illustrative planning calculation only: using the synthetic flagged signup activation rate p1 = 813/1,440 = 56.46% as a rough baseline and a minimum detectable absolute improvement of 8 percentage points (p2 = 64.46%), a two-sided normal approximation with alpha 0.05 and 80% power requires about 586 signups per arm (1,172 total). Re-estimate this after measuring the real primary outcome, since the synthetic baseline uses a different activation definition. Do not stop early for significance without a sequential-testing design.</p>
+<p>Sample-size formula per arm: n = [1.96<em>sqrt(2</em>p_bar<em>(1-p_bar)) + 0.842</em>sqrt(p1<em>(1-p1)+p2</em>(1-p2))]^2 / (p2-p1)^2. No uplift, p-value, confidence interval or winner is reported because no experimental observations exist.</p>
+<p><img alt="Figure 4.7. Proposed experiment flow. This is not a chart of observed A/B performance." src="images/4_7_ab_test.png" /></p>
+<p><em>Figure 4.7. Proposed experiment flow. This is not a chart of observed A/B performance.</em></p>
+<h2>4.8 Identify the Right Model and Train</h2>
+<p>The repository's ML task is event-level security-risk estimation, not user-churn prediction. etl/ml-service/model.py implements MultiOutputRegressor around XGBRegressor to estimate injection, leakage, hallucination, bias, anomaly and tool-misuse risk. An additional XGBClassifier predicts CRI levels. XGBoost is a plausible candidate for engineered tabular features, but it has not been demonstrated to be the best model by this report.</p>
+<p>Feature extraction includes prompt/response lengths, attack-pattern indicators, leakage markers, token/latency ratios and provider/model metadata. Default model settings are 100 estimators, maximum depth 10, learning rate 0.1 and random state 42. The fit routine scales features and trains the regressors/classifier. A scaler is not generally required for tree models, but it is present in the code.</p>
+<table>
+<thead>
+<tr>
+<th>Validation gate</th>
+<th>Required action before claiming a trained, reliable model</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Consistent labels</td>
+<td>Replace the synthetic trainer's unweighted mean CRI labels with labels based on the configured weighted CRI, or document an independently reviewed target.</td>
+</tr>
+<tr>
+<td>Coverage and class handling</td>
+<td>The 77-row generator supplies minimal/low labels, while the classifier config specifies five classes. Test library compatibility and class handling; add high-risk coverage.</td>
+</tr>
+<tr>
+<td>Leakage-resistant split</td>
+<td>Deduplicate repeated benign prompts; hold out prompt/attack families or later time periods before fitting preprocessing.</td>
+</tr>
+<tr>
+<td>Candidate comparison</td>
+<td>Compare constant/rule baselines, regularized linear regression, random forest and XGBoost using the same folds.</td>
+</tr>
+<tr>
+<td>Evaluation and audit</td>
+<td>Report per-risk MAE/RMSE, high-risk recall, false-positive rates, calibration and inference latency on independent labels.</td>
+</tr>
+</tbody>
+</table>
+<p>The inspected BatchTrainer sends its available examples directly into fit; it does not execute a held-out evaluation. Training entry points are python train.py --synthetic and python train.py --database from etl/ml-service. They require service dependencies and, for the database path, configured labeled data. This report does not run training, certify these commands, create a model artifact or invent accuracy scores.</p>
+<p><img alt="Figure 4.8. Existing model design with proposed validation gates, not a completed model-selection result." src="images/4_8_model_training.png" /></p>
+<p><em>Figure 4.8. Existing model design with proposed validation gates, not a completed model-selection result.</em></p>
+<h2>4.9 Model Predictions and Recommendations</h2>
+<p>At inference, the intended service extracts features, predicts six risk values, clips each to [0,1], and computes a weighted Cognitive Risk Index (CRI). The configured equation is CRI = 0.25<em>injection + 0.20</em>leakage + 0.15<em>hallucination + 0.10</em>bias + 0.15<em>anomaly + 0.15</em>tool_misuse.</p>
+<table>
+<thead>
+<tr>
+<th>CRI range</th>
+<th>Configured action</th>
+<th>Recommended operational handling</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0.00 &lt;= CRI &lt; 0.20</td>
+<td>allow</td>
+<td>Log and monitor; a low score is not a safety guarantee.</td>
+</tr>
+<tr>
+<td>0.20 &lt;= CRI &lt; 0.50</td>
+<td>warn</td>
+<td>Show risk context; review flagged content if relevant.</td>
+</tr>
+<tr>
+<td>0.50 &lt;= CRI &lt; 0.75</td>
+<td>restrict</td>
+<td>Consider limiting tools or sensitive operations after validation.</td>
+</tr>
+<tr>
+<td>0.75 &lt;= CRI &lt;= 1.00</td>
+<td>block</td>
+<td>Candidate for blocking, with an audited override / review path.</td>
+</tr>
+</tbody>
+</table>
+<p>Worked arithmetic example, not model output: risk vector [0.80, 0.30, 0.20, 0.10, 0.40, 0.20] gives CRI = 0.390. The configured action is warn; the separate trust mapping marks it restricted (trust threshold 0.25). CRI-level category thresholds differ from action thresholds, and the optional classifier can disagree with the weighted-score category. Report these fields separately rather than assuming they are interchangeable.</p>
+<p>Recommended user-facing responses include isolating untrusted instructions for injection risk, redacting sensitive output for leakage risk, and checking claims against trusted evidence for hallucination risk. A lexical feature model cannot verify factual truth or prove an interaction safe. Begin in shadow mode; calibrate thresholds and assess false positives before any automated enforcement.</p>
+<p><img alt="Figure 4.9. Configured CRI risk weights. No live or trained-model predictions are presented." src="images/4_9_risk_weights.png" /></p>
+<p><em>Figure 4.9. Configured CRI risk weights. No live or trained-model predictions are presented.</em></p>
+<p>Evidence: etl/ml-service/config.py; model.py (_compute_cri, _get_action, _get_trust_level, predict); main.py prediction endpoints.</p>
+<h2>4.10 Observations/Results</h2>
+<p>The reproducible result is a descriptive analysis of the existing synthetic project dataset, supported by source inspection. It establishes where the simulated funnel leaks and which measurements need correction; it does not establish real-world business impact.</p>
+<table>
+<thead>
+<tr>
+<th>Observation</th>
+<th>Result and interpretation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Dataset scale</td>
+<td>20,731 visitors; 1,440 signups; 1,194 key configs; 13,385 sessions.</td>
+</tr>
+<tr>
+<td>Activation</td>
+<td>813 flagged users (56.46% of signups), but 804 session-observed users; nine flags need reconciliation.</td>
+</tr>
+<tr>
+<td>Inactivity</td>
+<td>295 / 813 = 36.3% using the repository proxy; not cancellation churn.</td>
+</tr>
+<tr>
+<td>Location</td>
+<td>50.0% campus vs 59.4% outside-campus activation; no meaningful descriptive campus inactivity excess.</td>
+</tr>
+<tr>
+<td>Complete-month engagement</td>
+<td>Synthetic MAU grows from 68 in March to 429 in August; August DAU/MAU is 20.1%.</td>
+</tr>
+<tr>
+<td>Quality / safety (August)</td>
+<td>CWI 0.429; efficiency 0.774; average CRI 0.205; these are simulated telemetry aggregates.</td>
+</tr>
+<tr>
+<td>Experiment and ML outcomes</td>
+<td>No observed A/B uplift, validated model accuracy or independently measured deployment impact is available.</td>
+</tr>
+</tbody>
+</table>
+<p><img alt="Figure 4.10. Synthetic MAU trend across complete months. Increased simulated usage is not evidence that an intervention worked." src="images/4_10_results.png" /></p>
+<p><em>Figure 4.10. Synthetic MAU trend across complete months. Increased simulated usage is not evidence that an intervention worked.</em></p>
+<p>Conclusion: prioritize clean observed-activation metrics, guided onboarding and validated risk scoring. Use mature cohorts for retention and a randomized test to estimate intervention effects. Keep product-analytics simulation, model training, and real production measurements clearly separated.</p>
+<p>Evidence limitations: no live GA4, Firebase, Convex or PostgreSQL data was accessed; no experiment or model training was executed. The original analytics CSVs and application implementation remain unchanged. All ten figures were programmatically created from repository values or labeled implementation/design diagrams.</p>
+<h2>Source files and reproduction</h2>
+<p>Primary sources: <code>README.md</code>, <code>analytics/README.md</code>, <code>analytics/summary.json</code>, <code>analytics/data/*.csv</code>, <code>analytics/generate_data.py</code>, <code>frontend/analytics.js</code>, <code>frontend/key.html</code>, <code>convex/etlExport.ts</code>, <code>etl/webhook.ts</code>, <code>etl/models/</code>, and <code>etl/ml-service/{config,features,model,processor,train,main}.py</code>.</p>
+<p>Reproduce this chapter: <code>python3 -m venv .venv</code>, <code>.venv/bin/pip install -r "product analytics/requirements.txt"</code>, then <code>.venv/bin/python "product analytics/build_report.py"</code>. Original source datasets are read-only inputs. <code>evidence.json</code> records computed counts and mature week-four retention.</p></main></html>
